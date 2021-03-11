@@ -29,7 +29,7 @@
 #define MATRIX_COLS 14
 
 //underglow
-#define MATRIX_ROW_PINS { A9, A10, B13, B14, B15}
+#define MATRIX_ROW_PINS { A9, A10, B13, B14, B15    }
 #define MATRIX_COL_PINS { A8, A2, A1, A0, B11, B10, B2, B1, B0, A7, A6, A5, A4, A3 }
 #define UNUSED_PINS
 
@@ -49,11 +49,11 @@
 #define I2C1_SDA            9
 #define I2C1_SCL_PAL_MODE   1
 #define I2C1_SDA_PAL_MODE   1
-#define I2C1_TIMINGR_PRESC  0U
-#define I2C1_TIMINGR_SCLDEL 3U
-#define I2C1_TIMINGR_SDADEL 1U
-#define I2C1_TIMINGR_SCLH   3U
-#define I2C1_TIMINGR_SCLL   9U
+#define I2C1_TIMINGR_PRESC  2U
+#define I2C1_TIMINGR_SCLDEL 7U
+#define I2C1_TIMINGR_SDADEL 0U
+#define I2C1_TIMINGR_SCLH   13U
+#define I2C1_TIMINGR_SCLL   42U
 
 // I2C EEPROM Chip
 #define EEPROM_I2C_24LC256
@@ -61,13 +61,18 @@
 // Dynamic Keymap
 //#define DYNAMIC_KEYMAP_EEPROM_MAX_ADDR  65535
 
-// PWM RGB Underglow Defines
-#define WS2812_PWM_DRIVER PWMD3
-#define WS2812_PWM_CHANNEL 2
-#define WS2812_PWM_PAL_MODE 1
-#define WS2812_DMA_STREAM STM32_DMA1_STREAM3
-#define WS2812_DMA_CHANNEL 3
-#define WS2812_EXTERNAL_PULLUP
+// // PWM RGB Underglow Defines
+// #define WS2812_PWM_DRIVER PWMD3
+// #define WS2812_PWM_CHANNEL 2
+// #define WS2812_PWM_PAL_MODE 1
+// #define WS2812_DMA_STREAM STM32_DMA1_STREAM3
+// #define WS2812_DMA_CHANNEL 3
+// #define WS2812_EXTERNAL_PULLUP
+
+// SPI RGB Underglow Defines
+#define WS2812_SPI SPID1 // default: SPID1
+#define WS2812_SPI_MOSI_PAL_MODE 5 // Pin "alternate function", see the respective datasheet for the appropriate values for your MCU. default: 5
+
 
 // This conditionally compiles the backlight code for Dawn60 specifics
 #define RGB_BACKLIGHT_ENABLED 1
@@ -80,7 +85,7 @@
 //RGB Underglow defines
 #define RGB_DI_PIN B5
 #define WS2812_LED_TOTAL 20
-#define RGBLED_NUM WS2812_LED_TOTAL
+#define RGBLED_NUM 20
 
 #define RGB_UNDERGLOW_ALPHA_TOP_START 0
 #define RGB_UNDERGLOW_ALPHA_TOP_END   6   
@@ -144,3 +149,6 @@
 
 // VIA lighting is handled by the keyboard-level code
 #define VIA_CUSTOM_LIGHTING_ENABLE
+
+
+#define DEBUG_MATRIX_SCAN_RATE

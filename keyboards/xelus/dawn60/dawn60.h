@@ -21,6 +21,6 @@
     #include "rev1.h"
 #elif defined(KEYBOARD_xelus_dawn60_rev1_qmk)
     #include "rev1_qmk.h"
-#elif defined(KEYBOARD_xelus_dawn60_rev2)
-    #include "rev2.h"
+#elif defined(KEYBOARD_xelus_dawn60_rev2_l433)
+    #include "rev2_l433.h"
 #endif
