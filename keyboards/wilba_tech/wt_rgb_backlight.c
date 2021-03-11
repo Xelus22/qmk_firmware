@@ -25,11 +25,11 @@
     defined(RGB_BACKLIGHT_HS60) || \
     defined(RGB_BACKLIGHT_NK65) || \
     defined(RGB_BACKLIGHT_NK87) || \
-    defined(RGB_BACKLIGHT_KW_MEGA) || \
     defined(RGB_BACKLIGHT_NEBULA12) || \
-    defined(RGB_BACKLIGHT_NEBULA68) || \
+    defined(RGB_BACKLIGHT_NEBULA65) || \
     defined(RGB_BACKLIGHT_U80_A) || \
     defined(RGB_BACKLIGHT_DAWN60) || \
+    defined(RGB_BACKLIGHT_DAWN60REV2) || \
     defined(RGB_BACKLIGHT_WT60_B) || \
     defined(RGB_BACKLIGHT_WT60_BX) || \
     defined(RGB_BACKLIGHT_WT60_C) || \
@@ -51,16 +51,16 @@
 #include "wt_rgb_backlight_api.h"
 #include "wt_rgb_backlight_keycodes.h"
 
-#if !defined(RGB_BACKLIGHT_HS60) && !defined(RGB_BACKLIGHT_NK65) && !defined(RGB_BACKLIGHT_NK87) && !defined(RGB_BACKLIGHT_NEBULA68) && !defined(RGB_BACKLIGHT_NEBULA12) && !defined (RGB_BACKLIGHT_KW_MEGA)
+#if !defined(RGB_BACKLIGHT_HS60) && !defined(RGB_BACKLIGHT_NK65) && !defined(RGB_BACKLIGHT_NK87) && !defined(RGB_BACKLIGHT_NEBULA65) && !defined(RGB_BACKLIGHT_NEBULA12) && !defined(RGB_BACKLIGHT_DAWN60REV2)
 #include <avr/interrupt.h>
 #include "drivers/avr/i2c_master.h"
 #else
-#include <ch.h>
-#include <hal.h>
+#include "ch.h"
+#include "hal.h"
 #include "drivers/chibios/i2c_master.h"
 #endif
 
-#if defined(RGB_BACKLIGHT_DAWN60)
+#if defined(RGB_BACKLIGHT_DAWN60) || defined(RGB_BACKLIGHT_DAWN60REV2)
 #include "ws2812.h"
 LED_TYPE g_ws2812_leds[WS2812_LED_TOTAL];
 #endif
@@ -82,7 +82,7 @@ LED_TYPE g_ws2812_leds[WS2812_LED_TOTAL];
 #elif defined(RGB_BACKLIGHT_HS60)
 #include "drivers/issi/is31fl3733.h"
 #define BACKLIGHT_LED_COUNT 64
-#elif defined(RGB_BACKLIGHT_NK65) || defined(RGB_BACKLIGHT_NEBULA68) || defined(RGB_BACKLIGHT_KW_MEGA)
+#elif defined(RGB_BACKLIGHT_NK65) || defined(RGB_BACKLIGHT_NEBULA65)
 #include "drivers/issi/is31fl3733.h"
 #define BACKLIGHT_LED_COUNT 69
 #elif defined(RGB_BACKLIGHT_NK87)
@@ -94,6 +94,8 @@ LED_TYPE g_ws2812_leds[WS2812_LED_TOTAL];
 #define BACKLIGHT_LED_COUNT 108
 #elif defined(RGB_BACKLIGHT_DAWN60)
 #define BACKLIGHT_LED_COUNT 84  //64 + 20
+#elif defined(RGB_BACKLIGHT_DAWN60REV2)
+#define BACKLIGHT_LED_COUNT 92  //72 + 20
 #elif defined(RGB_BACKLIGHT_NEBULA12)
 #define BACKLIGHT_LED_COUNT 16
 #elif defined(RGB_BACKLIGHT_M10_C)
@@ -228,7 +230,7 @@ const is31_led g_is31_leds[DRIVER_LED_TOTAL] = {
     {0, K_16,  J_16,  L_16}, //LA64
 };
 
-#elif defined(RGB_BACKLIGHT_NK65) || defined(RGB_BACKLIGHT_NEBULA68) || defined(RGB_BACKLIGHT_NK87) || defined(RGB_BACKLIGHT_KW_MEGA)
+#elif defined(RGB_BACKLIGHT_NK65) || defined(RGB_BACKLIGHT_NEBULA65) || defined(RGB_BACKLIGHT_NK87)
 
 // This is a 7-bit address, that gets left-shifted and bit 0
 // set to 0 for write, 1 for read (as per I2C protocol)
@@ -1002,7 +1004,7 @@ const Point g_map_led_to_point_polar[BACKLIGHT_LED_COUNT] PROGMEM = {
     {255,255},// LA61 does not exit, dummy
     {209,255}, {215,255}, {220,255}
 };
-#elif defined(RGB_BACKLIGHT_NK65) || defined(RGB_BACKLIGHT_KW_MEGA)
+#elif defined(RGB_BACKLIGHT_NK65)
 const Point g_map_led_to_point[BACKLIGHT_LED_COUNT] PROGMEM = {
     // LA1..LA60
     {0,0}, {4,16}, {6,32}, {10,48}, {16,0}, {24,16}, {28,32}, {36,48}, {32,0}, {40,16}, {44,32}, {52,48},
@@ -1062,7 +1064,7 @@ const Point g_map_led_to_point_polar[BACKLIGHT_LED_COUNT] PROGMEM = {
     {255,255}, {255,255}, {255,255}, {255,255},
     {200,196}, {192,192}, {184,196}, {213,74}
 };
-#elif defined(RGB_BACKLIGHT_NEBULA68)
+#elif defined(RGB_BACKLIGHT_NEBULA65)
 const Point g_map_led_to_point[BACKLIGHT_LED_COUNT] PROGMEM = {
     // LA1..LA60
     {0,0}, {4,16}, {6,31}, {10,47}, {16,0}, {24,16}, {27,31}, {35,47}, {31,0}, {39,16}, {43,31}, {51,47},
@@ -1156,10 +1158,51 @@ const Point g_map_led_to_point_polar[BACKLIGHT_LED_COUNT] PROGMEM = {
     //11 - 20
     {234,255}, {222,255}, {213,255}, {197,255}, {180,255}, {167,255}, {152,255}, {147,255}, {128,255}, {101,255}
 };
+#elif defined(RGB_BACKLIGHT_DAWN60REV2)
+const Point g_map_led_to_point[BACKLIGHT_LED_COUNT] PROGMEM = {
+    // LA0..LA17
+    {255,255}, {104, 16}, {88 , 16}, {72 , 16}, {56 , 16}, {40 , 16}, {24 , 16}, {4  , 16}, {6  , 32},
+    {112,  0}, {96 ,  0}, {80 ,  0}, {64 ,  0}, {48 ,  0}, {32 ,  0}, {16 ,  0}, {0  ,  0}, {255,255},
+
+    // LB0..LB17
+    {128,  0}, {144,  0}, {160,  0}, {176,  0}, {192,  0}, {208,  0}, {216,  0}, {224,  0}, {214, 32},
+    {120, 16}, {136, 16}, {152, 16}, {168, 16}, {184, 16}, {200, 16}, {220, 16}, {224, 48}, {224, 64},
+
+    // LC0..LC17
+    {112, 64}, {100, 48}, {84 , 48}, {68 , 48}, {52 , 48}, {36 , 48}, {102, 64}, {42 , 64}, {22 , 64},
+    {108, 32}, {92 , 32}, {76 , 32}, {60 , 32}, {44 , 32}, {28 , 32}, {10 , 48}, {2  , 64}, {255,255},
+
+    // LD0..LD17
+    {225, 64}, {124, 32}, {140, 32}, {156, 32}, {172, 32}, {188, 32}, {180, 48}, {202, 48}, {224, 64},
+    {116, 48}, {132, 48}, {148, 48}, {164, 48}, {160, 64}, {176, 64}, {192, 64}, {208, 64}, {200, 64},
+
+    //RGB UNDERGLOW
+    {27 ,  3}, {64 ,  3}, {100,  3}, {137,  3}, {173,  3}, {209,  3}, {242,  4}, {255,  8}, {255, 32}, {255, 64},
+    {241, 64}, {212, 64}, {173, 64}, {137, 64}, {100, 64}, {63 , 64}, {28 , 64}, {0  , 64}, {0  , 32}, {0  ,  8}
+};
+
+const Point g_map_led_to_point_polar[BACKLIGHT_LED_COUNT] PROGMEM = {
+    // LA0..LA17
+    {255,255}, { 70,129}, { 80,139}, { 89,157}, { 96,181}, {101,208}, {105,238}, {109,255}, {128,247},
+    { 64,255}, { 70,255}, { 75,255}, { 80,255}, { 85,255}, { 89,255}, { 93,255}, { 96,255}, {255,255},
+    // LB0..LB17
+    {255,255}, { 58,255}, { 53,255}, { 48,255}, { 43,255}, { 39,255}, { 34,255}, { 32,255}, {255,233},
+    { 58,129}, { 48,139}, { 39,157}, { 32,181}, { 27,208}, { 23,238}, { 19,255}, {237,255}, {255,255},
+    // LC0..LC17
+    {255,255}, {183,131}, {173,143}, {165,163}, {159,188}, {154,216}, {188,255}, {170,255}, {165,255},
+    {128,9  }, {128,46 }, {128,82 }, {128,119}, {128,155}, {128,192}, {147,255}, {161,255}, {255,255},
+    // LD0..LD17
+    {255,255}, {  0,27 }, {  0,64 }, {  0,101}, {  0,137}, {  0,174}, {228,201}, {235,255}, {224,255},
+    {195,128}, {206,136}, {215,152}, {222,175}, {208,255}, {213,255}, {217,255}, {222,225}, {255,255},
+
+    //UNDERGLOW, {A,D}
+    { 91,255}, { 84,255}, { 74,255}, { 60,255}, { 48,255}, { 39,255}, { 32,255}, { 27,255}, {  0,255}, {236,255},
+    {234,255}, {222,255}, {213,255}, {197,255}, {180,255}, {167,255}, {152,255}, {147,255}, {128,255}, {101,255}
+};
 #elif defined(RGB_BACKLIGHT_M50_A)
 const Point g_map_led_to_point[BACKLIGHT_LED_COUNT] PROGMEM = {
     // LA0..LA17
-    {255,255}, {104,16}, {88,16}, {72,16}, {56,16}, {40,16}, {24,16}, {255,255}, {255,255},
+    {255,255}, {104,16}, {88,16}, {72,16}, {56,16}, {40,16}, {24,16}, {255,255}, {255,255}, 
     {104,0}, {88,0}, {72,0}, {56,0}, {40,0}, {24,0}, {0,0}, {0,16}, {255,255},
     // LB0..LB17
     {255,255}, {120,0}, {136,0}, {152,0}, {168,0}, {184,0}, {200,0}, {255,255}, {255,255},
@@ -1198,8 +1241,7 @@ void map_led_to_point( uint8_t index, Point *point )
     point->x = pgm_read_byte(addr);
     point->y = pgm_read_byte(addr+1);
 
-#if defined(RGB_BACKLIGHT_M6_B) || defined(RGB_BACKLIGHT_M10_C) || defined(RGB_BACKLIGHT_HS60) || defined(RGB_BACKLIGHT_NK65) || \
-    defined(RGB_BACKLIGHT_NK87) || defined(RGB_BACKLIGHT_NEBULA68) || defined(RGB_BACKLIGHT_NEBULA12) || defined(RGB_BACKLIGHT_KW_MEGA)
+#if defined(RGB_BACKLIGHT_M6_B) || defined(RGB_BACKLIGHT_M10_C) || defined(RGB_BACKLIGHT_HS60) || defined(RGB_BACKLIGHT_NK65) || defined(RGB_BACKLIGHT_NK87) || defined(RGB_BACKLIGHT_NEBULA65) || defined(RGB_BACKLIGHT_NEBULA12) || defined(RGB_BACKLIGHT_DAWN60REV2)
     return;
 #endif
 
@@ -1402,7 +1444,7 @@ const uint8_t g_map_row_column_to_led[MATRIX_ROWS][MATRIX_COLS] PROGMEM = {
     {  4-1, 48-1,  8-1, 12-1, 16-1, 20-1, 24-1, 28-1, 32-1, 36-1, 40-1, 44-1,  255, 52-1 },
     { 57-1, 58-1, 59-1,  255,  255,  255, 60-1,  255,  255,  255, 62-1, 63-1, 64-1, 56-1 }
 };
-#elif defined(RGB_BACKLIGHT_NK65) || defined(RGB_BACKLIGHT_NEBULA68) || defined(RGB_BACKLIGHT_KW_MEGA)
+#elif defined(RGB_BACKLIGHT_NK65) || defined(RGB_BACKLIGHT_NEBULA65)
 //
 // LA1,  LA5,  LA9,  LA13, LA17, LA21, LA25, LA29, LA33, LA37, LA41, LA45, LA49, LA53, LB1,
 // LA2,  LA6,  LA10, LA14, LA18, LA22, LA26, LA30, LA34, LA38, LA42, LA46, LA50,  ---, LB2,
@@ -1471,8 +1513,22 @@ const uint8_t g_map_row_column_to_led[MATRIX_ROWS][MATRIX_COLS] PROGMEM = {
     { -1+16, -1+15, -1+14, -1+13, -1+12, -1+11, -1+10, -1+9 , 15+1 , 15+2 , 15+3 , 15+4 , 15+5 , 15+6 },
     { -1+7 , -1+6 , -1+5 , -1+4 , -1+3 , -1+2 , -1 +1, 15+9 , 15+10, 15+11, 15+12, 15+13, 15+14, 15+15},
     { -1+8 , 31+14, 31+13, 31+12, 31+11, 31+10, 31+9 , 47+1 , 47+2 , 47+3 , 47+4 , 47+5 , 15+8 , 15+7 },
-    { 31+15, 31+5 , 31+4 , 31+3 , 31+2 , 31+1 , 47+9 , 47+10, 47+11, 47+12, 255  ,47+6 , 47+7 , 15+16},
+    { 31+15, 31+5 , 31+4 , 31+3 , 31+2 , 31+1 , 47+9 , 47+10, 47+11, 47+12, 255  , 47+6 , 47+7 , 15+16},
     { 31+16, 31+8 , 31+7 , 255  , 255  , 31+6 , 255  , 255  , 255  , 47+13, 47+14, 47+15, 47+16, 47+8 }
+};
+#elif defined(RGB_BACKLIGHT_DAWN60REV2)
+//Dawn60
+// A16, A15, A14, A13, A12, A11, A10,  A9,  B0, B1,  B2,  B3,  B4,  B5,
+//  A7,  A6,  A5,  A4,  A3,  A2,  A1,  B9, B10, B11, B12, B13, B14, B15,
+//  A8, C14, C13, C12, C11, C10,  C9,  D1,  D2,  D3,  D4,  D5,  B8,  B7,
+// C15,  C5,  C4,  C3,  C2,  C1,  D9, D10, D11, D12, ---,  D0, B17, B16,
+// C16,  C8,  C7, ---, ---,  C6,  D6,  D7,  B6, D13, D14, D15, D16,  D8,
+const uint8_t g_map_row_column_to_led[MATRIX_ROWS][MATRIX_COLS] PROGMEM = {
+    {  0+16,  0+15,  0+14,  0+13,  0+12,  0+11,  0+10,  0+9 , 18+0 , 18+1 , 18+2 , 18+3 , 18+4 , 18+5  },
+    {  0+7 ,  0+6 ,  0+5 ,  0+4 ,  0+3 ,  0+2 ,  0+1 , 18+9 , 18+10, 18+11, 18+12, 18+13, 18+14, 18+15 },
+    {  0+8 , 36+14, 36+13, 36+12, 36+11, 36+10, 36+9 , 54+1 , 54+2 , 54+3 , 54+4 , 54+5 , 18+8 , 18+7  },
+    { 36+15, 36+5 , 36+4 , 36+3 , 36+2 , 36+1 , 54+9 , 54+10, 54+11, 54+12, 255  , 54+0 , 18+17, 18+16 },
+    { 36+16, 36+8 , 36+7 , 255  , 255  , 36+6 , 54+6 , 54+7 , 18+6 , 54+13, 54+14, 54+15, 54+16, 54+8  }
 };
 #elif defined(RGB_BACKLIGHT_M50_A)
 // LA15, LA14, LA13, LA12, LA11, LA10,  LA9,  LB1,  LB2,  LB3,  LB4,  LB5,  LB6
@@ -1506,7 +1562,7 @@ void backlight_update_pwm_buffers(void)
 #elif defined(RGB_BACKLIGHT_HS60)
     IS31FL3733_update_pwm_buffers( ISSI_ADDR_1, 0 );
     IS31FL3733_update_led_control_registers( ISSI_ADDR_1, 0 );
-#elif defined(RGB_BACKLIGHT_NK65) || defined(RGB_BACKLIGHT_NEBULA68) || defined(RGB_BACKLIGHT_NK87) || defined(RGB_BACKLIGHT_KW_MEGA)
+#elif defined(RGB_BACKLIGHT_NK65) || defined(RGB_BACKLIGHT_NEBULA65) || defined(RGB_BACKLIGHT_NK87)
     IS31FL3733_update_pwm_buffers( ISSI_ADDR_1, 0 );
     IS31FL3733_update_pwm_buffers( ISSI_ADDR_2, 1 );
     IS31FL3733_update_led_control_registers( ISSI_ADDR_1, 0 );
@@ -1544,14 +1600,14 @@ void backlight_set_color( int index, uint8_t red, uint8_t green, uint8_t blue )
 {
 #if defined(RGB_BACKLIGHT_M6_B)
     IS31FL3218_set_color( index, red, green, blue );
-#elif defined(RGB_BACKLIGHT_HS60) || defined(RGB_BACKLIGHT_NK65) || defined(RGB_BACKLIGHT_NEBULA68) || defined(RGB_BACKLIGHT_KW_MEGA)
+#elif defined(RGB_BACKLIGHT_HS60) || defined(RGB_BACKLIGHT_NK65) || defined(RGB_BACKLIGHT_NEBULA65)
     IS31FL3733_set_color( index, red, green, blue );
 #elif defined(RGB_BACKLIGHT_NK87)
     // This is done to avoid indicator LEDs being set
     if (( index != 63+64-1 ) && ( index != 48+64-1 )) {
         IS31FL3733_set_color( index, red, green, blue );
     }
-#elif defined(RGB_BACKLIGHT_DAWN60)
+#elif defined(RGB_BACKLIGHT_DAWN60) || defined(RGB_BACKLIGHT_DAWN60REV2)
     if( index < DRIVER_LED_TOTAL ) {
         IS31FL3731_set_color( index, red, green, blue );
     } else {
@@ -1569,7 +1625,7 @@ void backlight_set_color_all( uint8_t red, uint8_t green, uint8_t blue )
 {
 #if defined(RGB_BACKLIGHT_M6_B)
     IS31FL3218_set_color_all( red, green, blue );
-#elif defined(RGB_BACKLIGHT_HS60) || defined(RGB_BACKLIGHT_NK65) || defined(RGB_BACKLIGHT_NEBULA68) || defined(RGB_BACKLIGHT_KW_MEGA)
+#elif defined(RGB_BACKLIGHT_HS60) || defined(RGB_BACKLIGHT_NK65) || defined(RGB_BACKLIGHT_NEBULA65)
     // This is done to avoid indicator LEDs being set
     for (int i = 0; i < BACKLIGHT_LED_COUNT; i++) {
         IS31FL3733_set_color(i, red, green, blue);
@@ -1581,7 +1637,7 @@ void backlight_set_color_all( uint8_t red, uint8_t green, uint8_t blue )
             IS31FL3733_set_color(i, red, green, blue);
         }
     }
-#elif defined(RGB_BACKLIGHT_DAWN60)
+#elif defined(RGB_BACKLIGHT_DAWN60) || defined(RGB_BACKLIGHT_DAWN60REV2)
     IS31FL3731_set_color_all( red, green, blue );
     for (uint8_t i = 0; i < WS2812_LED_TOTAL; i++) {
         g_ws2812_leds[i].r = red;
@@ -1603,7 +1659,7 @@ void backlight_set_key_hit(uint8_t row, uint8_t column)
     g_any_key_hit = 0;
 }
 
-#if !defined(RGB_BACKLIGHT_HS60) && !defined(RGB_BACKLIGHT_NK65) && !defined(RGB_BACKLIGHT_NEBULA68) && !defined(RGB_BACKLIGHT_NEBULA12) && !defined(RGB_BACKLIGHT_NK87) && !defined(RGB_BACKLIGHT_KW_MEGA)
+#if !defined(RGB_BACKLIGHT_HS60) && !defined(RGB_BACKLIGHT_NK65) && !defined(RGB_BACKLIGHT_NEBULA65) && !defined(RGB_BACKLIGHT_NEBULA12) && !defined(RGB_BACKLIGHT_NK87) && !defined(RGB_BACKLIGHT_DAWN60REV2)
 // This is (F_CPU/1024) / 20 Hz
 // = 15625 Hz / 20 Hz
 // = 781
@@ -1661,6 +1717,28 @@ void backlight_timer_disable(void)
 {
     gptStopTimer(&GPTD3);
 }
+#elif defined(RGB_BACKLIGHT_DAWN60REV2) //STM32, use GPT with TIM3. Enable in halconf.h
+static void gpt_backlight_timer_task(GPTDriver *gptp);
+// Timer setup at 200Khz, callback at 10k ticks = 20Hz
+static GPTConfig gpt1cfg1 = {
+    .frequency = 200000U,
+    .callback  = gpt_backlight_timer_task
+};
+
+void backlight_timer_init(void)
+{
+    gptStart(&GPTD1, &gpt1cfg1);
+}
+
+void backlight_timer_enable(void)
+{
+    gptStartContinuous(&GPTD1, 10000);
+}
+
+void backlight_timer_disable(void)
+{
+    gptStopTimer(&GPTD1);
+}
 #else //STM32, use GPT with TIM4. Enable in halconf.h
 static void gpt_backlight_timer_task(GPTDriver *gptp);
 // Timer setup at 200Khz, callback at 10k ticks = 20Hz
@@ -1683,7 +1761,7 @@ void backlight_timer_disable(void)
 {
     gptStopTimer(&GPTD4);
 }
-#endif //!defined(RGB_BACKLIGHT_HS60) && !defined(RGB_BACKLIGHT_NK65) && !defined(RGB_BACKLIGHT_NEBULA68) && !defined(RGB_BACKLIGHT_NEBULA12) && !defined(RGB_BACKLIGHT_NK87) && !defined(RGB_BACKLIGHT_KW_MEGA)
+#endif //!defined(RGB_BACKLIGHT_HS60) && !defined(RGB_BACKLIGHT_NK65) && !defined(RGB_BACKLIGHT_NEBULA65) && !defined(RGB_BACKLIGHT_NEBULA12) && !defined(RGB_BACKLIGHT_NK87)
 
 void backlight_set_suspend_state(bool state)
 {
@@ -1815,6 +1893,11 @@ void backlight_effect_alphas_mods(void)
 #else
                 is_alpha = ( g_config.alphas_mods[row] & (1<<column) ) == 0;
 #endif
+#if defined(RGB_BACKLIGHT_DAWN60REV2)
+                if ( index == 18+5 && !g_config.use_split_backspace) { //LB5
+                    is_alpha = false;
+                }
+#endif
                 if ( is_alpha )
                 {
                     backlight_set_color( index, rgb1.r, rgb1.g, rgb1.b );
@@ -1826,7 +1909,7 @@ void backlight_effect_alphas_mods(void)
             }
         }
     }
-#if defined(RGB_BACKLIGHT_DAWN60)
+#if defined(RGB_BACKLIGHT_DAWN60) || defined(RGB_BACKLIGHT_DAWN60REV2)
     for (int i = 0; i < WS2812_LED_TOTAL; i++) {
         if ((RGB_UNDERGLOW_ALPHA_TOP_START <= i && i <= RGB_UNDERGLOW_ALPHA_TOP_END) ||
             (RGB_UNDERGLOW_ALPHA_BOT_START <= i && i <= RGB_UNDERGLOW_ALPHA_BOT_END)) {
@@ -1929,12 +2012,28 @@ void backlight_effect_cycle_all(void)
     for ( int i=0; i<BACKLIGHT_LED_COUNT; i++ )
     {
         uint16_t offset2 = g_key_hit[i]<<2;
-#if !defined(RGB_BACKLIGHT_HS60) && !defined(RGB_BACKLIGHT_NK65) && !defined(RGB_BACKLIGHT_DAWN60) && !defined(RGB_BACKLIGHT_NEBULA68) && !defined(RGB_BACKLIGHT_NEBULA12) && !defined(RGB_BACKLIGHT_NK87) && !defined(RGB_BACKLIGHT_KW_MEGA)
+#if !defined(RGB_BACKLIGHT_HS60) && !defined(RGB_BACKLIGHT_NK65) && !defined(RGB_BACKLIGHT_DAWN60) && !defined(RGB_BACKLIGHT_NEBULA65) && !defined(RGB_BACKLIGHT_NEBULA12) && !defined(RGB_BACKLIGHT_NK87) && !defined(RGB_BACKLIGHT_DAWN60REV2)
         // stabilizer LEDs use spacebar hits
         if ( i == 36+6 || i == 54+13 || // LC6, LD13
                 ( g_config.use_7u_spacebar && i == 54+14 ) ) // LD14
         {
             offset2 = g_key_hit[36+0]<<2;
+        }
+#endif
+#if defined(RGB_BACKLIGHT_DAWN60REV2)
+        //layout LED options
+        if ( i == 18+6 && !g_config.use_split_backspace ) {         //change if normal bsp- LB6
+            offset2 = g_key_hit[18+5]<<2;                           // LB5
+        } else if ( i == 18+7 && !g_config.use_split_backspace ) {  //change if normal bsp- LB7
+            offset2 = g_key_hit[18+5]<<2;                           // LB5
+        } else if ( i == 36+0 && g_config.use_7u_spacebar ) {       //change if tsangan
+            offset2 = g_key_hit[36+8]<<2;                           // LC8
+        } else if ( i == 54+17 && g_config.use_7u_spacebar ) {      //change if tsangan
+            offset2 = g_key_hit[54+15]<<2;                          // LD15
+        } else if ( i == 54+0 && g_config.use_split_right_shift ) { //change if arrows
+            offset2 = g_key_hit[54+6]<<2;                           // LD6
+        } else if ( i == 18+17 && g_config.use_split_right_shift ) {//change if arrows
+            offset2 = g_key_hit[54+7]<<2;                          // LD7
         }
 #endif
         offset2 = (offset2<=63) ? (63-offset2) : 0;
@@ -1954,12 +2053,28 @@ void backlight_effect_cycle_left_right(void)
     for ( int i=0; i<BACKLIGHT_LED_COUNT; i++ )
     {
         uint16_t offset2 = g_key_hit[i]<<2;
-#if !defined(RGB_BACKLIGHT_HS60) && !defined(RGB_BACKLIGHT_NK65) && !defined(RGB_BACKLIGHT_DAWN60) && !defined(RGB_BACKLIGHT_NEBULA68) && !defined(RGB_BACKLIGHT_NEBULA12) && !defined(RGB_BACKLIGHT_NK87) && !defined(RGB_BACKLIGHT_KW_MEGA)
+#if !defined(RGB_BACKLIGHT_HS60) && !defined(RGB_BACKLIGHT_NK65) && !defined(RGB_BACKLIGHT_DAWN60) && !defined(RGB_BACKLIGHT_NEBULA65) && !defined(RGB_BACKLIGHT_NEBULA12) && !defined(RGB_BACKLIGHT_NK87) && !defined(RGB_BACKLIGHT_DAWN60REV2)
         // stabilizer LEDs use spacebar hits
         if ( i == 36+6 || i == 54+13 || // LC6, LD13
                 ( g_config.use_7u_spacebar && i == 54+14 ) ) // LD14
         {
             offset2 = g_key_hit[36+0]<<2;
+        }
+#endif
+#if defined(RGB_BACKLIGHT_DAWN60REV2)
+        //layout LED options
+        if ( i == 18+6 && !g_config.use_split_backspace ) {         //change if normal bsp- LB6
+            offset2 = g_key_hit[18+5]<<2;                           // LB5
+        } else if ( i == 18+7 && !g_config.use_split_backspace ) {  //change if normal bsp- LB7
+            offset2 = g_key_hit[18+5]<<2;                           // LB5
+        } else if ( i == 36+0 && g_config.use_7u_spacebar ) {       //change if tsangan
+            offset2 = g_key_hit[36+8]<<2;                           // LC8
+        } else if ( i == 54+17 && g_config.use_7u_spacebar ) {      //change if tsangan
+            offset2 = g_key_hit[54+15]<<2;                          // LD15
+        } else if ( i == 54+0 && g_config.use_split_right_shift ) { //change if arrows
+            offset2 = g_key_hit[54+6]<<2;                           // LD6
+        } else if ( i == 18+17 && g_config.use_split_right_shift ) {//change if arrows
+            offset2 = g_key_hit[54+7]<<2;                          // LD7
         }
 #endif
         offset2 = (offset2<=63) ? (63-offset2) : 0;
@@ -1981,12 +2096,28 @@ void backlight_effect_cycle_up_down(void)
     for ( int i=0; i<BACKLIGHT_LED_COUNT; i++ )
     {
         uint16_t offset2 = g_key_hit[i]<<2;
-#if !defined(RGB_BACKLIGHT_HS60) && !defined(RGB_BACKLIGHT_NK65) && !defined(RGB_BACKLIGHT_DAWN60) && !defined(RGB_BACKLIGHT_NEBULA68) && !defined(RGB_BACKLIGHT_NEBULA12) && !defined(RGB_BACKLIGHT_NK87) && !defined(RGB_BACKLIGHT_KW_MEGA)
+#if !defined(RGB_BACKLIGHT_HS60) && !defined(RGB_BACKLIGHT_NK65) && !defined(RGB_BACKLIGHT_DAWN60) && !defined(RGB_BACKLIGHT_NEBULA65) && !defined(RGB_BACKLIGHT_NEBULA12) && !defined(RGB_BACKLIGHT_NK87) && !defined(RGB_BACKLIGHT_DAWN60REV2)
         // stabilizer LEDs use spacebar hits
         if ( i == 36+6 || i == 54+13 || // LC6, LD13
                 ( g_config.use_7u_spacebar && i == 54+14 ) ) // LD14
         {
             offset2 = g_key_hit[36+0]<<2;
+        }
+#endif
+#if defined(RGB_BACKLIGHT_DAWN60REV2)
+        //layout LED options
+        if ( i == 18+6 && !g_config.use_split_backspace ) {         //change if normal bsp- LB6
+            offset2 = g_key_hit[18+5]<<2;                           // LB5
+        } else if ( i == 18+7 && !g_config.use_split_backspace ) {  //change if normal bsp- LB7
+            offset2 = g_key_hit[18+5]<<2;                           // LB5
+        } else if ( i == 36+0 && g_config.use_7u_spacebar ) {       //change if tsangan
+            offset2 = g_key_hit[36+8]<<2;                           // LC8
+        } else if ( i == 54+17 && g_config.use_7u_spacebar ) {      //change if tsangan
+            offset2 = g_key_hit[54+15]<<2;                          // LD15
+        } else if ( i == 54+0 && g_config.use_split_right_shift ) { //change if arrows
+            offset2 = g_key_hit[54+6]<<2;                           // LD6
+        } else if ( i == 18+17 && g_config.use_split_right_shift ) {//change if arrows
+            offset2 = g_key_hit[54+7]<<2;                          // LD7
         }
 #endif
         offset2 = (offset2<=63) ? (63-offset2) : 0;
@@ -2102,7 +2233,7 @@ void backlight_effect_indicators_set_colors( uint8_t index, HS color )
         // do the same for the spacebar stabilizers
         if ( index == 36+0 ) // LC0
         {
-#if defined(RGB_BACKLIGHT_ZEAL65)
+#if defined(RGB_BACKLIGHT_ZEAL65)                
             backlight_set_color( 36+7, rgb.r, rgb.g, rgb.b ); // LC7
             backlight_set_color( 54+14, rgb.r, rgb.g, rgb.b ); // LD14
 #elif defined(RGB_BACKLIGHT_KOYU) || defined(RGB_BACKLIGHT_M65_B) || defined(RGB_BACKLIGHT_M65_BX)
@@ -2162,7 +2293,7 @@ void backlight_effect_indicators(void)
     }
 }
 
-#if !defined(RGB_BACKLIGHT_HS60) && !defined(RGB_BACKLIGHT_NK65) && !defined(RGB_BACKLIGHT_NEBULA68) && !defined(RGB_BACKLIGHT_NEBULA12) && !defined(RGB_BACKLIGHT_NK87) && !defined(RGB_BACKLIGHT_KW_MEGA)
+#if !defined(RGB_BACKLIGHT_HS60) && !defined(RGB_BACKLIGHT_NK65) && !defined(RGB_BACKLIGHT_NEBULA65) && !defined(RGB_BACKLIGHT_NEBULA12) && !defined(RGB_BACKLIGHT_NK87) && !defined(RGB_BACKLIGHT_DAWN60REV2)
 ISR(TIMER3_COMPA_vect)
 #else //STM32 interrupt
 static void gpt_backlight_timer_task(GPTDriver *gptp)
@@ -2689,7 +2820,7 @@ void backlight_init_drivers(void)
     // This actually updates the LED drivers
     IS31FL3733_update_led_control_registers( ISSI_ADDR_1, 0 );
     IS31FL3733_update_led_control_registers( ISSI_ADDR_2, 1 );
-#elif defined(RGB_BACKLIGHT_NEBULA68)
+#elif defined(RGB_BACKLIGHT_NEBULA65)
     IS31FL3733_init( ISSI_ADDR_1, 0 );
     IS31FL3733_init( ISSI_ADDR_2, 0 );
 
@@ -2697,20 +2828,6 @@ void backlight_init_drivers(void)
     {
         bool enabled = !( ( index == 61-1 )   || //LA61
                           ( index > 5+64-1 ) ); //LB6-LB64
-        // This only caches it for later
-        IS31FL3733_set_led_control_register( index, enabled, enabled, enabled );
-    }
-    // This actually updates the LED drivers
-    IS31FL3733_update_led_control_registers( ISSI_ADDR_1, 0 );
-    IS31FL3733_update_led_control_registers( ISSI_ADDR_2, 1 );
-#elif defined(RGB_BACKLIGHT_KW_MEGA)
-    IS31FL3733_init( ISSI_ADDR_1, 0 );
-    IS31FL3733_init( ISSI_ADDR_2, 0 );
-
-    for ( int index = 0; index < DRIVER_LED_TOTAL; index++ )
-    {
-        bool enabled = !( ( index == 61-1 )   || //LA61
-                          ( index > 6+64-1 ) ); //LB7-LB64
         // This only caches it for later
         IS31FL3733_set_led_control_register( index, enabled, enabled, enabled );
     }
@@ -2819,35 +2936,50 @@ void backlight_init_drivers(void)
         bool enabled = !( ( index == 15+7 && !g_config.use_split_backspace ) || //other backspace
                           ( index == 47+13 && g_config.use_7u_spacebar ) ||     //LD13
                           ( index == 47+15 && g_config.use_7u_spacebar ) );       //LD15
+#elif defined(RGB_BACKLIGHT_DAWN60REV2)
+        bool enabled = !( ( index == 18+6 && g_config.use_split_backspace ) ||      //normal backspace - LB6
+                          ( index == 36+0 && !g_config.use_7u_spacebar ) ||         //LC0
+                          ( index == 54+17 && !g_config.use_7u_spacebar ) ||        //LD17
+                          ( index == 36+6 && g_config.use_7u_spacebar ) ||          //LC6
+                          ( index == 54+13 && g_config.use_7u_spacebar ) ||         //LD13
+                          ( index == 54+15 && g_config.use_7u_spacebar ) ||         //LD15
+                          ( index == 54+16 && g_config.use_7u_spacebar ) ||         //LD16
+                          ( index == 54+0 && !g_config.use_split_right_shift ) ||   //LD0
+                          ( index == 18+17 && !g_config.use_split_right_shift ) ||  //LB17
+                          ( index == 54+6 && g_config.use_split_right_shift ) ||    //LD6
+                          ( index == 54+7 && g_config.use_split_right_shift ) ||    //LD7
+                          ( index == 0+17 ) ||                                      //LA17
+                          ( index == 36+17 ) ||                                     //LC17
+                          ( index == 0+0 ));                                        //LA0
 #elif defined(RGB_BACKLIGHT_NEBULA12)
         bool enabled = !( ( index >= 9-1 && index <= 12-1 ) ); // A9-A12
 #elif defined(RGB_BACKLIGHT_M50_A)
         bool enabled = !(
         // LA0, LA7, LA8, LA17
-                          ( index == 0+0 ) ||
-                          ( index == 0+7 ) ||
-                          ( index == 0+8 ) ||
-                          ( index == 0+17 ) ||
+                          ( index == 0+0 ) || 
+                          ( index == 0+7 ) || 
+                          ( index == 0+8 ) || 
+                          ( index == 0+17 ) || 
 
         // LB0, LB7, LB8, LB15, LB16, LB17,
-                          ( index == 18+0 ) ||
-                          ( index == 18+7 ) ||
-                          ( index == 18+8 ) ||
-                          ( index == 18+15 ) ||
-                          ( index == 18+16 ) ||
-                          ( index == 18+17 ) ||
+                          ( index == 18+0 ) || 
+                          ( index == 18+7 ) || 
+                          ( index == 18+8 ) || 
+                          ( index == 18+15 ) || 
+                          ( index == 18+16 ) || 
+                          ( index == 18+17 ) || 
         // LC0, LC8, LC16, LC17
-                          ( index == 36+0 ) ||
-                          ( index == 36+8 ) ||
-                          ( index == 36+16 ) ||
-                          ( index == 36+17 ) ||
+                          ( index == 36+0 ) || 
+                          ( index == 36+8 ) || 
+                          ( index == 36+16 ) || 
+                          ( index == 36+17 ) || 
         // LD0, LD7, LD8, LD9, LD15, LD16, LD17
-                          ( index == 54+0 ) ||
-                          ( index == 54+7 ) ||
-                          ( index == 54+8 ) ||
-                          ( index == 54+9 ) ||
-                          ( index == 54+15 ) ||
-                          ( index == 54+16 ) ||
+                          ( index == 54+0 ) || 
+                          ( index == 54+7 ) || 
+                          ( index == 54+8 ) || 
+                          ( index == 54+9 ) || 
+                          ( index == 54+15 ) || 
+                          ( index == 54+16 ) || 
                           ( index == 54+17 ) );
 #elif defined(RGB_BACKLIGHT_M10_C)
         bool enabled = true;
@@ -2861,7 +2993,7 @@ void backlight_init_drivers(void)
 #if !defined(RGB_BACKLIGHT_NEBULA12) && !defined(RGB_BACKLIGHT_M10_C)
     IS31FL3731_update_led_control_registers( ISSI_ADDR_2, 1 );
 #endif
-#if defined(RGB_BACKLIGHT_U80_A)
+#if defined(RGB_BACKLIGHT_U80_A)    
     IS31FL3731_update_led_control_registers( ISSI_ADDR_3, 2 );
 #endif
 #endif

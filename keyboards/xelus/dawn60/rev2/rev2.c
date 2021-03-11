@@ -13,14 +13,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#pragma once
-
-#include "quantum.h"
-
-#if defined(KEYBOARD_xelus_dawn60_rev1)
-    #include "rev1.h"
-#elif defined(KEYBOARD_xelus_dawn60_rev1_qmk)
-    #include "rev1_qmk.h"
-#elif defined(KEYBOARD_xelus_dawn60_rev2)
-    #include "rev2.h"
+#ifndef RGB_BACKLIGHT_DAWN60REV2
+#error RGB_BACKLIGHT_DAWN60REV2 not defined, you done goofed somehao, brah
 #endif
+
+#include "rev2.h"
+
+void matrix_io_delay(void) { __asm__ volatile("nop\nnop\nnop\n"); }
+
+void board_init(void) {
+    SYSCFG->CFGR1 |= SYSCFG_CFGR1_I2C1_DMA_RMP;
+}
