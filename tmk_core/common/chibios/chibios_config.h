@@ -23,10 +23,6 @@
 #    define USE_I2CV1
 #endif
 
-#if defined(STM32L4xx)
-#    define PAL_STM32_OSPEED_HIGHEST PAL_STM32_OSPEED_HIGH
-#endif
-
 // teensy
 #if defined(K20x) || defined(KL2x)
 #    define USE_I2CV1
