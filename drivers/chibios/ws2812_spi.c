@@ -82,13 +82,15 @@ void ws2812_init(void) {
 
     //TODO: more dynamic baudrate
     static const SPIConfig spicfg = {
-        0, NULL, PAL_PORT(RGB_DI_PIN), PAL_PAD(RGB_DI_PIN),
-        SPI_CR1_BR_1 | SPI_CR1_BR_0 | SPI_CR2_DS_2 | SPI_CR2_DS_1 | SPI_CR2_DS_0   // baudrate : fpclk / 8 => 1tick is 0.32us (2.25 MHz)
+        1, NULL, PAL_PORT(RGB_DI_PIN), PAL_PAD(RGB_DI_PIN),
+        SPI_CR1_BR_2  // baudrate : fpclk / 8 => 1tick is 0.32us (2.25 MHz)
     };
 
     spiAcquireBus(&WS2812_SPI);     /* Acquire ownership of the bus.    */
     spiStart(&WS2812_SPI, &spicfg); /* Setup transfer parameters.       */
     spiSelect(&WS2812_SPI);         /* Slave Select assertion.          */
+    //spiAbort(&WS2812_SPI);
+    spiStartSend(&WS2812_SPI, sizeof(txbuf) / sizeof(txbuf[0]), txbuf);
 }
 
 void ws2812_setleds(LED_TYPE* ledarray, uint16_t leds) {
@@ -107,6 +109,5 @@ void ws2812_setleds(LED_TYPE* ledarray, uint16_t leds) {
 #ifdef WS2812_SPI_SYNC
     spiSend(&WS2812_SPI, sizeof(txbuf) / sizeof(txbuf[0]), txbuf);
 #else
-    spiStartSend(&WS2812_SPI, sizeof(txbuf) / sizeof(txbuf[0]), txbuf);
 #endif
 }
