@@ -80,10 +80,10 @@ static void set_led_color_rgb(LED_TYPE color, int pos) {
 void ws2812_init(void) {
     palSetLineMode(RGB_DI_PIN, WS2812_OUTPUT_MODE);
 
-    // TODO: more dynamic baudrate
+    //TODO: more dynamic baudrate
     static const SPIConfig spicfg = {
         0, NULL, PAL_PORT(RGB_DI_PIN), PAL_PAD(RGB_DI_PIN),
-        SPI_CR1_BR_1 | SPI_CR1_BR_0  // baudrate : fpclk / 8 => 1tick is 0.32us (2.25 MHz)
+        SPI_CR1_BR_1 | SPI_CR1_BR_0 | SPI_CR2_DS_2 | SPI_CR2_DS_1 | SPI_CR2_DS_0   // baudrate : fpclk / 8 => 1tick is 0.32us (2.25 MHz)
     };
 
     spiAcquireBus(&WS2812_SPI);     /* Acquire ownership of the bus.    */

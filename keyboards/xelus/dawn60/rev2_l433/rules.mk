@@ -24,15 +24,14 @@ RGBLIGHT_ENABLE = no        # Enable keyboard RGB underglow
 BLUETOOTH_ENABLE = no       # Enable Bluetooth
 AUDIO_ENABLE = no           # Audio output
 EEPROM_DRIVER = i2c
-
 #CIE1931_CURVE = yes
 LAYOUT = LAYOUT_all
 
 # project specific files
-# SRC +=	keyboards/wilba_tech/wt_main.c \
-# 		keyboards/wilba_tech/wt_rgb_backlight.c \
-# 		drivers/issi/is31fl3731.c \
-# 		quantum/color.c \
-# 		drivers/chibios/ws2812_spi.c
+SRC +=	keyboards/wilba_tech/wt_main.c \
+		keyboards/wilba_tech/wt_rgb_backlight.c \
+		drivers/issi/is31fl3731.c \
+		quantum/color.c \
+		drivers/chibios/ws2812.c
 
-# QUANTUM_LIB_SRC += i2c_master.c 
+QUANTUM_LIB_SRC += i2c_master.c 

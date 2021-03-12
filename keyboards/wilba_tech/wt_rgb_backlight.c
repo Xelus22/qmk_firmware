@@ -2937,17 +2937,17 @@ void backlight_init_drivers(void)
                           ( index == 47+13 && g_config.use_7u_spacebar ) ||     //LD13
                           ( index == 47+15 && g_config.use_7u_spacebar ) );       //LD15
 #elif defined(RGB_BACKLIGHT_DAWN60REV2)
-        bool enabled = !( ( index == 18+6 && g_config.use_split_backspace ) ||      //normal backspace - LB6
-                          ( index == 36+0 && !g_config.use_7u_spacebar ) ||         //LC0
-                          ( index == 54+17 && !g_config.use_7u_spacebar ) ||        //LD17
-                          ( index == 36+6 && g_config.use_7u_spacebar ) ||          //LC6
-                          ( index == 54+13 && g_config.use_7u_spacebar ) ||         //LD13
-                          ( index == 54+15 && g_config.use_7u_spacebar ) ||         //LD15
-                          ( index == 54+16 && g_config.use_7u_spacebar ) ||         //LD16
-                          ( index == 54+0 && !g_config.use_split_right_shift ) ||   //LD0
-                          ( index == 18+17 && !g_config.use_split_right_shift ) ||  //LB17
-                          ( index == 54+6 && g_config.use_split_right_shift ) ||    //LD6
-                          ( index == 54+7 && g_config.use_split_right_shift ) ||    //LD7
+         bool enabled = !( //( index == 18+6 && g_config.use_split_backspace ) ||      //normal backspace - LB6
+        //                   ( index == 36+0 && !g_config.use_7u_spacebar ) ||         //LC0
+        //                   ( index == 54+17 && !g_config.use_7u_spacebar ) ||        //LD17
+        //                   ( index == 36+6 && g_config.use_7u_spacebar ) ||          //LC6
+        //                   ( index == 54+13 && g_config.use_7u_spacebar ) ||         //LD13
+        //                   ( index == 54+15 && g_config.use_7u_spacebar ) ||         //LD15
+        //                   ( index == 54+16 && g_config.use_7u_spacebar ) ||         //LD16
+        //                   ( index == 54+0 && !g_config.use_split_right_shift ) ||   //LD0
+        //                   ( index == 18+17 && !g_config.use_split_right_shift ) ||  //LB17
+        //                   ( index == 54+6 && g_config.use_split_right_shift ) ||    //LD6
+        //                   ( index == 54+7 && g_config.use_split_right_shift ) ||    //LD7
                           ( index == 0+17 ) ||                                      //LA17
                           ( index == 36+17 ) ||                                     //LC17
                           ( index == 0+0 ));                                        //LA0

@@ -47,8 +47,8 @@
 // I2C Defines
 #define I2C1_SCL            8
 #define I2C1_SDA            9
-#define I2C1_SCL_PAL_MODE   1
-#define I2C1_SDA_PAL_MODE   1
+#define I2C1_SCL_PAL_MODE   4
+#define I2C1_SDA_PAL_MODE   4
 #define I2C1_TIMINGR_PRESC  2U
 #define I2C1_TIMINGR_SCLDEL 7U
 #define I2C1_TIMINGR_SDADEL 0U
@@ -72,11 +72,17 @@
 // SPI RGB Underglow Defines
 #define WS2812_SPI SPID1 // default: SPID1
 #define WS2812_SPI_MOSI_PAL_MODE 5 // Pin "alternate function", see the respective datasheet for the appropriate values for your MCU. default: 5
+#define WS2812_EXTERNAL_PULLUP
+#define RGBLIGHT_ANIMATIONS
+#define RGBLIGHT_LIMIT_VAL 200
+//#define WS2812_SPI_SYNC
+#define NOP_FUDGE 0.4
 
 
 // This conditionally compiles the backlight code for Dawn60 specifics
 #define RGB_BACKLIGHT_ENABLED 1
 #define RGB_BACKLIGHT_DAWN60REV2
+
 
 // IS31FL3731 driver
 #define DRIVER_COUNT 2
@@ -152,3 +158,7 @@
 
 
 #define DEBUG_MATRIX_SCAN_RATE
+
+#define USB_POLLING_INTERVAL_MS 1
+#define QMK_KEYS_PER_SCAN 8
+#define MOUSEKEY_INTERVAL 1
