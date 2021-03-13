@@ -24,5 +24,6 @@ void matrix_io_delay(void) { __asm__ volatile("nop\nnop\nnop\n"); }
 void board_init(void) {
     //SYSCFG->CFGR1 |= SYSCFG_CFGR1_I2C1_DMA_RMP;
     //palSetLineMode(B3, PAL_MODE_ALTERNATE(6) | PAL_STM32_OTYPE_PUSHPULL);
+    //palSetLineMode(B4, PAL_MODE_ALTERNATE(6) | PAL_STM32_MODE_INPUT);
 }
 
