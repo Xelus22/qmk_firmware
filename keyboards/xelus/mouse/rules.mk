@@ -1,16 +1,11 @@
 # MCU name
-MCU = atmega32u4
-
-# Processor frequency
-F_CPU = 8000000
-
-# Bootloader selection
-BOOTLOADER = atmel-dfu
+MCU = STM32L433
 
 # Build Options
 #   change yes to no to disable
 #
 BOOTMAGIC_ENABLE = lite     # Virtual DIP switch configuration
+MOUSEKEY_ENABLE = yes       # Mouse keys
 EXTRAKEY_ENABLE = yes       # Audio control and System control
 CONSOLE_ENABLE = no         # Console for debug
 COMMAND_ENABLE = no         # Commands for debug and configuration
@@ -24,7 +19,11 @@ UNICODE_ENABLE = no         # Unicode
 BLUETOOTH_ENABLE = no       # Enable Bluetooth
 AUDIO_ENABLE = no           # Audio output
 POINTING_DEVICE_ENABLE = yes
-MOUSEKEY_ENABLE = yes       # Mouse keys
 
-QUANTUM_LIB_SRC += analog.c spi_master.c
-SRC += pmw3360.c opt_encoder.c
+EEPROM_DRIVER = i2c
+
+QUANTUM_LIB_SRC += spi_master.c
+SRC += pmw3360.c
+
+LTO_ENABLE = yes
+OPT = 2

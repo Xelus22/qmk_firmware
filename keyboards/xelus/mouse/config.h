@@ -29,55 +29,73 @@
 
 /* key matrix size */
 #define MATRIX_ROWS 1
-#define MATRIX_COLS 8
+#define MATRIX_COLS 5
 
-/*
- * Keyboard Matrix Assignments
- *
- * Change this to how you wired your keyboard
- * COLS: AVR pins used for columns, left to right
- * ROWS: AVR pins used for rows, top to bottom
- * DIODE_DIRECTION: COL2ROW = COL = Anode (+), ROW = Cathode (-, marked on diode)
- *                  ROW2COL = ROW = Anode (+), COL = Cathode (-, marked on diode)
- *
- */
+#define LAYER_STATE_8BIT
+
 #define DIRECT_PINS                        \
     {                                      \
-        { D4, D2, E6, B6, D7, C6, C7, B7 } \
+        { A13, A3, A2, A14, A15 }          \
     }
 
-// These pins are not broken out, and cannot be used normally.
-// They are set as output and pulled high, by default
-#define UNUSED_PINS \
-    { B4, D6, F1, F5, F6, F7 }
+#define UNUSED_PINS
 
 /* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
-#define DEBOUNCE 5
+#define DEBOUNCE 1
 
 /* Much more so than a keyboard, speed matters for a mouse. So we'll go for as high
    a polling rate as possible. */
 #define USB_POLLING_INTERVAL_MS 1
 #define USB_MAX_POWER_CONSUMPTION 100
 
-/* define if matrix has ghost (lacks anti-ghosting diodes) */
-//#define MATRIX_HAS_GHOST
-
 /* disable action features */
-//#define NO_ACTION_LAYER
-//#define NO_ACTION_TAPPING
-//#define NO_ACTION_ONESHOT
+#define NO_ACTION_LAYER
+#define NO_ACTION_TAPPING
+#define NO_ACTION_ONESHOT
 #define NO_ACTION_MACRO
 #define NO_ACTION_FUNCTION
 
 /* Bootmagic Lite key configuration */
 #define BOOTMAGIC_LITE_ROW 0
-#define BOOTMAGIC_LITE_COLUMN 3
+#define BOOTMAGIC_LITE_COLUMN 1
 
-#define RGB_DI_PIN B5
-#define RGBLED_NUM 4
+// I2C eeprom
+#define EEPROM_I2C_24LC64
+
+// I2C config
+#define I2C1_SCL            6
+#define I2C1_SDA            7
+#define I2C1_SCL_PAL_MODE   4
+#define I2C1_SDA_PAL_MODE   4
+#define I2C1_TIMINGR_PRESC  0U
+#define I2C1_TIMINGR_SCLDEL 11U
+#define I2C1_TIMINGR_SDADEL 0U
+#define I2C1_TIMINGR_SCLH   14U
+#define I2C1_TIMINGR_SCLL   42U
+
+// SPI config
+#define SPI_DRIVER SPID1
+#define SPI_SCK_PIN A5
+#define SPI_SCK_PAL_MODE 5
+#define SPI_MISO_PIN A6
+#define SPI_MISO_PAL_MODE 5
+#define SPI_MOSI_PIN A7
+#define SPI_MOSI_PAL_MODE 5
+#define SPI_SS_PIN A4
+
+// RGB
+#define RGB_DI_PIN A8
+#define RGBLED_NUM 1
 #define RGBLIGHT_LIMIT_VAL 40
 #define RGBLIGHT_EFFECT_BREATHING
 #define RGBLIGHT_EFFECT_RAINBOW_MOOD
 #define RGBLIGHT_EFFECT_RAINBOW_SWIRL
 
-// #define DEBUG_LED_PIN F7
+// PWM config
+#define WS2812_PWM_DRIVER PWMD1
+#define WS2812_PWM_CHANNEL 1
+#define WS2812_PWM_PAL_MODE 1 
+#define WS2812_DMA_STREAM STM32_DMA1_STREAM6
+#define WS2812_DMA_CHANNEL 1
+#define WS2812_DMAMUX_ID STM32_DMAMUX1_TIM5_UP
+

@@ -22,12 +22,8 @@
 #include "spi_master.h"
 #include "pmw3360.h"
 #include "analog.h"
-#include "opt_encoder.h"
 #include "pointing_device.h"
 
-// Sensor defs
-#define OPT_ENC1 F0
-#define OPT_ENC2 F4
 #define OPT_ENC1_MUX 0
 #define OPT_ENC2_MUX 4
 
@@ -36,8 +32,8 @@ void process_mouse_user(report_mouse_t* mouse_report, int16_t x, int16_t y);
 void process_wheel(report_mouse_t* mouse_report);
 void process_wheel_user(report_mouse_t* mouse_report, int16_t h, int16_t v);
 
-#define LAYOUT(BLL, BL, BM, BR, BRR, BF, BB, BDPI) \
-    { {BL, BM, BR, BF, BB, BRR, BLL, BDPI}, }
+#define LAYOUT(BL, BM, BR, BLL, BRR) \
+    { { BL, BM, BR, BLL, BRR }, }
 
 typedef union {
   uint32_t raw;
