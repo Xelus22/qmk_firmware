@@ -345,7 +345,7 @@ uint16_t dynamic_keymap_macro_get_offset(uint8_t id) {
         return UINT16_MAX;
     }
 
-    void *source = (void *)(DYNAMIC_KEYMAP_MACRO_REPEAT_EEPROM_ADDR + id * sizeof(dynamic_macro_header_t));
+    void *source = (void *)(DYNAMIC_KEYMAP_MACRO_REPEAT_EEPROM_ADDR + id * sizeof(dynamic_macro_header_t) + sizeof(struct dynamic_macro_repeat_t));
 
     uint16_t offset = eeprom_read_word(source);
     return offset;
