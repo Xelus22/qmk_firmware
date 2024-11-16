@@ -17,9 +17,10 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "assert.h"
 
 uint8_t  dynamic_keymap_get_layer_count(void);
-void *   dynamic_keymap_key_to_eeprom_address(uint8_t layer, uint8_t row, uint8_t column);
+void    *dynamic_keymap_key_to_eeprom_address(uint8_t layer, uint8_t row, uint8_t column);
 uint16_t dynamic_keymap_get_keycode(uint8_t layer, uint8_t row, uint8_t column);
 void     dynamic_keymap_set_keycode(uint8_t layer, uint8_t row, uint8_t column, uint16_t keycode);
 #ifdef ENCODER_MAP_ENABLE
@@ -66,5 +67,35 @@ uint16_t dynamic_keymap_macro_get_buffer_size(void);
 void     dynamic_keymap_macro_get_buffer(uint16_t offset, uint16_t size, uint8_t *data);
 void     dynamic_keymap_macro_set_buffer(uint16_t offset, uint16_t size, uint8_t *data);
 void     dynamic_keymap_macro_reset(void);
+void     dynamic_keymap_macro_send(uint8_t id);
 
-void dynamic_keymap_macro_send(uint8_t id);
+#ifdef DYNAMIC_KEYMAP_MACRO_REPEAT_ENABLE
+void     dynamic_keymap_macro_repeat_reset(void);
+void     dynamic_keymap_macro_repeat_task(void);
+uint16_t dynamic_keymap_macro_get_offset(uint8_t id);
+void     dynamic_keymap_macro_get_repeat_data(uint8_t id, uint8_t *data);
+void     dynamic_keymap_macro_set_repeat_data(uint8_t id, uint8_t repeatCount, uint32_t repeatInterval, uint16_t macroOffset);
+uint8_t  dynamic_keymap_macro_get_repeat_count(uint8_t id);
+uint32_t dynamic_keymap_macro_get_repeat_interval(uint8_t id);
+
+void process_record_dynamic_keymap_macro_repeat(uint8_t id);
+void dynamic_keymap_macro_enable_repeat(uint8_t id);
+void dynamic_keymap_macro_disable_repeat(uint8_t id);
+
+typedef union __attribute__((__packed__)) {
+    struct {
+        uint8_t repeatCount;
+        uint8_t repeatIntervalHI;
+        uint8_t repeatIntervalMD;
+        uint8_t repeatIntervalLO;
+    };
+    uint32_t raw;
+} dynamic_macro_repeat_t;
+
+typedef struct __attribute__((__packed__)) {
+    dynamic_macro_repeat_t repeat;
+    uint16_t pMacroOffset;
+} dynamic_macro_header_t; // 6 bytes
+
+_Static_assert(sizeof(dynamic_macro_header_t) == 6, "dynamic_macro_header_t is not 6 bytes");
+#endif
