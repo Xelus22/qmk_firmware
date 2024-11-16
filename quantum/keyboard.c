@@ -140,6 +140,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef OS_DETECTION_ENABLE
 #    include "os_detection.h"
 #endif
+#ifdef DYNAMIC_KEYMAP_MACRO_REPEAT_ENABLE
+#   include "dynamic_keymap.h"
+#endif
 
 static uint32_t last_input_modification_time = 0;
 uint32_t        last_input_activity_time(void) {
@@ -666,6 +669,10 @@ void keyboard_task(void) {
     }
 
     quantum_task();
+
+#ifdef DYNAMIC_KEYMAP_MACRO_REPEAT_ENABLE
+    dynamic_keymap_macro_repeat_task();
+#endif
 
 #if defined(SPLIT_WATCHDOG_ENABLE)
     split_watchdog_task();
