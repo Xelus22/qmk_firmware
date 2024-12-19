@@ -736,6 +736,14 @@ hsv_t rgb_matrix_get_per_key_colour(uint8_t led) {
 
 void rgb_matrix_set_per_key_colour(uint8_t led, hsv_t hsv) {
     if (led >= RGB_MATRIX_LED_COUNT) return;
+
+    // clamp value based on RGB_MATRIX_MAXIMUM_BRIGHTNESS
+    // should this behaviour be optional?
+    // could be added to config if needed?
+    if (hsv.v > RGB_MATRIX_MAXIMUM_BRIGHTNESS) {
+        hsv.v = RGB_MATRIX_MAXIMUM_BRIGHTNESS;
+    }
+
     g_hsv_per_key_colour[led] = hsv;
 }
 #endif // RGB_MATRIX_PER_KEY_COLOUR
