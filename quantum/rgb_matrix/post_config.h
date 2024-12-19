@@ -27,3 +27,8 @@
     defined(ENABLE_RGB_MATRIX_SOLID_MULTISPLASH)
 #    define RGB_MATRIX_KEYPRESSES
 #endif
+
+// custom per key
+#if defined(ENABLE_RGB_MATRIX_CUSTOM_PER_KEY)
+#    define RGB_MATRIX_PER_KEY_COLOUR
+#endif

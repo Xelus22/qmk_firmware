@@ -69,6 +69,9 @@ uint8_t g_rgb_frame_buffer[MATRIX_ROWS][MATRIX_COLS] = {{0}};
 #ifdef RGB_MATRIX_KEYREACTIVE_ENABLED
 last_hit_t g_last_hit_tracker;
 #endif // RGB_MATRIX_KEYREACTIVE_ENABLED
+#ifdef RGB_MATRIX_PER_KEY_COLOUR
+hsv_t g_hsv_per_key_colour[RGB_MATRIX_LED_COUNT];
+#endif // RGB_MATRIX_PER_KEY_COLOUR
 
 // internals
 static bool            suspend_state     = false;
@@ -467,6 +470,12 @@ void rgb_matrix_init(void) {
     }
 #endif // RGB_MATRIX_KEYREACTIVE_ENABLED
 
+#ifdef RGB_MATRIX_PER_KEY_COLOUR
+    for (uint8_t i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
+        g_hsv_per_key_colour[i] = (hsv_t){RGB_MATRIX_DEFAULT_HUE, RGB_MATRIX_DEFAULT_SAT, RGB_MATRIX_DEFAULT_VAL};
+    }
+#endif // RGB_MATRIX_PER_KEY_COLOUR
+
     eeconfig_init_rgb_matrix();
     if (!rgb_matrix_config.mode) {
         dprintf("rgb_matrix_init_drivers rgb_matrix_config.mode = 0. Write default values to EEPROM.\n");
@@ -717,3 +726,16 @@ void rgb_matrix_set_flags(led_flags_t flags) {
 void rgb_matrix_set_flags_noeeprom(led_flags_t flags) {
     rgb_matrix_set_flags_eeprom_helper(flags, false);
 }
+
+// expose getter and setter for g_hsv_per_key_colour
+#ifdef RGB_MATRIX_PER_KEY_COLOUR
+hsv_t rgb_matrix_get_per_key_colour(uint8_t led) {
+    if (led >= RGB_MATRIX_LED_COUNT) return (hsv_t){0, 0, 0};
+    return g_hsv_per_key_colour[led];
+}
+
+void rgb_matrix_set_per_key_colour(uint8_t led, hsv_t hsv) {
+    if (led >= RGB_MATRIX_LED_COUNT) return;
+    g_hsv_per_key_colour[led] = hsv;
+}
+#endif // RGB_MATRIX_PER_KEY_COLOUR

@@ -280,3 +280,10 @@ extern last_hit_t g_last_hit_tracker;
 #ifdef RGB_MATRIX_FRAMEBUFFER_EFFECTS
 extern uint8_t g_rgb_frame_buffer[MATRIX_ROWS][MATRIX_COLS];
 #endif
+#ifdef RGB_MATRIX_PER_KEY_COLOUR
+extern hsv_t g_hsv_per_key_colour[RGB_MATRIX_LED_COUNT];
+// expose getter and setter for g_hsv_per_key_colour
+hsv_t rgb_matrix_get_per_key_colour(uint8_t led);
+void rgb_matrix_set_per_key_colour(uint8_t led, hsv_t hsv);
+#endif
+
