@@ -377,7 +377,13 @@ void rgb_matrix_task(void) {
             rgb_task_start();
             break;
         case RENDERING:
-            rgb_task_render(effect);
+            if (direct_mode) {
+                // render the direct effects
+                rgb_matrix_direct_task();
+            } else {
+                // render the normal effects
+                rgb_task_render(effect);
+            }
             if (effect) {
                 if (rgb_task_state == FLUSHING) { // ensure we only draw basic indicators once rendering is finished
                     rgb_matrix_indicators();
