@@ -18,8 +18,29 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifdef DYNAMIC_KEYMAP_32BIT_ADDRESS
+#    if DYNAMIC_KEYMAP_EEPROM_MAX_ADDR > 4294967295
+#        pragma message STR(DYNAMIC_KEYMAP_EEPROM_MAX_ADDR) " > 4294967295"
+#        error DYNAMIC_KEYMAP_EEPROM_MAX_ADDR must be less than 4294967295
+#    endif
+#else
+#    if DYNAMIC_KEYMAP_EEPROM_MAX_ADDR > 65535
+#        pragma message STR(DYNAMIC_KEYMAP_EEPROM_MAX_ADDR) " > 65535"
+#        error DYNAMIC_KEYMAP_EEPROM_MAX_ADDR must be less than 65536
+#    endif
+#endif
+
+// Due to usage of uint16_t check for max 65535
+
+#if defined(DYNAMIC_KEYMAP_32BIT_ADDRESS)
+typedef uint32_t dk_size_t;
+#else
+typedef uint16_t dk_size_t;
+#endif
+
+
 uint8_t  dynamic_keymap_get_layer_count(void);
-void *   dynamic_keymap_key_to_eeprom_address(uint8_t layer, uint8_t row, uint8_t column);
+void    *dynamic_keymap_key_to_eeprom_address(uint8_t layer, uint8_t row, uint8_t column);
 uint16_t dynamic_keymap_get_keycode(uint8_t layer, uint8_t row, uint8_t column);
 void     dynamic_keymap_set_keycode(uint8_t layer, uint8_t row, uint8_t column, uint16_t keycode);
 #ifdef ENCODER_MAP_ENABLE
@@ -35,8 +56,8 @@ void dynamic_keymap_reset(void);
 // This is only really useful for host applications that want to get a whole keymap fast,
 // by reading 14 keycodes (28 bytes) at a time, reducing the number of raw HID transfers by
 // a factor of 14.
-void dynamic_keymap_get_buffer(uint16_t offset, uint16_t size, uint8_t *data);
-void dynamic_keymap_set_buffer(uint16_t offset, uint16_t size, uint8_t *data);
+void dynamic_keymap_get_buffer(dk_size_t offset, uint16_t size, uint8_t *data);
+void dynamic_keymap_set_buffer(dk_size_t offset, uint16_t size, uint8_t *data);
 
 // This overrides the one in quantum/keymap_common.c
 // uint16_t keymap_key_to_keycode(uint8_t layer, keypos_t key);
@@ -61,10 +82,10 @@ void dynamic_keymap_set_buffer(uint16_t offset, uint16_t size, uint8_t *data);
 // Note: dynamic_keymap_macro_get_count() returns the maximum that *can* be
 // stored, not the current count of macros in the buffer.
 
-uint8_t  dynamic_keymap_macro_get_count(void);
-uint16_t dynamic_keymap_macro_get_buffer_size(void);
-void     dynamic_keymap_macro_get_buffer(uint16_t offset, uint16_t size, uint8_t *data);
-void     dynamic_keymap_macro_set_buffer(uint16_t offset, uint16_t size, uint8_t *data);
-void     dynamic_keymap_macro_reset(void);
+uint8_t   dynamic_keymap_macro_get_count(void);
+dk_size_t dynamic_keymap_macro_get_buffer_size(void);
+void      dynamic_keymap_macro_get_buffer(dk_size_t offset, uint16_t size, uint8_t *data);
+void      dynamic_keymap_macro_set_buffer(dk_size_t offset, uint16_t size, uint8_t *data);
+void      dynamic_keymap_macro_reset(void);
 
 void dynamic_keymap_macro_send(uint8_t id);

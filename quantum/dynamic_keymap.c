@@ -57,12 +57,6 @@
 #    error DYNAMIC_KEYMAP_EEPROM_MAX_ADDR is configured to use more space than what is available for the selected EEPROM driver
 #endif
 
-// Due to usage of uint16_t check for max 65535
-#if DYNAMIC_KEYMAP_EEPROM_MAX_ADDR > 65535
-#    pragma message STR(DYNAMIC_KEYMAP_EEPROM_MAX_ADDR) " > 65535"
-#    error DYNAMIC_KEYMAP_EEPROM_MAX_ADDR must be less than 65536
-#endif
-
 // If DYNAMIC_KEYMAP_EEPROM_ADDR not explicitly defined in config.h,
 #ifndef DYNAMIC_KEYMAP_EEPROM_ADDR
 #    define DYNAMIC_KEYMAP_EEPROM_ADDR DYNAMIC_KEYMAP_EEPROM_START
@@ -167,10 +161,10 @@ void dynamic_keymap_reset(void) {
     }
 }
 
-void dynamic_keymap_get_buffer(uint16_t offset, uint16_t size, uint8_t *data) {
-    uint16_t dynamic_keymap_eeprom_size = DYNAMIC_KEYMAP_LAYER_COUNT * MATRIX_ROWS * MATRIX_COLS * 2;
-    void *   source                     = (void *)(DYNAMIC_KEYMAP_EEPROM_ADDR + offset);
-    uint8_t *target                     = data;
+void dynamic_keymap_get_buffer(dk_size_t offset, uint16_t size, uint8_t *data) {
+    dk_size_t dynamic_keymap_eeprom_size = DYNAMIC_KEYMAP_LAYER_COUNT * MATRIX_ROWS * MATRIX_COLS * 2;
+    void *    source                     = (void *)(DYNAMIC_KEYMAP_EEPROM_ADDR + offset);
+    uint8_t * target                     = data;
     for (uint16_t i = 0; i < size; i++) {
         if (offset + i < dynamic_keymap_eeprom_size) {
             *target = eeprom_read_byte(source);
@@ -182,10 +176,10 @@ void dynamic_keymap_get_buffer(uint16_t offset, uint16_t size, uint8_t *data) {
     }
 }
 
-void dynamic_keymap_set_buffer(uint16_t offset, uint16_t size, uint8_t *data) {
-    uint16_t dynamic_keymap_eeprom_size = DYNAMIC_KEYMAP_LAYER_COUNT * MATRIX_ROWS * MATRIX_COLS * 2;
-    void *   target                     = (void *)(DYNAMIC_KEYMAP_EEPROM_ADDR + offset);
-    uint8_t *source                     = data;
+void dynamic_keymap_set_buffer(dk_size_t offset, uint16_t size, uint8_t *data) {
+    dk_size_t dynamic_keymap_eeprom_size = DYNAMIC_KEYMAP_LAYER_COUNT * MATRIX_ROWS * MATRIX_COLS * 2;
+    void *    target                     = (void *)(DYNAMIC_KEYMAP_EEPROM_ADDR + offset);
+    uint8_t * source                     = data;
     for (uint16_t i = 0; i < size; i++) {
         if (offset + i < dynamic_keymap_eeprom_size) {
             eeprom_update_byte(target, *source);
@@ -215,12 +209,12 @@ uint8_t dynamic_keymap_macro_get_count(void) {
     return DYNAMIC_KEYMAP_MACRO_COUNT;
 }
 
-uint16_t dynamic_keymap_macro_get_buffer_size(void) {
+dk_size_t dynamic_keymap_macro_get_buffer_size(void) {
     return DYNAMIC_KEYMAP_MACRO_EEPROM_SIZE;
 }
 
-void dynamic_keymap_macro_get_buffer(uint16_t offset, uint16_t size, uint8_t *data) {
-    void *   source = (void *)(DYNAMIC_KEYMAP_MACRO_EEPROM_ADDR + offset);
+void dynamic_keymap_macro_get_buffer(dk_size_t offset, uint16_t size, uint8_t *data) {
+    void    *source = (void *)(DYNAMIC_KEYMAP_MACRO_EEPROM_ADDR + offset);
     uint8_t *target = data;
     for (uint16_t i = 0; i < size; i++) {
         if (offset + i < DYNAMIC_KEYMAP_MACRO_EEPROM_SIZE) {
@@ -233,8 +227,8 @@ void dynamic_keymap_macro_get_buffer(uint16_t offset, uint16_t size, uint8_t *da
     }
 }
 
-void dynamic_keymap_macro_set_buffer(uint16_t offset, uint16_t size, uint8_t *data) {
-    void *   target = (void *)(DYNAMIC_KEYMAP_MACRO_EEPROM_ADDR + offset);
+void dynamic_keymap_macro_set_buffer(dk_size_t offset, uint16_t size, uint8_t *data) {
+    void    *target = (void *)(DYNAMIC_KEYMAP_MACRO_EEPROM_ADDR + offset);
     uint8_t *source = data;
     for (uint16_t i = 0; i < size; i++) {
         if (offset + i < DYNAMIC_KEYMAP_MACRO_EEPROM_SIZE) {
@@ -247,7 +241,8 @@ void dynamic_keymap_macro_set_buffer(uint16_t offset, uint16_t size, uint8_t *da
 
 void dynamic_keymap_macro_reset(void) {
     void *p   = (void *)(DYNAMIC_KEYMAP_MACRO_EEPROM_ADDR);
-    void *end = (void *)(DYNAMIC_KEYMAP_MACRO_EEPROM_ADDR + DYNAMIC_KEYMAP_MACRO_EEPROM_SIZE);
+    // clear the buffer by writing DYNAMIC_KEYMAP_MACRO_COUNT nulls
+    void *end = (void *)(DYNAMIC_KEYMAP_MACRO_EEPROM_ADDR + DYNAMIC_KEYMAP_MACRO_COUNT);
     while (p != end) {
         eeprom_update_byte(p, 0);
         ++p;

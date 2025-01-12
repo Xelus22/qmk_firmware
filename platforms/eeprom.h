@@ -79,3 +79,9 @@ void     eeprom_update_block(const void *__src, void *__dst, size_t __n);
 #else
 #    error Unknown EEPROM driver.
 #endif
+
+// see https://github.com/qmk/qmk_firmware/issues/8742
+#if defined(__AVR__) && (TOTAL_EEPROM_BYTE_COUNT > 65535)
+#    pragma message STR(TOTAL_EEPROM_BYTE_COUNT) " > 65535"
+#    error TOTAL_EEPROM_BYTE_COUNT must be less than 65536 on AVR
+#endif

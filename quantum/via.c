@@ -60,7 +60,7 @@
 // Can be called in an overriding via_init_kb() to test if keyboard level code usage of
 // EEPROM is invalid and use/save defaults.
 bool via_eeprom_is_valid(void) {
-    char *  p      = QMK_BUILDDATE; // e.g. "2019-11-05-11:29:54"
+    char   *p      = QMK_BUILDDATE; // e.g. "2019-11-05-11:29:54"
     uint8_t magic0 = ((p[2] & 0x0F) << 4) | (p[3] & 0x0F);
     uint8_t magic1 = ((p[5] & 0x0F) << 4) | (p[6] & 0x0F);
     uint8_t magic2 = ((p[8] & 0x0F) << 4) | (p[9] & 0x0F);
@@ -71,7 +71,7 @@ bool via_eeprom_is_valid(void) {
 // Sets VIA/keyboard level usage of EEPROM to valid/invalid
 // Keyboard level code (eg. via_init_kb()) should not call this
 void via_eeprom_set_valid(bool valid) {
-    char *  p      = QMK_BUILDDATE; // e.g. "2019-11-05-11:29:54"
+    char   *p      = QMK_BUILDDATE; // e.g. "2019-11-05-11:29:54"
     uint8_t magic0 = ((p[2] & 0x0F) << 4) | (p[3] & 0x0F);
     uint8_t magic1 = ((p[5] & 0x0F) << 4) | (p[6] & 0x0F);
     uint8_t magic2 = ((p[8] & 0x0F) << 4) | (p[9] & 0x0F);
@@ -337,6 +337,14 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
                     command_data[4] = value & 0xFF;
                     break;
                 }
+                case id_dk_32bit_address: {
+#if defined(DYNAMIC_KEYMAP_32BIT_ADDRESS)
+                    command_data[1] = 1;
+#else
+                    command_data[1] = 0;
+#endif
+                    break;
+                }
                 default: {
                     // The value ID is not known
                     // Return the unhandled state
@@ -399,21 +407,40 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
             break;
         }
         case id_dynamic_keymap_macro_get_buffer_size: {
-            uint16_t size   = dynamic_keymap_macro_get_buffer_size();
+            dk_size_t size = dynamic_keymap_macro_get_buffer_size();
+#if defined(DYNAMIC_KEYMAP_32BIT_ADDRESS)
+            command_data[0] = size >> 24;
+            command_data[1] = size >> 16;
+            command_data[2] = size >> 8;
+            command_data[3] = size & 0xFF;
+#else
             command_data[0] = size >> 8;
             command_data[1] = size & 0xFF;
+#endif
             break;
         }
         case id_dynamic_keymap_macro_get_buffer: {
-            uint16_t offset = (command_data[0] << 8) | command_data[1];
-            uint16_t size   = command_data[2]; // size <= 28
+#if defined(DYNAMIC_KEYMAP_32BIT_ADDRESS)
+            dk_size_t offset = (command_data[0] << 24) | (command_data[1] << 16) | (command_data[2] << 8) | command_data[3];
+            uint16_t  size   = command_data[2]; // size <= 25
+            dynamic_keymap_macro_get_buffer(offset, size, &command_data[5]);
+#else
+            dk_size_t offset = (command_data[0] << 8) | command_data[1];
+            uint16_t  size   = command_data[2]; // size <= 28
             dynamic_keymap_macro_get_buffer(offset, size, &command_data[3]);
+#endif
             break;
         }
         case id_dynamic_keymap_macro_set_buffer: {
-            uint16_t offset = (command_data[0] << 8) | command_data[1];
-            uint16_t size   = command_data[2]; // size <= 28
+#if defined(DYNAMIC_KEYMAP_32BIT_ADDRESS)
+            dk_size_t offset = (command_data[0] << 24) | (command_data[1] << 16) | (command_data[2] << 8) | command_data[3];
+            uint16_t  size   = command_data[2]; // size <= 25
+            dynamic_keymap_macro_set_buffer(offset, size, &command_data[5]);
+#else
+            dk_size_t offset = (command_data[0] << 8) | command_data[1];
+            uint16_t  size   = command_data[2]; // size <= 28
             dynamic_keymap_macro_set_buffer(offset, size, &command_data[3]);
+#endif
             break;
         }
         case id_dynamic_keymap_macro_reset: {
@@ -425,15 +452,27 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
             break;
         }
         case id_dynamic_keymap_get_buffer: {
-            uint16_t offset = (command_data[0] << 8) | command_data[1];
-            uint16_t size   = command_data[2]; // size <= 28
+#if defined(DYNAMIC_KEYMAP_32BIT_ADDRESS)
+            dk_size_t offset = (command_data[0] << 24) | (command_data[1] << 16) | (command_data[2] << 8) | command_data[3];
+            uint16_t  size   = command_data[2]; // size <= 25
+            dynamic_keymap_get_buffer(offset, size, &command_data[5]);
+#else
+            dk_size_t offset = (command_data[0] << 8) | command_data[1];
+            uint16_t  size   = command_data[2]; // size <= 28
             dynamic_keymap_get_buffer(offset, size, &command_data[3]);
+#endif
             break;
         }
         case id_dynamic_keymap_set_buffer: {
-            uint16_t offset = (command_data[0] << 8) | command_data[1];
-            uint16_t size   = command_data[2]; // size <= 28
+#if defined(DYNAMIC_KEYMAP_32BIT_ADDRESS)
+            dk_size_t offset = (command_data[0] << 24) | (command_data[1] << 16) | (command_data[2] << 8) | command_data[3];
+            uint16_t  size   = command_data[2]; // size <= 25
+            dynamic_keymap_set_buffer(offset, size, &command_data[5]);
+#else
+            dk_size_t offset = (command_data[0] << 8) | command_data[1];
+            uint16_t  size   = command_data[2]; // size <= 28
             dynamic_keymap_set_buffer(offset, size, &command_data[3]);
+#endif
             break;
         }
 #ifdef ENCODER_MAP_ENABLE

@@ -102,6 +102,7 @@ enum via_keyboard_value_id {
     id_switch_matrix_state = 0x03,
     id_firmware_version    = 0x04,
     id_device_indication   = 0x05,
+    id_dk_32bit_address    = 0x06,
 };
 
 enum via_channel_id {
