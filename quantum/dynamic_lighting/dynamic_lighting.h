@@ -31,6 +31,11 @@ typedef enum {
 #    include "dynamic_lighting_gpio_leds.h"
 #endif
 
+// LED Matrix
+#ifdef DYNAMIC_LIGHTING_LED_MATRIX_ENABLE
+#    include "dynamic_lighting_led_matrix.h"
+#endif
+
 // RGB Light
 #ifdef DYNAMIC_LIGHTING_RGBLIGHT_ENABLE
 #    include "dynamic_lighting_rgblight.h"
@@ -52,6 +57,13 @@ void  dynamic_lighting_set_led_hsv(dynamic_lighting_type_t type, int index, hsv_
 void  dynamic_lighting_set_led_range_hsv(dynamic_lighting_type_t type, int index, int range, hsv_t hsv);
 void  dynamic_lighting_set_all_hsv(dynamic_lighting_type_t type, hsv_t hsv);
 hsv_t dynamic_lighting_get_led_hsv(dynamic_lighting_type_t type, int index);
+#endif
+
+#if defined(DYNAMIC_LIGHTING_LED_MATRIX_ENABLE)
+void    dynamic_lighting_set_led_value(dynamic_lighting_type_t type, int index, uint8_t val);
+void    dynamic_lighting_set_led_range_value(dynamic_lighting_type_t type, int index, int range, uint8_t val);
+void    dynamic_lighting_set_all_value(dynamic_lighting_type_t type, uint8_t val);
+uint8_t dynamic_lighting_get_led_value(dynamic_lighting_type_t type, int index);
 #endif
 
 #if defined(DYNAMIC_LIGHTING_GPIO_LEDS_ENABLE)

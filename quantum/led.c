@@ -19,6 +19,8 @@
 #include "debug.h"
 #include "gpio.h"
 
+bool led_bDirectMode = false;
+
 #ifdef BACKLIGHT_CAPS_LOCK
 #    ifdef BACKLIGHT_ENABLE
 #        include "backlight.h"
@@ -138,11 +140,13 @@ __attribute__((weak)) void led_init_ports(void) {
 /** \brief Entrypoint for protocol to LED binding
  */
 __attribute__((weak)) void led_set(uint8_t usb_led) {
+    // allow the dynamic lighting to take over
+    if (!bDirectMode) {
 #ifdef BACKLIGHT_CAPS_LOCK
-    handle_backlight_caps_lock((led_t)usb_led);
+        handle_backlight_caps_lock((led_t)usb_led);
 #endif
-
-    led_update_kb((led_t)usb_led);
+        led_update_ports((led_t)usb_led);
+    }
 }
 
 /** \brief Trigger behaviour on transition to suspend

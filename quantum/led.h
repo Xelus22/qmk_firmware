@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 extern "C" {
 #endif
 
+extern bool led_bDirectMode;
 typedef union {
     uint8_t raw;
     struct {
