@@ -15,9 +15,9 @@
  */
 #include "rgblight.h"
 
-extern hsv_t g_rgblight_leds[RGBLIGHT_LED_COUNT];
+extern hsv_t g_dynamic_lighting_rgblight_leds[RGBLIGHT_LED_COUNT];
 
-bool dynamic_lighting_rgblight_enabled(void);
-void dynamic_lighting_rgblight_set_led_hsv(int index, hsv_t hsv);
-void dynamic_lighting_rgblight_set_led_range_hsv(int index, int range, hsv_t hsv);
+bool  dynamic_lighting_rgblight_enabled(void);
+void  dynamic_lighting_rgblight_set_led_hsv(int index, hsv_t hsv);
+void  dynamic_lighting_rgblight_set_led_range_hsv(int index, int range, hsv_t hsv);
 hsv_t dynamic_lighting_rgblight_get_led_hsv(int index);

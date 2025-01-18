@@ -15,9 +15,8 @@
  */
 
 #include "../led.h"
-extern led_t g_led_state;
+extern led_t g_dynamic_lighting_led_state;
 
 bool dynamic_lighting_led_enabled();
 void dynamic_lighting_led_set_value(int bit, bool state);
 bool dynamic_lighting_led_get_value(int bit);
-

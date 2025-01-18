@@ -17,9 +17,10 @@
 #include "../color.h"
 #include "rgb_matrix.h"
 
-extern hsv_t g_rgb_matrix_leds[RGB_MATRIX_LED_COUNT];
+extern hsv_t g_dynamic_lighting_rgb_matrix_leds[RGB_MATRIX_LED_COUNT];
 
-bool dynamic_lighting_rgb_matrix_enabled(void);
-void dynamic_lighting_rgb_matrix_set_led_hsv(int index, hsv_t hsv);
-void dynamic_lighting_rgb_matrix_set_led_range_hsv(int index, int range, hsv_t hsv);
+bool  dynamic_lighting_rgb_matrix_enabled(void);
+void  dynamic_lighting_rgb_matrix_set_led_hsv(int index, hsv_t hsv);
+void  dynamic_lighting_rgb_matrix_set_led_range_hsv(int index, int range, hsv_t hsv);
 hsv_t dynamic_lighting_rgb_matrix_get_led_hsv(int index);
+void  dynamic_lighting_rgb_matrix_flush(void);

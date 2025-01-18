@@ -45,3 +45,9 @@ hsv_t dynamic_lighting_rgb_matrix_get_led_hsv(int index) {
     }
     return g_dynamic_lighting_rgb_matrix_leds[index];
 }
+
+void dynamic_lighting_rgb_matrix_flush(void) {
+    for (int i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
+        rgb_matrix_set_color(i, g_dynamic_lighting_rgb_matrix_leds[i].h, g_dynamic_lighting_rgb_matrix_leds[i].s, g_dynamic_lighting_rgb_matrix_leds[i].v);
+    }
+}

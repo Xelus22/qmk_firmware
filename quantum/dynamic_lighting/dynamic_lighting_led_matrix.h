@@ -17,9 +17,9 @@
 #include "../color.h"
 #include "led_matrix.h"
 
-extern uint8_t g_led_matrix_leds[LED_MATRIX_LED_COUNT];
+extern uint8_t g_dynamic_lighting_led_matrix_leds[LED_MATRIX_LED_COUNT];
 
-bool dynamic_lighting_led_matrix_enabled(void);
-void dynamic_lighting_led_matrix_set_led_value(int index, uint8_t value);
-void dynamic_lighting_led_matrix_set_led_range_value(int index, int range, uint8_t value);
+bool    dynamic_lighting_led_matrix_enabled(void);
+void    dynamic_lighting_led_matrix_set_led_value(int index, uint8_t value);
+void    dynamic_lighting_led_matrix_set_led_range_value(int index, int range, uint8_t value);
 uint8_t dynamic_lighting_led_matrix_get_led_value(int index);

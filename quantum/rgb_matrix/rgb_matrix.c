@@ -96,17 +96,19 @@ void eeconfig_update_rgb_matrix(void) {
 
 void eeconfig_update_rgb_matrix_default(void) {
     dprintf("eeconfig_update_rgb_matrix_default\n");
-    rgb_matrix_config.enable = RGB_MATRIX_DEFAULT_ON;
-    rgb_matrix_config.mode   = RGB_MATRIX_DEFAULT_MODE;
-    rgb_matrix_config.hsv    = (hsv_t){RGB_MATRIX_DEFAULT_HUE, RGB_MATRIX_DEFAULT_SAT, RGB_MATRIX_DEFAULT_VAL};
-    rgb_matrix_config.speed  = RGB_MATRIX_DEFAULT_SPD;
-    rgb_matrix_config.flags  = RGB_MATRIX_DEFAULT_FLAGS;
+    rgb_matrix_config.enable     = RGB_MATRIX_DEFAULT_ON;
+    rgb_matrix_config.directMode = RGB_MATRIX_DEFAULT_DIRECT_MODE;
+    rgb_matrix_config.mode       = RGB_MATRIX_DEFAULT_MODE;
+    rgb_matrix_config.hsv        = (hsv_t){RGB_MATRIX_DEFAULT_HUE, RGB_MATRIX_DEFAULT_SAT, RGB_MATRIX_DEFAULT_VAL};
+    rgb_matrix_config.speed      = RGB_MATRIX_DEFAULT_SPD;
+    rgb_matrix_config.flags      = RGB_MATRIX_DEFAULT_FLAGS;
     eeconfig_flush_rgb_matrix(true);
 }
 
 void eeconfig_debug_rgb_matrix(void) {
     dprintf("rgb_matrix_config EEPROM\n");
     dprintf("rgb_matrix_config.enable = %d\n", rgb_matrix_config.enable);
+    dprintf("rgb_matrix_config.directMode = %d\n", rgb_matrix_config.directMode);
     dprintf("rgb_matrix_config.mode = %d\n", rgb_matrix_config.mode);
     dprintf("rgb_matrix_config.hsv.h = %d\n", rgb_matrix_config.hsv.h);
     dprintf("rgb_matrix_config.hsv.s = %d\n", rgb_matrix_config.hsv.s);
@@ -377,7 +379,7 @@ void rgb_matrix_task(void) {
             rgb_task_start();
             break;
         case RENDERING:
-            if (direct_mode) {
+            if (rgb_matrix_config.directMode) {
                 // render the direct effects
                 rgb_matrix_direct_task();
             } else {
@@ -722,4 +724,23 @@ void rgb_matrix_set_flags(led_flags_t flags) {
 
 void rgb_matrix_set_flags_noeeprom(led_flags_t flags) {
     rgb_matrix_set_flags_eeprom_helper(flags, false);
+}
+
+// enable and disable the direct mode
+void rgb_matrix_direct_mode_enable(void) {
+    rgb_matrix_direct_mode_enable_noeeprom();
+    eeconfig_flag_rgb_matrix(true);
+}
+
+void rgb_matrix_direct_mode_enable_noeeprom(void) {
+    rgb_matrix_config.directMode = 1;
+}
+
+void rgb_matrix_direct_mode_disable(void) {
+    rgb_matrix_direct_mode_disable_no_eeprom();
+    eeconfig_flag_rgb_matrix(true);
+}
+
+void rgb_matrix_direct_mode_disable_no_eeprom(void) {
+    rgb_matrix_config.directMode = 0;
 }

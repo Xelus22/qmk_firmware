@@ -19,6 +19,7 @@
 void dynamic_lighting_init(void) {
     // Initialize the dynamic lighting subsystems
 
+    // inside will need to implement read from EEPROM/flash to get the override
 #ifdef DYNAMIC_LIGHTING_GPIO_LEDS_ENABLE
     dynamic_lighting_led_init();
 #endif
@@ -84,16 +85,55 @@ void dynamic_lighting_set_led_range_hsv(dynamic_lighting_type_t type, int index,
     if (!dynamic_lighting_type_enabled(type)) {
         return;
     }
+
+    switch (type) {
+#    ifdef DYNAMIC_LIGHTING_RGBLIGHT_ENABLE
+        case DYNAMIC_LIGHTING_TYPE_RGBLIGHT:
+            dynamic_lighting_rgblight_set_led_range_hsv(index, range, hsv);
+            break;
+#    endif
+#    ifdef DYNAMIC_LIGHTING_RGB_MATRIX_ENABLE
+        case DYNAMIC_LIGHTING_TYPE_RGB_MATRIX:
+            dynamic_lighting_rgb_matrix_set_led_range_hsv(index, range, hsv);
+            break;
+#    endif
+    }
 }
 void dynamic_lighting_set_all_hsv(dynamic_lighting_type_t type, hsv_t hsv) {
     if (!dynamic_lighting_type_enabled(type)) {
         return;
     }
+
+    switch (type) {
+#    ifdef DYNAMIC_LIGHTING_RGBLIGHT_ENABLE
+        case DYNAMIC_LIGHTING_TYPE_RGBLIGHT:
+            dynamic_lighting_rgblight_set_all_hsv(hsv);
+            break;
+#    endif
+#    ifdef DYNAMIC_LIGHTING_RGB_MATRIX_ENABLE
+        case DYNAMIC_LIGHTING_TYPE_RGB_MATRIX:
+            dynamic_lighting_rgb_matrix_set_all_hsv(hsv);
+            break;
+#    endif
+    }
 }
 
 hsv_t dynamic_lighting_get_led_hsv(dynamic_lighting_type_t type, int index) {
     if (!dynamic_lighting_type_enabled(type)) {
-        return;
+        return (hsv_t){0, 0, 0};
     }
+
+    switch (type) {
+#    ifdef DYNAMIC_LIGHTING_RGBLIGHT_ENABLE
+        case DYNAMIC_LIGHTING_TYPE_RGBLIGHT:
+            return dynamic_lighting_rgblight_get_led_hsv(index);
+#    endif
+#    ifdef DYNAMIC_LIGHTING_RGB_MATRIX_ENABLE
+        case DYNAMIC_LIGHTING_TYPE_RGB_MATRIX:
+            return dynamic_lighting_rgb_matrix_get_led_hsv(index);
+#    endif
+    }
+
+    return (hsv_t){0, 0, 0};
 }
 #endif

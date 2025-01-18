@@ -24,12 +24,12 @@ bool dynamic_lighting_led_enabled() {
 
 void dynamic_lighting_led_set_value(int bit, bool state) {
     if (state) {
-        g_led_state.raw |= (1 << bit);
+        g_dynamic_lighting_led_state.raw |= (1 << bit);
     } else {
-        g_led_state.raw &= ~(1 << bit);
+        g_dynamic_lighting_led_state.raw &= ~(1 << bit);
     }
 }
 
 bool dynamic_lighting_led_get_value(int bit) {
-    return g_led_state.raw & (1 << bit);
+    return g_dynamic_lighting_led_state.raw & (1 << bit);
 }

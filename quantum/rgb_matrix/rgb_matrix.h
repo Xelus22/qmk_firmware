@@ -53,6 +53,10 @@
 #    define RGB_MATRIX_DEFAULT_ON true
 #endif
 
+#ifndef RGB_MATRIX_DEFAULT_DIRECT_MODE
+#    define RGB_MATRIX_DEFAULT_DIRECT_MODE false
+#endif
+
 #ifndef RGB_MATRIX_DEFAULT_MODE
 #    ifdef ENABLE_RGB_MATRIX_CYCLE_LEFT_RIGHT
 #        define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_CYCLE_LEFT_RIGHT
@@ -213,7 +217,10 @@ led_flags_t rgb_matrix_get_flags(void);
 void        rgb_matrix_set_flags(led_flags_t flags);
 void        rgb_matrix_set_flags_noeeprom(led_flags_t flags);
 void        rgb_matrix_update_pwm_buffers(void);
-
+void        rgb_matrix_direct_mode_enable(void);
+void        rgb_matrix_direct_mode_enable_noeeprom(void);
+void        rgb_matrix_direct_mode_disable(void);
+void        rgb_matrix_direct_mode_disable_no_eeprom(void);
 #ifndef RGBLIGHT_ENABLE
 #    define eeconfig_update_rgblight_current eeconfig_update_rgb_matrix
 #    define rgblight_reload_from_eeprom rgb_matrix_reload_from_eeprom
