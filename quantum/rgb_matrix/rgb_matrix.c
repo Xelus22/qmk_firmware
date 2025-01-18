@@ -29,6 +29,10 @@
 
 #include <lib/lib8tion/lib8tion.h>
 
+#if defined(DYNAMIC_LIGHTING_ENABLE) && defined(DYNAMIC_LIGHTING_RGB_MATRIX_ENABLE)
+#include "dynamic_lighting_rgb_matrix.h"
+#endif
+
 #ifndef RGB_MATRIX_CENTER
 const led_point_t k_rgb_matrix_center = {112, 32};
 #else
@@ -379,13 +383,23 @@ void rgb_matrix_task(void) {
             rgb_task_start();
             break;
         case RENDERING:
+#if defined(DYNAMIC_LIGHTING_ENABLE) && defined(DYNAMIC_LIGHTING_RGB_MATRIX_ENABLE)
             if (rgb_matrix_config.directMode) {
                 // render the direct effects
-                rgb_matrix_direct_task();
+                // rgb_direct_render();
+                for (int i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
+                    hsv_t hsv = dynamic_lighting_rgb_matrix_get_led_hsv(i);
+                    rgb_t rgb = rgb_matrix_hsv_to_rgb(hsv);
+                    rgb_matrix_driver.set_color(rgb_matrix_led_index(i), rgb.r, rgb.g, rgb.b);
+                }
+
             } else {
+#endif
                 // render the normal effects
                 rgb_task_render(effect);
+#if defined(DYNAMIC_LIGHTING_ENABLE) && defined(DYNAMIC_LIGHTING_RGB_MATRIX_ENABLE)
             }
+#endif
             if (effect) {
                 if (rgb_task_state == FLUSHING) { // ensure we only draw basic indicators once rendering is finished
                     rgb_matrix_indicators();

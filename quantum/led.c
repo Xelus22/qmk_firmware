@@ -141,7 +141,7 @@ __attribute__((weak)) void led_init_ports(void) {
  */
 __attribute__((weak)) void led_set(uint8_t usb_led) {
     // allow the dynamic lighting to take over
-    if (!bDirectMode) {
+    if (!led_bDirectMode) {
 #ifdef BACKLIGHT_CAPS_LOCK
         handle_backlight_caps_lock((led_t)usb_led);
 #endif

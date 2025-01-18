@@ -16,6 +16,26 @@
 
 #include "dynamic_lighting.h"
 
+// Direct LED GPIO control
+#ifdef DYNAMIC_LIGHTING_GPIO_LEDS_ENABLE
+#    include "dynamic_lighting_gpio_leds.h"
+#endif
+
+// LED Matrix
+#ifdef DYNAMIC_LIGHTING_LED_MATRIX_ENABLE
+#    include "dynamic_lighting_led_matrix.h"
+#endif
+
+// RGB Light
+#ifdef DYNAMIC_LIGHTING_RGBLIGHT_ENABLE
+#    include "dynamic_lighting_rgblight.h"
+#endif
+
+// RGB Matrix
+#ifdef DYNAMIC_LIGHTING_RGB_MATRIX_ENABLE
+#    include "dynamic_lighting_rgb_matrix.h"
+#endif
+
 void dynamic_lighting_init(void) {
     // Initialize the dynamic lighting subsystems
 
@@ -78,6 +98,8 @@ void dynamic_lighting_set_led_hsv(dynamic_lighting_type_t type, int index, hsv_t
             dynamic_lighting_rgb_matrix_set_led_hsv(index, hsv);
             break;
 #    endif
+        default:
+            break;
     }
 }
 
@@ -97,8 +119,11 @@ void dynamic_lighting_set_led_range_hsv(dynamic_lighting_type_t type, int index,
             dynamic_lighting_rgb_matrix_set_led_range_hsv(index, range, hsv);
             break;
 #    endif
+        default:
+            break;
     }
 }
+
 void dynamic_lighting_set_all_hsv(dynamic_lighting_type_t type, hsv_t hsv) {
     if (!dynamic_lighting_type_enabled(type)) {
         return;
@@ -115,6 +140,8 @@ void dynamic_lighting_set_all_hsv(dynamic_lighting_type_t type, hsv_t hsv) {
             dynamic_lighting_rgb_matrix_set_all_hsv(hsv);
             break;
 #    endif
+        default:
+            break;
     }
 }
 
@@ -132,6 +159,8 @@ hsv_t dynamic_lighting_get_led_hsv(dynamic_lighting_type_t type, int index) {
         case DYNAMIC_LIGHTING_TYPE_RGB_MATRIX:
             return dynamic_lighting_rgb_matrix_get_led_hsv(index);
 #    endif
+        default:
+            break;
     }
 
     return (hsv_t){0, 0, 0};

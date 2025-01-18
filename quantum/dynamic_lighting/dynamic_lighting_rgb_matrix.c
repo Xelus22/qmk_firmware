@@ -18,6 +18,10 @@
 
 hsv_t g_dynamic_lighting_rgb_matrix_leds[RGB_MATRIX_LED_COUNT] = {0};
 
+void dynamic_lighting_rgb_matrix_init(void) {
+    // Initialize the RGB Matrix dynamic lighting subsystem
+}
+
 bool dynamic_lighting_rgb_matrix_enabled(void) {
     return true;
 }
@@ -27,6 +31,12 @@ void dynamic_lighting_rgb_matrix_set_led_hsv(int index, hsv_t hsv) {
         return;
     }
     g_dynamic_lighting_rgb_matrix_leds[index] = hsv;
+}
+
+void  dynamic_lighting_rgb_matrix_set_all_hsv(hsv_t hsv) {
+    for (int i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
+        g_dynamic_lighting_rgb_matrix_leds[i] = hsv;
+    }
 }
 
 void dynamic_lighting_rgb_matrix_set_led_range_hsv(int index, int range, hsv_t hsv) {
@@ -44,10 +54,4 @@ hsv_t dynamic_lighting_rgb_matrix_get_led_hsv(int index) {
         return (hsv_t){0, 0, 0};
     }
     return g_dynamic_lighting_rgb_matrix_leds[index];
-}
-
-void dynamic_lighting_rgb_matrix_flush(void) {
-    for (int i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
-        rgb_matrix_set_color(i, g_dynamic_lighting_rgb_matrix_leds[i].h, g_dynamic_lighting_rgb_matrix_leds[i].s, g_dynamic_lighting_rgb_matrix_leds[i].v);
-    }
 }

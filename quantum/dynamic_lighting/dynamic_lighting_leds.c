@@ -16,7 +16,11 @@
 
 #include "dynamic_lighting_leds.h"
 
-led_t g_led_state;
+led_t g_dynamic_lighting_led_state;
+
+void dynamic_lighting_led_init(void) {
+
+}
 
 bool dynamic_lighting_led_enabled() {
     return true;

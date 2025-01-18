@@ -143,6 +143,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef LAYER_LOCK_ENABLE
 #    include "layer_lock.h"
 #endif
+#ifdef DYNAMIC_LIGHTING_ENABLE
+#    include "dynamic_lighting.h"
+#endif
 
 static uint32_t last_input_modification_time = 0;
 uint32_t        last_input_activity_time(void) {
@@ -487,6 +490,9 @@ void keyboard_init(void) {
 #endif
 #ifdef HAPTIC_ENABLE
     haptic_init();
+#endif
+#ifdef DYNAMIC_LIGHTING_ENABLE
+    dynamic_lighting_init();
 #endif
 
 #if defined(DEBUG_MATRIX_SCAN_RATE) && defined(CONSOLE_ENABLE)

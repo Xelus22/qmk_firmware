@@ -19,32 +19,14 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "keyboard.h"
 
 typedef enum {
     DYNAMIC_LIGHTING_TYPE_LED = 0,
+    DYNAMIC_LIGHTING_TYPE_LED_MATRIX,
     DYNAMIC_LIGHTING_TYPE_RGBLIGHT,
     DYNAMIC_LIGHTING_TYPE_RGB_MATRIX,
 } dynamic_lighting_type_t;
-
-// Direct LED GPIO control
-#ifdef DYNAMIC_LIGHTING_GPIO_LEDS_ENABLE
-#    include "dynamic_lighting_gpio_leds.h"
-#endif
-
-// LED Matrix
-#ifdef DYNAMIC_LIGHTING_LED_MATRIX_ENABLE
-#    include "dynamic_lighting_led_matrix.h"
-#endif
-
-// RGB Light
-#ifdef DYNAMIC_LIGHTING_RGBLIGHT_ENABLE
-#    include "dynamic_lighting_rgblight.h"
-#endif
-
-// RGB Matrix
-#ifdef DYNAMIC_LIGHTING_RGB_MATRIX_ENABLE
-#    include "dynamic_lighting_rgb_matrix.h"
-#endif
 
 void dynamic_lighting_init(void);
 

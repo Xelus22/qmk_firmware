@@ -286,7 +286,7 @@ ifneq ($(strip $(FLASH_DRIVER)), none)
         $(call CATASTROPHIC_ERROR,Invalid FLASH_DRIVER,FLASH_DRIVER="$(FLASH_DRIVER)" is not a valid flash driver)
     else
         OPT_DEFS += -DFLASH_ENABLE -DFLASH_DRIVER -DFLASH_DRIVER_$(strip $(shell echo $(FLASH_DRIVER) | tr '[:lower:]' '[:upper:]'))
-		COMMON_VPATH += $(DRIVER_PATH)/flash
+        COMMON_VPATH += $(DRIVER_PATH)/flash
         ifeq ($(strip $(FLASH_DRIVER)),spi)
             SRC += flash_spi.c
             SPI_DRIVER_REQUIRED = yes
@@ -566,6 +566,30 @@ ifeq ($(strip $(RGB_MATRIX_ENABLE)), yes)
 
     ifeq ($(strip $(RGB_MATRIX_CUSTOM_USER)), yes)
         OPT_DEFS += -DRGB_MATRIX_CUSTOM_USER
+    endif
+endif
+
+ifeq ($(strip $(DYNAMIC_LIGHTING_ENABLE)), yes)
+    OPT_DEFS += -DDYNAMIC_LIGHTING_ENABLE
+
+    COMMON_VPATH += $(QUANTUM_DIR)/dynamic_lighting
+    SRC += $(QUANTUM_DIR)/dynamic_lighting/dynamic_lighting.c
+
+    ifeq ($(strip $(DYNAMIC_LIGHTING_RGB_MATRIX_ENABLE)), yes)
+        OPT_DEFS += -DDYNAMIC_LIGHTING_RGB_MATRIX_ENABLE
+        SRC += $(QUANTUM_DIR)/dynamic_lighting/dynamic_lighting_rgb_matrix.c
+    endif
+    ifeq ($(strip $(DYNAMIC_LIGHTING_LED_MATRIX_ENABLE)), yes)
+        OPT_DEFS += -DDYNAMIC_LIGHTING_LED_MATRIX_ENABLE
+        SRC += $(QUANTUM_DIR)/dynamic_lighting/dynamic_lighting_rgb_matrix.c
+    endif
+    ifeq ($(strip $(DYNAMIC_LIGHTING_GPIO_LEDS_ENABLE)), yes)
+        OPT_DEFS += -DDYNAMIC_LIGHTING_GPIO_LEDS_ENABLE
+        SRC += $(QUANTUM_DIR)/dynamic_lighting/dynamic_lighting_leds.c
+    endif
+    ifeq ($(strip $(DYNAMIC_LIGHTING_RGBLIGHT_ENABLE)), yes)
+        OPT_DEFS += -DDYNAMIC_LIGHTING_RGBLIGHT_ENABLE
+        SRC += $(QUANTUM_DIR)/dynamic_lighting/dynamic_lighting_rgblight.c
     endif
 endif
 

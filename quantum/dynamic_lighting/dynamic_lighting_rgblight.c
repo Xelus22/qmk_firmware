@@ -18,6 +18,10 @@
 
 hsv_t g_dynamic_lighting_rgblight_leds[RGBLIGHT_LED_COUNT];
 
+void  dynamic_lighting_rgblight_init(void) {
+
+}
+
 bool dynamic_lighting_rgblight_enabled(void) {
     return true;
 }
@@ -35,6 +39,11 @@ void dynamic_lighting_rgblight_set_led_range_hsv(int index, int range, hsv_t hsv
     }
 
     for (int i = index; i < index + range; i++) {
+        g_dynamic_lighting_rgblight_leds[i] = hsv;
+    }
+}
+void  dynamic_lighting_rgblight_set_all_hsv(hsv_t hsv) {
+    for (int i = 0; i < RGBLIGHT_LED_COUNT; i++) {
         g_dynamic_lighting_rgblight_leds[i] = hsv;
     }
 }

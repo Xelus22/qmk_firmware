@@ -13,11 +13,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "rgblight.h"
+#include "color.h"
 
 extern hsv_t g_dynamic_lighting_rgblight_leds[RGBLIGHT_LED_COUNT];
 
+void  dynamic_lighting_rgblight_init(void);
 bool  dynamic_lighting_rgblight_enabled(void);
 void  dynamic_lighting_rgblight_set_led_hsv(int index, hsv_t hsv);
+void  dynamic_lighting_rgblight_set_all_hsv(hsv_t hsv);
 void  dynamic_lighting_rgblight_set_led_range_hsv(int index, int range, hsv_t hsv);
 hsv_t dynamic_lighting_rgblight_get_led_hsv(int index);
