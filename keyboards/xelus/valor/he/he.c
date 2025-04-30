@@ -1,4 +1,4 @@
-/* Copyright 2021 QMK
+/* Copyright 2021 Harrison Chan (Xelus)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,11 +13,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#pragma once
 
-#define HAL_USE_SPI TRUE
-#define HAL_USE_PWM TRUE
-#define SPI_USE_WAIT TRUE
-#define SPI_SELECT_MODE SPI_SELECT_MODE_PAD
+#include "quantum.h"
+#include "analogkey.h"
 
-#include_next <halconf.h>
+// custom EECONFIG
+typedef struct custom_config_t {
+    per_key_analog_config config[MATRIX_ROWS][MATRIX_COLS];
+} custom_config_t;
+
+custom_config_t custom_config;
+
+#ifdef BOOTMAGIC_ENABLE
+void bootmagic_scan(void) {
+    matrix_scan();
+
+    uint16_t threshold = distance_to_adc(CALIBRATION_RANGE * 3 / 4);
+    uint16_t raw_value = keys[BOOTMAGIC_ROW][BOOTMAGIC_COLUMN].raw;
+
+    if (((lut_b > 0) & (raw_value > threshold)) | ((lut_b < 0) & (raw_value < threshold))) {
+        bootloader_jump();
+    }
+}
+#endif

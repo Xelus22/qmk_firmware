@@ -8,6 +8,8 @@
 #include <hal.h>
 #include "gpio.h"
 #include "analogkey.h"
+#include "adc.h"
+#include "eeprom_config.h"
 
 // mux
 // B6, B7, B8
@@ -26,8 +28,9 @@ static void process_adc_readings(uint8_t ch, const ADCManager *snapshot) {
         analog_key_t *key = &keys[mux][ch];
         key->raw          = getADCSample(snapshot, mux);
         // key->value =  use LUT to convert raw to value
-
-        switch (key->mode) {
+        // LUT for value to distance
+        uint8_t mode = get_analog_key_mode(mux, ch);
+        switch (mode) {
             case dynamic_actuation:
                 break;
             case continuous_dynamic_actuation:
@@ -42,7 +45,7 @@ static void process_adc_readings(uint8_t ch, const ADCManager *snapshot) {
     }
 }
 
-// greyh code
+// grey code
 // 000
 // 001
 // 011
@@ -51,7 +54,6 @@ static void process_adc_readings(uint8_t ch, const ADCManager *snapshot) {
 // 111
 // 101
 // 100
-
 
 void matrix_mux_change(uint8_t iteration) {
     // set mux
@@ -94,6 +96,23 @@ void matrix_mux_change(uint8_t iteration) {
     }
 }
 
+void matrix_init_custom(void) {
+    // init mux
+    gpio_set_pin_output_push_pull(B6);
+    gpio_set_pin_output_push_pull(B7);
+    gpio_set_pin_output_push_pull(B8);
+
+    // output 000 to all pins
+    gpio_write_pin_low(B6);
+    gpio_write_pin_low(B7);
+    gpio_write_pin_low(B8);
+
+    // init adc
+    adc_init();
+
+    //
+}
+
 bool matrix_scan_custom(matrix_row_t current_matrix[]) {
     // copy matrix to compare
     memcpy(previous_matrix, current_matrix, sizeof(previous_matrix));
@@ -109,6 +128,7 @@ bool matrix_scan_custom(matrix_row_t current_matrix[]) {
 
         // start adc read
         // process previous adc read
+        process_adc_readings(ch, getAdcManagerSnapshot());
         // wait for ADC conversion
     }
 

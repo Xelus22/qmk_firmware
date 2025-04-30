@@ -1,5 +1,5 @@
 SRC += matrix.c
-RGB_MATRIX_CUSTOM_KB = yes
+# RGB_MATRIX_CUSTOM_KB = yes
 FLASH_DRIVER = spi
 CUSTOM_MATRIX = lite
 OPT = 2
