@@ -7,9 +7,11 @@
 #include <ch.h>
 #include <hal.h>
 #include "gpio.h"
-#include "analogkey.h"
 #include "adc.h"
-#include "eeprom_config.h"
+
+// libraries
+#include "lib/analogkey.h"
+#include "lib/eeprom_config.h"
 
 // mux
 // B6, B7, B8

@@ -6,22 +6,22 @@ SPDX-License-Identifier: GPL-2.0-or-later */
 
 #pragma once
 
-typedef uint8_t analog_key_modes;
-enum { dynamic_actuation = 0, continuous_dynamic_actuation, static_actuation, flashing };
-
-typedef struct {
+// for saving to eeprom
+typedef struct PACKED {
     uint8_t  unused;
     uint8_t  mode;
     uint16_t actuation_point;
     uint16_t press_sensitivity;
     uint16_t release_sensitivity;
+    uint16_t actuation_hysteresis;
     uint16_t press_hysteresis;
     uint16_t release_hysteresis;
-} per_key_analog_config; /* 12 bytes */
-_Static_assert(sizeof(per_key_analog_config) == 12, "Size mismatch");
+} per_key_analog_config; /* 14 bytes */
+_Static_assert(sizeof(per_key_analog_config) == 14, "Size mismatch");
 extern per_key_analog_config analog_config[MATRIX_ROWS][MATRIX_COLS];
 
-typedef struct {
+// for use in RAM
+typedef struct PACKED {
     /* For individual analog key data */
     uint16_t raw;
     uint16_t value;

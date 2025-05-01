@@ -15,7 +15,7 @@
  */
 
 #include "quantum.h"
-#include "analogkey.h"
+#include "lib/analogkey.h"
 
 // custom EECONFIG
 typedef struct custom_config_t {
@@ -24,15 +24,15 @@ typedef struct custom_config_t {
 
 custom_config_t custom_config;
 
-#ifdef BOOTMAGIC_ENABLE
-void bootmagic_scan(void) {
-    matrix_scan();
+// #ifdef BOOTMAGIC_ENABLE
+// void bootmagic_scan(void) {
+//     matrix_scan();
 
-    uint16_t threshold = distance_to_adc(CALIBRATION_RANGE * 3 / 4);
-    uint16_t raw_value = keys[BOOTMAGIC_ROW][BOOTMAGIC_COLUMN].raw;
+//     uint16_t threshold = distance_to_adc(CALIBRATION_RANGE * 3 / 4);
+//     uint16_t raw_value = keys[BOOTMAGIC_ROW][BOOTMAGIC_COLUMN].raw;
 
-    if (((lut_b > 0) & (raw_value > threshold)) | ((lut_b < 0) & (raw_value < threshold))) {
-        bootloader_jump();
-    }
-}
-#endif
+//     if (((lut_b > 0) & (raw_value > threshold)) | ((lut_b < 0) & (raw_value < threshold))) {
+//         bootloader_jump();
+//     }
+// }
+// #endif
