@@ -20,6 +20,7 @@
 #define MUX_CHANNELS MATRIX_COLS
 #define NMUX MATRIX_ROWS
 
+// global variables required for key scanning
 analog_key_t keys[MATRIX_ROWS][MATRIX_COLS] = {0};
 
 matrix_row_t previous_matrix[MATRIX_ROWS];

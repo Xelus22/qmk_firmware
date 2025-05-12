@@ -28,6 +28,6 @@ typedef struct PACKED {
     uint16_t topOut;
     uint16_t bottomOut;
     uint16_t offset;
-    bool     continuous_dynamic_actuation;
+    uint16_t extremum; // for use in dynamic actuation
 } analog_key_t;
 extern analog_key_t keys[MATRIX_ROWS][MATRIX_COLS];

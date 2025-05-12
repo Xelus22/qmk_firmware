@@ -1,10 +1,17 @@
-
+#include <stdbool.h>
 #pragma once
 // create an enum of hall effect key modes
 typedef enum {
-    STATIC_ACTUATION = 0,
-    DYNAMIC_ACTUATION,
-    CONTINUOUS_DYNAMIC_ACTUATION,
-    DYNAMIC_KEY_STROKE,
-    ANALOG_HID_OUTPUT,
-} hall_effect_key_mode_t;
+    MODE_STATIC_ACTUATION = 0,
+    MODE_DYNAMIC_ACTUATION,
+    MODE_CONTINUOUS_DYNAMIC_ACTUATION,
+    MODE_DYNAMIC_KEY_STROKE,
+    MODE_ANALOG_HID_OUTPUT,
+    MODE_CALIBRATION
+} analog_key_mode_t;
+
+// run time struct for when is what
+typedef struct {
+    bool is_calibrating;
+    bool is_calibrated;
+} anlog_config_t;
