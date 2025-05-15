@@ -71,12 +71,12 @@ last_hit_t g_last_hit_tracker;
 #endif // RGB_MATRIX_KEYREACTIVE_ENABLED
 
 // internals
-static bool            suspend_state     = false;
-static uint8_t         rgb_last_enable   = UINT8_MAX;
-static uint8_t         rgb_last_effect   = UINT8_MAX;
-static effect_params_t rgb_effect_params = {0, LED_FLAG_ALL, false};
-static rgb_task_states rgb_task_state    = SYNCING;
-static uint8_t         rgb_task_count    = 0;
+static bool            suspend_state        = false;
+static uint8_t         rgb_last_enable      = UINT8_MAX;
+static uint8_t         rgb_last_effect      = UINT8_MAX;
+static effect_params_t rgb_effect_params    = {0, LED_FLAG_ALL, false};
+static rgb_task_states rgb_task_state       = SYNCING;
+static uint8_t         rgb_task_flush_count = 0;
 // double buffers
 static uint32_t rgb_timer_buffer;
 #ifdef RGB_MATRIX_KEYREACTIVE_ENABLED
@@ -268,9 +268,6 @@ static void rgb_task_timers(void) {
 }
 
 static void rgb_task_sync(void) {
-    // track count of the number of times we have sync'd
-    rgb_task_count++;
-    
     eeconfig_flush_rgb_matrix(false);
     // next task
     if (sync_timer_elapsed32(g_rgb_timer) >= RGB_MATRIX_LED_FLUSH_LIMIT) rgb_task_state = STARTING;
@@ -364,10 +361,11 @@ static void rgb_task_flush(uint8_t effect) {
 
 void rgb_matrix_task(void) {
     // if its disabled we may exit early
-    if (rgb_matrix_is_enabled() == 0) {
-        // only exit early if the rgb_task_count has been greater than 2
+    uint8_t effect = rgb_matrix_config.mode;
+    if (effect == RGB_MATRIX_NONE) {
+        // only exit early if the rgb_task_flush_count has been greater than 2
         // this is to ensure we have flushed at least once
-        if (rgb_task_count > 2) {
+        if (rgb_task_flush_count > 2) {
             return;
         }
     }
@@ -381,7 +379,9 @@ void rgb_matrix_task(void) {
 #endif // RGB_MATRIX_TIMEOUT > 0
                              false;
 
-    uint8_t effect = suspend_backlight ? 0 : rgb_matrix_config.mode;
+    if (suspend_backlight) {
+        effect = RGB_MATRIX_NONE;
+    }
 
     switch (rgb_task_state) {
         case STARTING:
@@ -398,6 +398,8 @@ void rgb_matrix_task(void) {
             break;
         case FLUSHING:
             rgb_task_flush(effect);
+            // track count of the number of times we have rendered
+            rgb_task_flush_count++;
             break;
         case SYNCING:
             rgb_task_sync();
@@ -531,7 +533,7 @@ void rgb_matrix_disable(void) {
 void rgb_matrix_disable_noeeprom(void) {
     if (rgb_matrix_config.enable) rgb_task_state = STARTING;
     rgb_matrix_config.enable = 0;
-    rgb_task_count = 0;
+    rgb_task_flush_count     = 0;
 }
 
 uint8_t rgb_matrix_is_enabled(void) {
@@ -539,6 +541,7 @@ uint8_t rgb_matrix_is_enabled(void) {
 }
 
 void rgb_matrix_mode_eeprom_helper(uint8_t mode, bool write_to_eeprom) {
+    rgb_task_flush_count = 0;
     if (!rgb_matrix_config.enable) {
         return;
     }
