@@ -365,7 +365,7 @@ void rgb_matrix_task(void) {
     if (effect == RGB_MATRIX_NONE) {
         // only exit early if the rgb_task_flush_count has been greater than 2
         // this is to ensure we have flushed at least once
-        if (rgb_task_flush_count > 2) {
+        if (rgb_task_flush_count > 100) {
             return;
         }
     }
@@ -398,10 +398,9 @@ void rgb_matrix_task(void) {
             break;
         case FLUSHING:
             rgb_task_flush(effect);
-            // track count of the number of times we have rendered
-            rgb_task_flush_count++;
             break;
         case SYNCING:
+            rgb_task_flush_count++;
             rgb_task_sync();
             break;
     }
@@ -531,7 +530,7 @@ void rgb_matrix_disable(void) {
 }
 
 void rgb_matrix_disable_noeeprom(void) {
-    if (rgb_matrix_config.enable) rgb_task_state = STARTING;
+    rgb_task_state = STARTING;
     rgb_matrix_config.enable = 0;
     rgb_task_flush_count     = 0;
 }
@@ -541,7 +540,6 @@ uint8_t rgb_matrix_is_enabled(void) {
 }
 
 void rgb_matrix_mode_eeprom_helper(uint8_t mode, bool write_to_eeprom) {
-    rgb_task_flush_count = 0;
     if (!rgb_matrix_config.enable) {
         return;
     }
