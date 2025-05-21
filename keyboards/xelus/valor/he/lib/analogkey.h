@@ -3,6 +3,7 @@
 SPDX-License-Identifier: GPL-2.0-or-later */
 #include <stdint.h>
 #include <stdbool.h>
+#include "util.h"
 
 #pragma once
 

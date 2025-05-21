@@ -15,3 +15,5 @@ typedef struct {
     bool is_calibrating;
     bool is_calibrated;
 } anlog_config_t;
+
+void process_mode_key(analog_key_mode_t mode, uint8_t row, uint8_t col);

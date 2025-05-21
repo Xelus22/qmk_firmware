@@ -1,5 +1,6 @@
 // EEPROM configuration for saving hysteresis values etc
 #include "analogConfig.h"
+#include <string.h>
 
 per_key_analog_config analog_config[MATRIX_ROWS][MATRIX_COLS] = {0};
 
@@ -12,11 +13,11 @@ void get_analog_config(per_key_analog_config *config, uint8_t row, uint8_t col) 
 }
 
 void set_analog_key_mode(uint8_t row, uint8_t col, analog_key_mode_t mode) {
-    keys[row][col].mode = mode;
+    analog_config[row][col].mode = mode;
 }
 
 uint8_t get_analog_key_mode(uint8_t row, uint8_t col) {
-    return keys[row][col].mode;
+    return analog_config[row][col].mode;
 }
 
 void set_analog_key_actuation_point(uint8_t row, uint8_t col, uint16_t actuation_point) {

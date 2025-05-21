@@ -11,7 +11,8 @@
 
 // libraries
 #include "lib/analogkey.h"
-#include "lib/eeprom_config.h"
+#include "lib/analogConfig.h"
+#include "adc.h"
 
 // mux
 // B6, B7, B8
@@ -33,18 +34,7 @@ static void process_adc_readings(uint8_t ch, const ADCManager *snapshot) {
         // key->value =  use LUT to convert raw to value
         // LUT for value to distance
         uint8_t mode = get_analog_key_mode(mux, ch);
-        switch (mode) {
-            case dynamic_actuation:
-                break;
-            case continuous_dynamic_actuation:
-                break;
-            case static_actuation:
-                break;
-            case flashing:
-            default:
-                bootloader_jump();
-                break;
-        }
+        process_mode_key(mode, mux, ch);
     }
 }
 
@@ -101,9 +91,9 @@ void matrix_mux_change(uint8_t iteration) {
 
 void matrix_init_custom(void) {
     // init mux
-    gpio_set_pin_output_push_pull(B6);
-    gpio_set_pin_output_push_pull(B7);
-    gpio_set_pin_output_push_pull(B8);
+    gpio_set_pin_output(B6);
+    gpio_set_pin_output(B7);
+    gpio_set_pin_output(B8);
 
     // output 000 to all pins
     gpio_write_pin_low(B6);

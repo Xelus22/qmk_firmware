@@ -130,3 +130,13 @@ msg_t adcStartAllConversions() {
 const ADCManager *getAdcManagerSnapshot(void) {
     return &adcManager;
 }
+
+void adc_init(void) {
+    // Initialize the ADC
+    initADCGroups();
+}
+
+void adc_start(void) {
+    // Start the ADC conversions
+    adcStartAllConversions();
+}

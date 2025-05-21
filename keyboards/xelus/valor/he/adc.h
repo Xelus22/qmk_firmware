@@ -1,9 +1,9 @@
 // adc.h
 
-#pragma once
-
 #include "hal.h"
 #include "hal_adc_lld.h"
+
+#pragma once
 
 #define ADC_GROUPS 3
 
@@ -35,7 +35,7 @@ static inline adcsample_t getADCSample(const ADCManager *m, uint8_t muxIndex) {
     else if (muxIndex < 6)
     return m->values.sampleBuffer2[muxIndex - 2];
     else if (muxIndex < 9)
-    return m->values.sampleBuffer3[1 - (muxIndex - 4)]; // swaps order for ADC4
+    return m->values.sampleBuffer3[muxIndex - 6]; // swaps order for ADC4
     return 0;
 }
 bool waitForAdcConversion(void);

@@ -36,3 +36,10 @@ custom_config_t custom_config;
 //     }
 // }
 // #endif
+
+void board_init(void) {
+    // Set the USB HS pin to high
+    gpio_set_pin_output(A15);
+    gpio_write_pin_high(A15);
+}
+
