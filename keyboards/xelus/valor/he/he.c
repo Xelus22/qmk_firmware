@@ -43,3 +43,12 @@ void board_init(void) {
     gpio_write_pin_high(A15);
 }
 
+void keyboard_post_init_kb(void) {
+  // Customise these values to desired behaviour
+  debug_enable=true;
+  debug_matrix=true;
+  //debug_keyboard=true;
+  //debug_mouse=true;
+
+  keyboard_post_init_user();
+}

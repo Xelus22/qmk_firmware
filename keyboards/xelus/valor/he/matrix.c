@@ -120,6 +120,10 @@ bool matrix_scan_custom(matrix_row_t current_matrix[]) {
         matrix_mux_change(ch);
 
         // start adc read
+        adc_start(); // start ADC conversion
+
+        waitForAdcConversion(); // wait for ADC conversion to complete
+
         // process previous adc read
         process_adc_readings(ch, getAdcManagerSnapshot());
         // wait for ADC conversion

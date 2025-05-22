@@ -36,6 +36,8 @@
 #undef STM32_ADC_USE_ADC3
 #define STM32_ADC_USE_ADC3 TRUE
 
+// adc only running at 21MHz clock (168 / 8)
+
 // Add DMA configuration for ADCs
 #undef STM32_ADC_ADC1_DMA_STREAM
 #define STM32_ADC_ADC1_DMA_STREAM STM32_DMA_STREAM_ID(2, 4)

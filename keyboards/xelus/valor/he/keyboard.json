@@ -12,6 +12,8 @@
         "lto": false
     },
     "features": {
+        "console": true,
+        "debug": true,
         "bootmagic": true,
         "extrakey": true,
         "mousekey": true,
