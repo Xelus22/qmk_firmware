@@ -14,7 +14,7 @@ void set_mode(uint8_t row, uint8_t col, uint8_t mode) {
     analog_config[row][col].mode = mode;
 }
 
-void process_mode_key(analog_key_mode_t mode, uint8_t row, uint8_t col) {
+bool process_mode_key(analog_key_mode_t mode, uint8_t row, uint8_t col) {
     switch (mode) {
         case MODE_STATIC_ACTUATION:
             // process static actuation
@@ -37,4 +37,6 @@ void process_mode_key(analog_key_mode_t mode, uint8_t row, uint8_t col) {
         default:
             break;
     }
+
+    return false; // key not pressed
 }

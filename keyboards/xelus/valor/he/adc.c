@@ -2,41 +2,62 @@
 #include "print.h"
 #include "stm32f405xx.h"
 
-// Define the global ADC manager instance
-ADCManager       adcManager;
-static ADCValues adcBuffers;
+semaphore_t sem;
+
+static uint32_t numConversions                = 0; // Number of conversions done
+adcsample_t     adcSamples1[ADC_NUM_CHANNELS] = {0};
+adcsample_t     adcSamples2[ADC_NUM_CHANNELS] = {0};
+adcsample_t     adcSamples3[ADC_NUM_CHANNELS] = {0};
+
+uint32_t getNumConversions(void) {
+    return numConversions;
+}
 
 static void adcCompleteCallback(ADCDriver *adcp) {
     (void)adcp;
-    if (++adcManager.completedConversions >= ADC_GROUPS) {
-        adcManager.completedConversions = 0;
-        chSemSignalI(&adcManager.sem);
+    numConversions++;
+    if (numConversions >= ADC_GROUPS) {
+        chSemSignalI(&sem);
     }
 }
 
 bool waitForAdcConversion(void) {
-    chSemWait(&adcManager.sem); // Wait for the semaphore to be signalled
-    // copy values from local buffer to ADCValues struct
-    memcpy(&adcManager.values, &adcBuffers, sizeof(ADCValues));
+    uprintf("Waiting for ADC conversion to complete...\n");
+    chSemWait(&sem); // Wait for the semaphore to be signalled
     return true;
+}
+
+adcsample_t *adc_get_samples1(void) {
+    // Return the pointer to the ADC samples buffer
+    return adcSamples1;
+}
+adcsample_t *adc_get_samples2(void) {
+    // Return the pointer to the ADC samples buffer
+    return adcSamples2;
+}
+adcsample_t *adc_get_samples3(void) {
+    // Return the pointer to the ADC samples buffer
+    return adcSamples3;
 }
 
 void adcErrorCallback(ADCDriver *adcp, adcerror_t err) {
     (void)adcp; // Unused parameter
+    osalSysLockFromISR();
     switch (err) {
         case ADC_ERR_DMAFAILURE:
-            uprintf("ADC ERROR: DMA failure.\n");
+            printf("ADC ERROR: DMA failure.\n");
             break;
         case ADC_ERR_OVERFLOW:
-            uprintf("ADC ERROR: Overflow.\n");
+            printf("ADC ERROR: Overflow.\n");
             break;
         case ADC_ERR_AWD:
-            uprintf("ADC ERROR: Watchdog 1 triggered.\n");
+            printf("ADC ERROR: Watchdog 1 triggered.\n");
             break;
         default:
-            uprintf("ADC ERROR: Unknown error.\n");
+            printf("ADC ERROR: Unknown error.\n");
             break;
     }
+    osalSysUnlockFromISR();
 }
 
 // turn off clang-format
@@ -45,9 +66,9 @@ static const ADCConversionGroup adc1Config = {
     .circular     = false,
     .num_channels = 3U,
     .end_cb       = adcCompleteCallback,
-    .error_cb     = NULL,
-    .cr1 = ADC_CR1_SCAN,
-    .cr2 = ADC_CR2_DMA | ADC_CR2_DDS,
+    .error_cb     = adcErrorCallback,
+    .cr1 = 0,
+    .cr2 = ADC_CR2_DMA | ADC_CR2_SWSTART,
     .smpr1 = 0U,
     .smpr2 = ADC_SMPR2_SMP_AN4(ADC_SAMPLE_3) |
              ADC_SMPR2_SMP_AN6(ADC_SAMPLE_3) |
@@ -63,9 +84,9 @@ static const ADCConversionGroup adc2Config = {
     .circular     = false,
     .num_channels = 3U,
     .end_cb       = adcCompleteCallback,
-    .error_cb     = NULL,
-    .cr1 = ADC_CR1_SCAN,
-    .cr2 = ADC_CR2_DMA | ADC_CR2_DDS,
+    .error_cb     = adcErrorCallback,
+    .cr1 = 0,
+    .cr2 = ADC_CR2_DMA | ADC_CR2_SWSTART,
     .smpr1 = ADC_SMPR1_SMP_AN11(ADC_SAMPLE_3) |
              ADC_SMPR1_SMP_AN14(ADC_SAMPLE_3) |
              ADC_SMPR1_SMP_AN15(ADC_SAMPLE_3),
@@ -81,9 +102,9 @@ static const ADCConversionGroup adc3Config = {
     .circular     = false,
     .num_channels = 3U,
     .end_cb       = adcCompleteCallback,
-    .error_cb     = NULL,
-    .cr1 = ADC_CR1_SCAN,
-    .cr2 = ADC_CR2_DMA | ADC_CR2_DDS,
+    .error_cb     = adcErrorCallback,
+    .cr1 = 0,
+    .cr2 = ADC_CR2_DMA | ADC_CR2_SWSTART,
     .smpr1 = 0U,
     .smpr2 = ADC_SMPR2_SMP_AN0(ADC_SAMPLE_3) |
              ADC_SMPR2_SMP_AN1(ADC_SAMPLE_3) |
@@ -97,9 +118,18 @@ static const ADCConversionGroup adc3Config = {
 // clang-format on
 // turn on clang-format
 
-void initADCGroups() {
-    adcManager.completedConversions = 0;
-    chSemObjectInit(&adcManager.sem, 0); // Initialize semaphore with a count of 0
+void adc_init(void) {
+    uprintf("ADC Init\n");
+    // setup the ADC pins
+    palSetPadMode(GPIOC, 5, PAL_MODE_INPUT_ANALOG);
+    palSetPadMode(GPIOC, 4, PAL_MODE_INPUT_ANALOG);
+    palSetPadMode(GPIOA, 7, PAL_MODE_INPUT_ANALOG);
+    palSetPadMode(GPIOA, 6, PAL_MODE_INPUT_ANALOG);
+    palSetPadMode(GPIOA, 4, PAL_MODE_INPUT_ANALOG);
+    palSetPadMode(GPIOA, 2, PAL_MODE_INPUT_ANALOG);
+    palSetPadMode(GPIOA, 1, PAL_MODE_INPUT_ANALOG);
+    palSetPadMode(GPIOA, 0, PAL_MODE_INPUT_ANALOG);
+    palSetPadMode(GPIOC, 1, PAL_MODE_INPUT_ANALOG);
 
     // PCLK2 divided by 4
     // DMA mode 1 enabled (2 / 3 half-words one by one - 1 then 2 then 3)
@@ -112,30 +142,15 @@ void initADCGroups() {
     adcStart(&ADCD1, NULL); // Start ADC1
     adcStart(&ADCD2, NULL); // Start ADC2
     adcStart(&ADCD3, NULL); // Start ADC3
-}
 
-msg_t adcStartAllConversions() {
-    adcManager.completedConversions = 0;
-
-    // Start conversions on multiple ADCs
-    adcStartConversion(&ADCD1, &adc1Config, adcBuffers.sampleBuffer1, 1);
-    adcStartConversion(&ADCD2, &adc2Config, adcBuffers.sampleBuffer2, 1);
-    adcStartConversion(&ADCD3, &adc3Config, adcBuffers.sampleBuffer3, 1);
-
-    return MSG_OK;
-}
-
-// Snapshot accessor.
-const ADCManager *getAdcManagerSnapshot(void) {
-    return &adcManager;
-}
-
-void adc_init(void) {
-    // Initialize the ADC
-    initADCGroups();
+    chSemObjectInit(&sem, 0);
+    uprintf("Complete semaphore\n");
+    numConversions = 0; // Reset the number of conversions
 }
 
 void adc_start(void) {
-    // Start the ADC conversions
-    adcStartAllConversions();
+    numConversions = 0; // Reset the number of conversions
+    adcStartConversionI(&ADCD1, &adc1Config, adcSamples1, 1);
+    adcStartConversionI(&ADCD2, &adc2Config, adcSamples2, 1);
+    adcStartConversionI(&ADCD3, &adc3Config, adcSamples3, 1);
 }

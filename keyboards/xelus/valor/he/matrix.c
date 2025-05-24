@@ -27,14 +27,15 @@ analog_key_t keys[MATRIX_ROWS][MATRIX_COLS] = {0};
 matrix_row_t previous_matrix[MATRIX_ROWS];
 
 // process adc reading
-static void process_adc_readings(uint8_t ch, const ADCManager *snapshot) {
+static void process_adc_readings(matrix_row_t *current_matrix, uint8_t ch) {
     for (int mux = 0; mux < NMUX; mux++) {
-        analog_key_t *key = &keys[mux][ch];
-        key->raw          = getADCSample(snapshot, mux);
+        // analog_key_t *key = &keys[mux][ch];
+        // key->raw          = getADCSample(snapshot, mux);
         // key->value =  use LUT to convert raw to value
         // LUT for value to distance
-        uint8_t mode = get_analog_key_mode(mux, ch);
-        process_mode_key(mode, mux, ch);
+        uint8_t mode     = get_analog_key_mode(mux, ch);
+        bool    bPressed = process_mode_key(mode, mux, ch);
+        current_matrix[mux] |= (bPressed ? (1 << ch) : 0);
     }
 }
 
@@ -90,6 +91,8 @@ void matrix_mux_change(uint8_t iteration) {
 }
 
 void matrix_init_custom(void) {
+    uprintf("Matrix Init\n");
+
     // init mux
     gpio_set_pin_output(B6);
     gpio_set_pin_output(B7);
@@ -100,13 +103,14 @@ void matrix_init_custom(void) {
     gpio_write_pin_low(B7);
     gpio_write_pin_low(B8);
 
+    uprintf("Starting ADC Init\n");
     // init adc
     adc_init();
-
-    //
 }
 
 bool matrix_scan_custom(matrix_row_t current_matrix[]) {
+    uprintf("starting matrix scan\n");
+
     // copy matrix to compare
     memcpy(previous_matrix, current_matrix, sizeof(previous_matrix));
 
@@ -116,17 +120,46 @@ bool matrix_scan_custom(matrix_row_t current_matrix[]) {
     // wait for ADC conversion
 
     // loop through each bundle of keys
-    for (uint8_t ch = 0; ch < MUX_CHANNELS; ch++) {
-        matrix_mux_change(ch);
+    // for (uint8_t ch = 0; ch < MUX_CHANNELS; ch++) {
+    // matrix_mux_change(ch);
 
-        // start adc read
-        adc_start(); // start ADC conversion
+    // start adc read
+    uprintf("starting adc read\n");
+    adc_start(); // start ADC conversion
 
-        waitForAdcConversion(); // wait for ADC conversion to complete
+    uprintf("waiting for adc to complete\n");
 
-        // process previous adc read
-        process_adc_readings(ch, getAdcManagerSnapshot());
-        // wait for ADC conversion
+    // waitForAdcConversion(); // wait for ADC conversion to complete
+    while(true) {
+        uint32_t num = getNumConversions();
+        uprintf("ADC conversions: %lu\n", num);
+        if (num >= ADC_GROUPS) {
+            uprintf("ADC conversion complete\n");
+            break; // exit loop when all conversions are done
+        }
+    }
+
+    // get the samples
+    adcsample_t *samples = adc_get_samples1();
+    for (int i = 0; i < ADC_NUM_CHANNELS; i++) {
+        // print each sample
+        uprintf("Sample %d: %u\n", i, samples[i]);
+    }
+    samples = adc_get_samples2();
+    for (int i = 0; i < ADC_NUM_CHANNELS; i++) {
+        // print each sample
+        uprintf("Sample %d: %u\n", i, samples[i]);
+    }
+    samples = adc_get_samples3();
+    for (int i = 0; i < ADC_NUM_CHANNELS; i++) {
+        // print each sample
+        uprintf("Sample %d: %u\n", i, samples[i]);
+    }
+    // }
+
+    // dummy call to process_adc_readings
+    if (false) {
+        process_adc_readings(current_matrix, 0);
     }
 
     // process last adc read
