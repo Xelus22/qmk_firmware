@@ -124,15 +124,15 @@ bool matrix_scan_custom(matrix_row_t current_matrix[]) {
     // matrix_mux_change(ch);
 
     // start adc read
-    uprintf("starting adc read\n");
+    // uprintf("starting adc read\n");
     adc_start(); // start ADC conversion
 
-    uprintf("waiting for adc to complete\n");
+    // uprintf("waiting for adc to complete\n");
 
     // waitForAdcConversion(); // wait for ADC conversion to complete
     while(true) {
         uint32_t num = getNumConversions();
-        uprintf("ADC conversions: %lu\n", num);
+        uprintf("convs: %lu\n", num);
         if (num >= ADC_GROUPS) {
             uprintf("ADC conversion complete\n");
             break; // exit loop when all conversions are done
@@ -140,18 +140,8 @@ bool matrix_scan_custom(matrix_row_t current_matrix[]) {
     }
 
     // get the samples
-    adcsample_t *samples = adc_get_samples1();
-    for (int i = 0; i < ADC_NUM_CHANNELS; i++) {
-        // print each sample
-        uprintf("Sample %d: %u\n", i, samples[i]);
-    }
-    samples = adc_get_samples2();
-    for (int i = 0; i < ADC_NUM_CHANNELS; i++) {
-        // print each sample
-        uprintf("Sample %d: %u\n", i, samples[i]);
-    }
-    samples = adc_get_samples3();
-    for (int i = 0; i < ADC_NUM_CHANNELS; i++) {
+    adcsample_t *samples = adc_get_samples();
+    for (int i = 0; i < NUM_SAMPLES; i++) {
         // print each sample
         uprintf("Sample %d: %u\n", i, samples[i]);
     }

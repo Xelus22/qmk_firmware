@@ -12,9 +12,9 @@
 #define NUM_SAMPLES (ADC_GROUPS * ADC_NUM_CHANNELS)
 
 uint32_t getNumConversions(void);
-adcsample_t *adc_get_samples1(void);
-adcsample_t *adc_get_samples2(void);
-adcsample_t *adc_get_samples3(void);
+adcsample_t *adc_get_samples(void);
+// adcsample_t *adc_get_samples2(void);
+// adcsample_t *adc_get_samples3(void);
 void adc_init(void);
 void adc_start(void);
 bool waitForAdcConversion(void);
