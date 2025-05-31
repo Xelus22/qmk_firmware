@@ -16,11 +16,21 @@ bool process_record_dynamic_keystroke(uint16_t keycode, keyrecord_t *record) {
         case COMMUNITY_MODULE_DYNAMIC_KEYSTROKE_0 ... COMMUNITY_MODULE_DYNAMIC_KEYSTROKE_9:
             uint16_t             index             = keycode - COMMUNITY_MODULE_DYNAMIC_KEYSTROKE_0;
             const dynamic_keystroke_t *dynamic_keystroke = dynamic_keystroke_get(index);
+            const dynamic_keystroke_behaviour_t behaviour = dynamic_keystroke->behaviour;
 
-            if (record->event.pressed) {
-                tap_code16(dynamic_keystroke->pressKeycode);
-            } else {
-                tap_code16(dynamic_keystroke->releaseKeycode);
+            if (behaviour == DKS_BEHAVIOUR_TAP) {
+                if (record->event.pressed) {
+                    tap_code16(dynamic_keystroke->press_keycode);
+                } else {
+                    tap_code16(dynamic_keystroke->release_keycode);
+                }
+            } else if (behaviour == DKS_BEHAVIOUR_PRESS_HOLD) {
+                if (record->event.pressed) {
+                    register_code16(dynamic_keystroke->press_keycode);
+                } else {
+                    unregister_code16(dynamic_keystroke->press_keycode);
+                    tap_code16(dynamic_keystroke->release_keycode);
+                }
             }
             return false;
     }
