@@ -48,13 +48,6 @@ bool process_dynamic_actuation(bool bPrevState, uint8_t row, uint8_t col) {
     uint16_t release_hysteresis = get_dynamic_release_hysteresis(row, col);
     uint16_t topOutHysteresis = get_top_out_calibration_hysteresis(row, col);
 
-    // extremum can swap between last press/release point
-    // based on prev state
-    // if (row == 5 && col == 3) {
-    //     uprintf("bp %d, raw %d, lcr %d, ph %d, rh %d\n", bPrevState, raw_value, keys[row][col].lastChangeRaw, press_hysteresis, release_hysteresis);
-    // }
-
-
     // make sure that we are below the activate threshold
     if (!bPrevState && raw_value < activate_threshold) {
         return false;
@@ -113,16 +106,11 @@ bool process_continuous_dynamic_actuation(bool bPrevState, uint8_t row, uint8_t 
     uint16_t release_hysteresis = get_dynamic_release_hysteresis(row, col);
     uint16_t topOutHysteresis   = get_top_out_calibration_hysteresis(row, col);
 
-    // extremum can swap between last press/release point
-    // based on prev state
-
-    // continuous dynamic actuation
-    // make sure that we are below the activate threshold
     bool bBelowActivateThreshold = (raw_value < activate_threshold);
 
-    // non continuous and below activate threshold
-    // or continuous and not pass active state and below activate threshold
     if (!bState && bBelowActivateThreshold) {
+        // automatically resets the bState to 0 here
+        // because we are stealing the top bit of the lastChangeRaw
         keys[row][col].lastChangeRaw = raw_value;
         return false;
     }
@@ -136,7 +124,6 @@ bool process_continuous_dynamic_actuation(bool bPrevState, uint8_t row, uint8_t 
                 // uprintf("release\n");
             }
             // key release
-            // set only the bottom 0x7FFF bits
             if (bState) {
                 raw_value |= 0x8000;
             }

@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <stdint.h>
 #pragma once
 // create an enum of hall effect key modes
 typedef enum {
