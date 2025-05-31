@@ -1,0 +1,238 @@
+#include "analogModes.h"
+#include "analogConfig.h"
+#include "analogkey.h"
+#include "calibration.h"
+#include "keymodes/dks.h"
+#include "print.h"
+
+// settings for when to do calibration and what not
+
+// get mode for a key
+uint8_t get_mode(uint8_t row, uint8_t col) {
+    return analog_config[row][col].mode;
+}
+
+// set mode for a key
+void set_mode(uint8_t row, uint8_t col, uint8_t mode) {
+    analog_config[row][col].mode = mode;
+}
+
+bool process_static_actuation(bool bPrevState, uint8_t row, uint8_t col) {
+    // static actuation logic
+    uint16_t raw_value       = keys[row][col].raw;
+    uint16_t actuation_point = get_static_actuation_point(row, col);
+
+    // applies to the negative
+    uint16_t actuation_hysteresis = get_static_actuation_hysteresis(row, col);
+
+    if (bPrevState) {
+        if (raw_value < actuation_point - actuation_hysteresis) {
+            return false; // not pressed
+        }
+    } else {
+        if (raw_value > actuation_point + actuation_hysteresis) {
+            return true; // now pressed
+        }
+    }
+
+    return bPrevState; // no mans land keep prev state
+}
+
+bool process_dynamic_actuation(bool bPrevState, uint8_t row, uint8_t col) {
+    // dynamic actuation logic
+    uint16_t raw_value = keys[row][col].raw;
+
+    // get the thresholds
+    uint16_t activate_threshold = get_dynamic_activate_threshold(row, col);
+    uint16_t press_hysteresis = get_dynamic_press_hysteresis(row, col);
+    uint16_t release_hysteresis = get_dynamic_release_hysteresis(row, col);
+    uint16_t topOutHysteresis = get_top_out_calibration_hysteresis(row, col);
+
+    // extremum can swap between last press/release point
+    // based on prev state
+    // if (row == 5 && col == 3) {
+    //     uprintf("bp %d, raw %d, lcr %d, ph %d, rh %d\n", bPrevState, raw_value, keys[row][col].lastChangeRaw, press_hysteresis, release_hysteresis);
+    // }
+
+
+    // make sure that we are below the activate threshold
+    if (!bPrevState && raw_value < activate_threshold) {
+        return false;
+    }
+    
+    if (bPrevState) {
+        // pressed state
+        
+        // check lastChangeRaw currently is the lowest press point 
+        if (raw_value < keys[row][col].lastChangeRaw - release_hysteresis) {
+            if (row == 5 && col == 3) {
+                // uprintf("release\n");
+            }
+            // key release
+            keys[row][col].lastChangeRaw = raw_value; // update last change raw
+            return false; // not pressed
+        }
+        
+        // update the last change raw if the current raw value is higher
+        if (raw_value > keys[row][col].lastChangeRaw + topOutHysteresis) {
+            keys[row][col].lastChangeRaw = raw_value; // update last change raw
+        }
+    } else {
+        // released state
+        if (raw_value > keys[row][col].lastChangeRaw + press_hysteresis) {
+            // key press
+            if (row == 5 && col == 3) {
+                // uprintf("press\n");
+            }
+            keys[row][col].lastChangeRaw = raw_value; // update last change raw
+            return true; // now pressed
+        }
+
+        // update the last change raw if the current raw value is lower
+        if (raw_value < keys[row][col].lastChangeRaw - topOutHysteresis) {
+            keys[row][col].lastChangeRaw = raw_value; // update last change raw
+        }
+    }
+
+    return bPrevState; // no mans land keep prev state
+}
+
+bool process_continuous_dynamic_actuation(bool bPrevState, uint8_t row, uint8_t col) {
+    // dynamic actuation logic
+    uint16_t raw_value = keys[row][col].raw;
+    // resuse the lastChangeRaw for dynamic actuation
+    // use to check if it is in the top-out region
+
+    // top bit is used to check the state
+    bool     bState        = keys[row][col].lastChangeRaw & 0x8000; // get the state from the lastChangeRaw
+    uint16_t lastChangeRaw = keys[row][col].lastChangeRaw & 0x7FFF;
+
+    // get the thresholds
+    uint16_t activate_threshold = get_dynamic_activate_threshold(row, col);
+    uint16_t press_hysteresis   = get_dynamic_press_hysteresis(row, col);
+    uint16_t release_hysteresis = get_dynamic_release_hysteresis(row, col);
+    uint16_t topOutHysteresis   = get_top_out_calibration_hysteresis(row, col);
+
+    // extremum can swap between last press/release point
+    // based on prev state
+
+    // continuous dynamic actuation
+    // make sure that we are below the activate threshold
+    bool bBelowActivateThreshold = (raw_value < activate_threshold);
+
+    // non continuous and below activate threshold
+    // or continuous and not pass active state and below activate threshold
+    if (!bState && bBelowActivateThreshold) {
+        keys[row][col].lastChangeRaw = raw_value;
+        return false;
+    }
+
+    if (bPrevState) {
+        // pressed state
+
+        // check lastChangeRaw currently is the lowest press point
+        if (raw_value < lastChangeRaw - release_hysteresis) {
+            if (row == 5 && col == 3) {
+                // uprintf("release\n");
+            }
+            // key release
+            // set only the bottom 0x7FFF bits
+            if (bState) {
+                raw_value |= 0x8000;
+            }
+            keys[row][col].lastChangeRaw = raw_value; // update last change raw
+            return false;                             // not pressed
+        }
+
+        // update the last change raw if the current raw value is higher
+        if (raw_value > keys[row][col].lastChangeRaw + topOutHysteresis) {
+            if (bState) {
+                raw_value |= 0x8000;
+            }
+            keys[row][col].lastChangeRaw = raw_value; // update last change raw
+        }
+    } else {
+        // released state
+        if (raw_value > keys[row][col].lastChangeRaw + press_hysteresis) {
+            // key press
+            if (row == 5 && col == 3) {
+                // uprintf("press\n");
+            }
+
+            if (!bState) {
+                bState = true;
+            }
+
+            if (bState) {
+                raw_value |= 0x8000;
+            }
+            keys[row][col].lastChangeRaw = raw_value; // update last change raw
+
+            return true; // now pressed
+        }
+
+        // update the last change raw if the current raw value is lower
+        if (raw_value < keys[row][col].lastChangeRaw - topOutHysteresis) {
+            if (bState) {
+                raw_value |= 0x8000;
+            }
+            keys[row][col].lastChangeRaw = raw_value; // update last change raw
+        }
+    }
+
+    return bPrevState; // no mans land keep prev state
+}
+
+bool process_dks(uint8_t row, uint8_t col) {
+    // process DKS logic
+    uint16_t raw_value = keys[row][col].raw;
+
+    // check which region the key is in
+    uint16_t topPress   = get_dks_top_actuation_point(row, col);
+    uint16_t botPress   = get_dks_bot_actuation_point(row, col);
+    uint16_t hysteresis = get_top_out_calibration_hysteresis(row, col);
+
+    dks_region_t currentRegion;
+
+    if (raw_value < topPress - hysteresis) {
+        // in the unpressed region
+        currentRegion = DKS_REGION_BEFORE_TOP;
+    } else if (raw_value > botPress + hysteresis) {
+        // in the bottom pressed region
+        currentRegion = DKS_REGION_AFTER_BOTTOM;
+    } else {
+        // in the top pressed region
+        currentRegion = DKS_REGION_BETWEEN_TOP_BOTTOM;
+    }
+
+    return dks_process_key_state(row, col, currentRegion);
+}
+
+bool process_mode_key(analog_key_mode_t mode, bool bPrevState, uint8_t row, uint8_t col) {
+    switch (mode) {
+        case MODE_STATIC_ACTUATION:
+            // process static actuation
+            return process_static_actuation(bPrevState, row, col);
+        case MODE_DYNAMIC_ACTUATION:
+            // process dynamic actuation
+            return process_dynamic_actuation(bPrevState, row, col);
+        case MODE_CONTINUOUS_DYNAMIC_ACTUATION:
+            // process continuous dynamic actuation
+            return process_continuous_dynamic_actuation(bPrevState, row, col);
+        case MODE_DYNAMIC_KEY_STROKE:
+            return process_dks(row, col);
+            break;
+        case MODE_ANALOG_HID_OUTPUT:
+            // process analog HID output
+            // do not ever output a key press
+            return false;
+        case MODE_CALIBRATION_BOTTOM_OUT:
+            // process calibration
+            calibrate_bottom_out(row, col);
+            break;
+        default:
+            break;
+    }
+
+    return false; // key has not changed state
+}
