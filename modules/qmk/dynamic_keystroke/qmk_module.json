@@ -1,0 +1,47 @@
+{
+    "module_name": "Dynamic Keystroke",
+    "maintainer": "QMK Maintainers",
+    "license": "GPL-2.0-or-later",
+    "keycodes": [
+        {
+            "key": "COMMUNITY_MODULE_DYNAMIC_KEYSTROKE_0",
+            "aliases": ["CM_DK_0"]
+        },
+        {
+            "key": "COMMUNITY_MODULE_DYNAMIC_KEYSTROKE_1",
+            "aliases": ["CM_DK_1"]
+        },
+        {
+            "key": "COMMUNITY_MODULE_DYNAMIC_KEYSTROKE_2",
+            "aliases": ["CM_DK_2"]
+        },
+        {
+            "key": "COMMUNITY_MODULE_DYNAMIC_KEYSTROKE_3",
+            "aliases": ["CM_DK_3"]
+        },
+        {
+            "key": "COMMUNITY_MODULE_DYNAMIC_KEYSTROKE_4",
+            "aliases": ["CM_DK_4"]
+        },
+        {
+            "key": "COMMUNITY_MODULE_DYNAMIC_KEYSTROKE_5",
+            "aliases": ["CM_DK_5"]
+        },
+        {
+            "key": "COMMUNITY_MODULE_DYNAMIC_KEYSTROKE_6",
+            "aliases": ["CM_DK_6"]
+        },
+        {
+            "key": "COMMUNITY_MODULE_DYNAMIC_KEYSTROKE_7",
+            "aliases": ["CM_DK_7"]
+        },
+        {
+            "key": "COMMUNITY_MODULE_DYNAMIC_KEYSTROKE_8",
+            "aliases": ["CM_DK_8"]
+        },
+        {
+            "key": "COMMUNITY_MODULE_DYNAMIC_KEYSTROKE_9",
+            "aliases": ["CM_DK_9"]
+        }
+    ]
+}
