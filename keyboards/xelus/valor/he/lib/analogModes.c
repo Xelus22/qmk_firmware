@@ -44,28 +44,28 @@ bool process_dynamic_actuation(bool bPrevState, uint8_t row, uint8_t col) {
 
     // get the thresholds
     uint16_t activate_threshold = get_dynamic_activate_threshold(row, col);
-    uint16_t press_hysteresis = get_dynamic_press_hysteresis(row, col);
+    uint16_t press_hysteresis   = get_dynamic_press_hysteresis(row, col);
     uint16_t release_hysteresis = get_dynamic_release_hysteresis(row, col);
-    uint16_t topOutHysteresis = get_top_out_calibration_hysteresis(row, col);
+    uint16_t topOutHysteresis   = get_top_out_calibration_hysteresis(row, col);
 
     // make sure that we are below the activate threshold
     if (!bPrevState && raw_value < activate_threshold) {
         return false;
     }
-    
+
     if (bPrevState) {
         // pressed state
-        
-        // check lastChangeRaw currently is the lowest press point 
+
+        // check lastChangeRaw currently is the lowest press point
         if (raw_value < keys[row][col].lastChangeRaw - release_hysteresis) {
             if (row == 5 && col == 3) {
                 // uprintf("release\n");
             }
             // key release
             keys[row][col].lastChangeRaw = raw_value; // update last change raw
-            return false; // not pressed
+            return false;                             // not pressed
         }
-        
+
         // update the last change raw if the current raw value is higher
         if (raw_value > keys[row][col].lastChangeRaw + topOutHysteresis) {
             keys[row][col].lastChangeRaw = raw_value; // update last change raw
@@ -78,7 +78,7 @@ bool process_dynamic_actuation(bool bPrevState, uint8_t row, uint8_t col) {
                 // uprintf("press\n");
             }
             keys[row][col].lastChangeRaw = raw_value; // update last change raw
-            return true; // now pressed
+            return true;                              // now pressed
         }
 
         // update the last change raw if the current raw value is lower
@@ -180,6 +180,7 @@ bool process_dks(uint8_t row, uint8_t col) {
     uint16_t hysteresis = get_top_out_calibration_hysteresis(row, col);
 
     dks_region_t currentRegion;
+    dks_region_t prevRegion = dks_keys[analog_config[row][col].dksNum].region;
 
     if (raw_value < topPress - hysteresis) {
         // in the unpressed region
@@ -188,8 +189,18 @@ bool process_dks(uint8_t row, uint8_t col) {
         // in the bottom pressed region
         currentRegion = DKS_REGION_AFTER_BOTTOM;
     } else {
-        // in the top pressed region
-        currentRegion = DKS_REGION_BETWEEN_TOP_BOTTOM;
+        if (prevRegion == DKS_REGION_BEFORE_TOP) {
+            // if we were in the unpressed region and now we are in the pressed region
+            // we are in the top pressed region
+            currentRegion = DKS_REGION_MID_PRESS;
+        } else if (prevRegion == DKS_REGION_AFTER_BOTTOM) {
+            // if we were in the bottom pressed region and now we are in the released region
+            // we are in the release pressed region
+            currentRegion = DKS_REGION_MID_RELEASE;
+        } else {
+            // we are in the pressed region
+            currentRegion = prevRegion;
+        }
     }
 
     return dks_process_key_state(row, col, currentRegion);
