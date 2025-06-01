@@ -188,19 +188,11 @@ bool process_dks(uint8_t row, uint8_t col) {
     } else if (raw_value > botPress + hysteresis) {
         // in the bottom pressed region
         currentRegion = DKS_REGION_AFTER_BOTTOM;
+    } else if ( topPress + hysteresis <= raw_value && raw_value <= botPress - hysteresis) {
+        // in the middle pressed region
+        currentRegion = DKS_REGION_MID_PRESS;
     } else {
-        if (prevRegion == DKS_REGION_BEFORE_TOP) {
-            // if we were in the unpressed region and now we are in the pressed region
-            // we are in the top pressed region
-            currentRegion = DKS_REGION_MID_PRESS;
-        } else if (prevRegion == DKS_REGION_AFTER_BOTTOM) {
-            // if we were in the bottom pressed region and now we are in the released region
-            // we are in the release pressed region
-            currentRegion = DKS_REGION_MID_RELEASE;
-        } else {
-            // we are in the pressed region
-            currentRegion = prevRegion;
-        }
+        currentRegion = prevRegion;
     }
 
     return dks_process_key_state(row, col, currentRegion);
