@@ -46,7 +46,7 @@ bool process_dynamic_actuation(bool bPrevState, uint8_t row, uint8_t col) {
     uint16_t activate_threshold = get_dynamic_activate_threshold(row, col);
     uint16_t press_hysteresis   = get_dynamic_press_hysteresis(row, col);
     uint16_t release_hysteresis = get_dynamic_release_hysteresis(row, col);
-    uint16_t topOutHysteresis   = get_top_out_calibration_hysteresis(row, col);
+    uint16_t top_out_hysteresis   = get_top_out_calibration_hysteresis(row, col);
 
     // make sure that we are below the activate threshold
     if (!bPrevState && raw_value < activate_threshold) {
@@ -67,7 +67,7 @@ bool process_dynamic_actuation(bool bPrevState, uint8_t row, uint8_t col) {
         }
 
         // update the last change raw if the current raw value is higher
-        if (raw_value > keys[row][col].lastChangeRaw + topOutHysteresis) {
+        if (raw_value > keys[row][col].lastChangeRaw + top_out_hysteresis) {
             keys[row][col].lastChangeRaw = raw_value; // update last change raw
         }
     } else {
@@ -82,7 +82,7 @@ bool process_dynamic_actuation(bool bPrevState, uint8_t row, uint8_t col) {
         }
 
         // update the last change raw if the current raw value is lower
-        if (raw_value < keys[row][col].lastChangeRaw - topOutHysteresis) {
+        if (raw_value < keys[row][col].lastChangeRaw - top_out_hysteresis) {
             keys[row][col].lastChangeRaw = raw_value; // update last change raw
         }
     }
@@ -104,7 +104,7 @@ bool process_continuous_dynamic_actuation(bool bPrevState, uint8_t row, uint8_t 
     uint16_t activate_threshold = get_dynamic_activate_threshold(row, col);
     uint16_t press_hysteresis   = get_dynamic_press_hysteresis(row, col);
     uint16_t release_hysteresis = get_dynamic_release_hysteresis(row, col);
-    uint16_t topOutHysteresis   = get_top_out_calibration_hysteresis(row, col);
+    uint16_t top_out_hysteresis   = get_top_out_calibration_hysteresis(row, col);
 
     bool bBelowActivateThreshold = (raw_value < activate_threshold);
 
@@ -132,7 +132,7 @@ bool process_continuous_dynamic_actuation(bool bPrevState, uint8_t row, uint8_t 
         }
 
         // update the last change raw if the current raw value is higher
-        if (raw_value > keys[row][col].lastChangeRaw + topOutHysteresis) {
+        if (raw_value > keys[row][col].lastChangeRaw + top_out_hysteresis) {
             if (bState) {
                 raw_value |= 0x8000;
             }
@@ -159,7 +159,7 @@ bool process_continuous_dynamic_actuation(bool bPrevState, uint8_t row, uint8_t 
         }
 
         // update the last change raw if the current raw value is lower
-        if (raw_value < keys[row][col].lastChangeRaw - topOutHysteresis) {
+        if (raw_value < keys[row][col].lastChangeRaw - top_out_hysteresis) {
             if (bState) {
                 raw_value |= 0x8000;
             }
@@ -180,7 +180,7 @@ bool process_dks(uint8_t row, uint8_t col) {
     uint16_t hysteresis = get_top_out_calibration_hysteresis(row, col);
 
     dks_region_t currentRegion;
-    dks_region_t prevRegion = dks_keys[analog_config[row][col].dksNum].region;
+    dks_region_t prevRegion = dks_keys[analog_config[row][col].dks_num].region;
 
     if (raw_value < topPress - hysteresis) {
         // in the unpressed region

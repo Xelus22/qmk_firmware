@@ -9,23 +9,23 @@ SPDX-License-Identifier: GPL-2.0-or-later */
 
 // for saving to eeprom
 typedef struct PACKED {
-    uint8_t  dksNum; // key number for DKS mapping - max 256
+    uint8_t  dks_num; // key number for DKS mapping - max 256
     uint8_t  mode;
     // calibration values
-    uint16_t topOutCalibration;
-    uint16_t topOutHysteresis; // auto calculated
-    uint16_t bottomOutCalibration;
-    uint16_t bottomOutHysteresis;  // auto calculated
+    uint16_t top_out_calibration;
+    uint16_t top_out_hysteresis; // auto calculated
+    uint16_t bottom_out_calibration;
+    uint16_t bottom_out_hysteresis;  // auto calculated
     // static actuation values
-    uint16_t staticActuationPoint;
-    uint16_t staticActuationHysteresis; // auto calc???
+    uint16_t static_actuation_point;
+    uint16_t static_actuation_hysteresis; // auto calc???
     // dynamic actuation values
-    uint16_t dynamicActivateThreshold;
-    uint16_t dynamicPressHysteresis;
-    uint16_t dynamicReleaseHysteresis;
+    uint16_t dynamic_activate_threshold;
+    uint16_t dynamic_press_hysteresis;
+    uint16_t dynamic_release_hysteresis;
     // dks actuation points
-    uint16_t dksTopActuationPoint;
-    uint16_t dksBotActuationPoint;
+    uint16_t dks_top_actuation_point;
+    uint16_t dks_bot_actuation_point;
     // re-use press-hysteresis and release-hysteresis for top/bottom actuation
 } per_key_analog_config; /* 24 bytes */
 _Static_assert(sizeof(per_key_analog_config) == 24, "Size mismatch");
