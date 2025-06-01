@@ -102,7 +102,7 @@ void dks_process_key_hit(dks_key_config_t *config, dks_state_t *state) {
 
 bool dks_process_key_state(uint8_t row, uint8_t col, dks_region_t currRegion) {
     // process the DKS key state based on the region
-    uint8_t      dks_idx    = analog_config[row][col].dksNum; // get the DKS index for the key
+    uint8_t      dks_idx    = analog_config[row][col].dks_num; // get the DKS index for the key
     dks_region_t prevRegion = dks_keys[dks_idx].region;       // get the previous region
 
     if (dks_idx >= MAX_DKS_KEYS) {

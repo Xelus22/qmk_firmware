@@ -48,9 +48,10 @@ STATIC_ASSERT(sizeof(dks_key_config_t) == 3, "Size mismatch for dks_key_t");
 typedef struct PACKED {
     dks_state_t      hit;    // current DKS state - internal state machine use
     dks_region_t     region; // DKS region - set by the matrix scan
+    bool             process_key;
     dks_key_config_t key_configs[NUM_DKS_CONFS_PER_KEY];
 } dks_key_t; // 10 bytes
-STATIC_ASSERT(sizeof(dks_key_t) == (1 + 1 + 3 * NUM_DKS_CONFS_PER_KEY), "Size mismatch for dks_key_t");
+STATIC_ASSERT(sizeof(dks_key_t) == (1 + 1 + 1 + 3 * NUM_DKS_CONFS_PER_KEY), "Size mismatch for dks_key_t");
 
 #ifndef MAX_DKS_KEYS
 #    define MAX_DKS_KEYS 10 // maximum number of DKS keys, can be changed if needed
@@ -67,5 +68,5 @@ void dks_set_key_bot_release(uint8_t idx, uint8_t config_idx, bool botRelease);
 void dks_set_key_start_region(uint8_t idx, uint8_t config_idx, dks_state_t startState);
 void dks_set_key_end_region(uint8_t idx, uint8_t config_idx, dks_state_t endState);
 
-bool dks_process_key_hit(uint8_t row, uint8_t col, dks_state_t hit);
+void dks_process_key_hit(dks_key_config_t *config, dks_state_t *state);
 bool dks_process_key_state(uint8_t row, uint8_t col, dks_region_t currRegion);
