@@ -9,16 +9,17 @@ SPDX-License-Identifier: GPL-2.0-or-later */
 
 // for saving to eeprom
 typedef struct PACKED {
-    uint8_t  dks_num; // key number for DKS mapping - max 256
-    uint8_t  mode;
+    // key number for DKS mapping - max 256 - limited to 10 atm anyway
+    uint8_t dks_num;
+    uint8_t mode;
     // calibration values
     uint16_t top_out_calibration;
-    uint16_t top_out_hysteresis; // auto calculated
+    uint16_t top_out_hysteresis;
     uint16_t bottom_out_calibration;
-    uint16_t bottom_out_hysteresis;  // auto calculated
+    uint16_t bottom_out_hysteresis;
     // static actuation values
     uint16_t static_actuation_point;
-    uint16_t static_actuation_hysteresis; // auto calc???
+    uint16_t static_actuation_hysteresis;
     // dynamic actuation values
     uint16_t dynamic_activate_threshold;
     uint16_t dynamic_press_hysteresis;

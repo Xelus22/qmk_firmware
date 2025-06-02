@@ -177,18 +177,19 @@ bool process_dks(uint8_t row, uint8_t col) {
     // check which region the key is in
     uint16_t topPress   = get_dks_top_actuation_point(row, col);
     uint16_t botPress   = get_dks_bot_actuation_point(row, col);
-    uint16_t hysteresis = get_top_out_calibration_hysteresis(row, col);
+    uint16_t topHysteresis = get_top_out_calibration_hysteresis(row, col);
+    uint16_t botHysteresis = get_bot_out_calibration_hysteresis(row, col);
 
     dks_region_t currentRegion;
     dks_region_t prevRegion = dks_keys[analog_config[row][col].dks_num].region;
 
-    if (raw_value < topPress - hysteresis) {
+    if (raw_value < topPress - topHysteresis) {
         // in the unpressed region
         currentRegion = DKS_REGION_BEFORE_TOP;
-    } else if (raw_value > botPress + hysteresis) {
+    } else if (raw_value > botPress + botHysteresis) {
         // in the bottom pressed region
         currentRegion = DKS_REGION_AFTER_BOTTOM;
-    } else if ( topPress + hysteresis <= raw_value && raw_value <= botPress - hysteresis) {
+    } else if ( topPress + topHysteresis <= raw_value && raw_value <= botPress - botHysteresis) {
         // in the middle pressed region
         currentRegion = DKS_REGION_MID_PRESS;
     } else {
@@ -212,10 +213,10 @@ bool process_mode_key(analog_key_mode_t mode, bool bPrevState, uint8_t row, uint
         case MODE_DYNAMIC_KEY_STROKE:
             return process_dks(row, col);
             break;
-        case MODE_ANALOG_HID_OUTPUT:
-            // process analog HID output
-            // do not ever output a key press
-            return false;
+        // case MODE_ANALOG_HID_OUTPUT:
+        //     // process analog HID output
+        //     // do not ever output a key press
+        //     return false;
         case MODE_CALIBRATION_BOTTOM_OUT:
             // process calibration
             calibrate_bottom_out(row, col);
