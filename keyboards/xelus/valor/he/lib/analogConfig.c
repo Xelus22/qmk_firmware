@@ -50,6 +50,12 @@ void set_top_out_calibration_hysteresis(uint8_t row, uint8_t col, uint16_t top_o
 uint16_t get_top_out_calibration_hysteresis(uint8_t row, uint8_t col) {
     return analog_config[row][col].top_out_hysteresis;
 }
+void set_bot_out_calibration_hysteresis(uint8_t row, uint8_t col, uint16_t bottom_out_hysteresis) {
+    analog_config[row][col].bottom_out_hysteresis = bottom_out_hysteresis;
+}
+uint16_t get_bot_out_calibration_hysteresis(uint8_t row, uint8_t col) {
+    return analog_config[row][col].bottom_out_hysteresis;
+}
 void set_bottom_out_calibration_hysteresis(uint8_t row, uint8_t col, uint16_t bottom_out_hysteresis) {
     analog_config[row][col].bottom_out_hysteresis = bottom_out_hysteresis;
 }

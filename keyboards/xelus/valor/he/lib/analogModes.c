@@ -178,7 +178,7 @@ bool process_dks(uint8_t row, uint8_t col) {
     uint16_t topPress   = get_dks_top_actuation_point(row, col);
     uint16_t botPress   = get_dks_bot_actuation_point(row, col);
     uint16_t topHysteresis = get_top_out_calibration_hysteresis(row, col);
-    uint16_t botHysteresis = get_bot_out_calibration_hysteresis(row, col);
+    uint16_t botHysteresis = get_bottom_out_calibration_hysteresis(row, col);
 
     dks_region_t currentRegion;
     dks_region_t prevRegion = dks_keys[analog_config[row][col].dks_num].region;
