@@ -50,7 +50,7 @@ typedef struct PACKED {
     dks_region_t     region; // DKS region - set by the matrix scan
     dks_key_config_t key_configs[NUM_DKS_CONFS_PER_KEY];
 } dks_key_t; // 10 bytes
-STATIC_ASSERT(sizeof(dks_key_t) == (1 + 1 + 1 + 3 * NUM_DKS_CONFS_PER_KEY), "Size mismatch for dks_key_t");
+STATIC_ASSERT(sizeof(dks_key_t) == (1 + 1 + 3 * NUM_DKS_CONFS_PER_KEY), "Size mismatch for dks_key_t");
 
 #ifndef MAX_DKS_KEYS
 #    define MAX_DKS_KEYS 10 // maximum number of DKS keys, can be changed if needed
