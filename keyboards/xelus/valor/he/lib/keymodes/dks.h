@@ -48,7 +48,6 @@ STATIC_ASSERT(sizeof(dks_key_config_t) == 3, "Size mismatch for dks_key_t");
 typedef struct PACKED {
     dks_state_t      hit;    // current DKS state - internal state machine use
     dks_region_t     region; // DKS region - set by the matrix scan
-    bool             process_key;
     dks_key_config_t key_configs[NUM_DKS_CONFS_PER_KEY];
 } dks_key_t; // 10 bytes
 STATIC_ASSERT(sizeof(dks_key_t) == (1 + 1 + 1 + 3 * NUM_DKS_CONFS_PER_KEY), "Size mismatch for dks_key_t");

@@ -7,7 +7,7 @@ typedef enum {
     MODE_DYNAMIC_ACTUATION,
     MODE_CONTINUOUS_DYNAMIC_ACTUATION,
     MODE_DYNAMIC_KEY_STROKE,
-    MODE_ANALOG_HID_OUTPUT,
+    // MODE_ANALOG_HID_OUTPUT,  // not implemented yet
     MODE_CALIBRATION_BOTTOM_OUT,
 } analog_key_mode_t;
 

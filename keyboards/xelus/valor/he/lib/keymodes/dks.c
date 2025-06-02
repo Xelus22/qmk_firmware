@@ -58,6 +58,7 @@ void dks_set_key_end_region(uint8_t idx, uint8_t config_idx, dks_state_t endStat
     }
 }
 
+// for use in process_keycode_xxx()
 void dks_process_key_hit(dks_key_config_t *config, dks_state_t *state) {
     // process the DKS key hit based on the state
     uint16_t keycode = config->dks_keycode; // get the keycode from the config
