@@ -59,7 +59,7 @@ void dks_set_key_active_region(uint8_t idx, uint8_t config_idx, dks_region_t reg
         dks_keys[idx].key_configs[config_idx].dist_config.active_region |= (1 << region);
     }
 }
-bool dks_activate_hold_key(dks_region_t regionBitField, dks_state_t state) {
+bool dks_activate_hold_key(dks_region_t regionBitField, dks_activate_t state) {
     // check if the region is valid
     if (regionBitField == 0) {
         return false; // no region is active
@@ -88,7 +88,7 @@ bool dks_activate_hold_key(dks_region_t regionBitField, dks_state_t state) {
     return false; // no valid state
 }
 
-bool dks_deactivate_hold_key(dks_region_t regionBitField, dks_state_t state) {
+bool dks_deactivate_hold_key(dks_region_t regionBitField, dks_activate_t state) {
     // check if the region is valid
     if (regionBitField == 0) {
         return false; // no region is active
@@ -115,12 +115,12 @@ bool dks_deactivate_hold_key(dks_region_t regionBitField, dks_state_t state) {
             };
             break;
     }
-    
+
     return false; // no valid state
 }
 
 // for use in process_keycode_xxx()
-void dks_process_key_hit(dks_key_config_t *config, dks_state_t *state) {
+void dks_process_key_hit(dks_key_config_t *config, dks_activate_t *state) {
     // process the DKS key hit based on the state
     uint16_t keycode = config->dks_keycode; // get the keycode from the config
 
