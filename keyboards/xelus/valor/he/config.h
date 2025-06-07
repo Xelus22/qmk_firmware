@@ -30,13 +30,9 @@
 
 // SPI FLASH
 #define EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN D2
-#define EXTERNAL_FLASH_SPI_CLOCK_DIVISOR 1  // 48MHz; max supported by W25Q128JV is 133MHz
+#define EXTERNAL_FLASH_SPI_CLOCK_DIVISOR 2  // max supported by W25Q128JV is 133MHz
 #define EXTERNAL_FLASH_SIZE (64 * 1024)  //128Mbit or 16MByte // actually 16MByte but using as 64kB for now
 #define EXTERNAL_FLASH_SPI_TIMEOUT 200000 //datasheet max is 200seconds for flash chip erase
-
-// WEAR LEVELLING
-// #define WEAR_LEVELING_EXTERNAL_FLASH_BLOCK_COUNT 8
-// #define WEAR_LEVELING_EXTERNAL_FLASH_BLOCK_OFFSET 0
 
 // RGB PWM
 #define WS2812_PWM_DRIVER PWMD4

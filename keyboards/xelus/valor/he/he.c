@@ -52,46 +52,13 @@ void eeconfig_init_kb(void) {
     eeconfig_init_user();
 }
 
-// void keyboard_pre_init_kb(void) {
-//     for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
-//         for (uint8_t col = 0; col < MATRIX_COLS; col++) {
-//             keys[row][col].lastChangeRaw = 2400;
-//         }
-//     }
-// }
-
 void keyboard_post_init_kb(void) {
-    // DOESNT WORK IDK WHY
-    // load the custom config from eeprom
-    // load_analog_config();
-    // eeconfig_read_kb_datablock(&analog_config);
     debug_enable = true;
     debug_matrix = true;
-
+    
     analog_config_init();
-
     eeconfig_read_kb_datablock(&analog_config, 0, EECONFIG_KB_DATA_SIZE);
 
-    // for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
-    //     for (uint8_t col = 0; col < MATRIX_COLS; col++) {
-    //         // temporarily set all keys to static actuation mode
-    //         set_analog_key_mode(row, col, MODE_DYNAMIC_ACTUATION);
-
-    //         // set calibration
-    //         set_top_out_calibration_hysteresis(row, col, 70);
-
-    //         // set acutation point
-    //         set_static_actuation_point(row, col, 2700);
-
-    //         // set the hysteresis values to 30
-    //         set_static_actuation_hysteresis(row, col, 50);
-
-    //         // set dynamic actuation values
-    //         set_dynamic_activate_threshold(row, col, 2400);
-    //         set_dynamic_press_hysteresis(row, col, 50);
-    //         set_dynamic_release_hysteresis(row, col, 50);
-    //     }
-    // }
     keyboard_post_init_user();
 }
 
