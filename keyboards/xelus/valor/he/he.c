@@ -42,13 +42,23 @@ void board_init(void) {
     gpio_write_pin_high(A15);
 }
 
-void keyboard_pre_init_kb(void) {
-    for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
-        for (uint8_t col = 0; col < MATRIX_COLS; col++) {
-            keys[row][col].lastChangeRaw = 2400;
-        }
-    }
+void eeconfig_init_kb(void) {
+    // Default values
+    reset_analog_config();
+
+    // Write default value to EEPROM now
+    eeconfig_update_kb_datablock(&analog_config, 0, EECONFIG_KB_DATA_SIZE);
+
+    eeconfig_init_user();
 }
+
+// void keyboard_pre_init_kb(void) {
+//     for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
+//         for (uint8_t col = 0; col < MATRIX_COLS; col++) {
+//             keys[row][col].lastChangeRaw = 2400;
+//         }
+//     }
+// }
 
 void keyboard_post_init_kb(void) {
     // DOESNT WORK IDK WHY
@@ -58,41 +68,46 @@ void keyboard_post_init_kb(void) {
     debug_enable = true;
     debug_matrix = true;
 
-    for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
-        for (uint8_t col = 0; col < MATRIX_COLS; col++) {
-            // temporarily set all keys to static actuation mode
-            set_analog_key_mode(row, col, MODE_DYNAMIC_ACTUATION);
+    analog_config_init();
 
-            // set calibration
-            set_top_out_calibration_hysteresis(row, col, 70);
+    eeconfig_read_kb_datablock(&analog_config, 0, EECONFIG_KB_DATA_SIZE);
 
-            // set acutation point
-            set_static_actuation_point(row, col, 2700);
+    // for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
+    //     for (uint8_t col = 0; col < MATRIX_COLS; col++) {
+    //         // temporarily set all keys to static actuation mode
+    //         set_analog_key_mode(row, col, MODE_DYNAMIC_ACTUATION);
 
-            // set the hysteresis values to 30
-            set_static_actuation_hysteresis(row, col, 50);
+    //         // set calibration
+    //         set_top_out_calibration_hysteresis(row, col, 70);
 
-            // set dynamic actuation values
-            set_dynamic_activate_threshold(row, col, 2400);
-            set_dynamic_press_hysteresis(row, col, 50);
-            set_dynamic_release_hysteresis(row, col, 50);
-        }
-    }
+    //         // set acutation point
+    //         set_static_actuation_point(row, col, 2700);
+
+    //         // set the hysteresis values to 30
+    //         set_static_actuation_hysteresis(row, col, 50);
+
+    //         // set dynamic actuation values
+    //         set_dynamic_activate_threshold(row, col, 2400);
+    //         set_dynamic_press_hysteresis(row, col, 50);
+    //         set_dynamic_release_hysteresis(row, col, 50);
+    //     }
+    // }
+    keyboard_post_init_user();
 }
 
-bool via_command_kb(uint8_t *data, uint8_t length) {
-    // send the matrix key numbers
+// bool via_command_kb(uint8_t *data, uint8_t length) {
+//     // send the matrix key numbers
 
-    uint8_t row = data[0];
-    // can only fit 32 bytes in a packet
-    // 15 keys per packet
-    uint8_t offset = 1;
-    for (int j = 0; j < MATRIX_COLS; j++) {
-        data[j * 2 + offset]     = (keys[row][j].raw >> 8) & 0xFF; // high byte
-        data[j * 2 + 1 + offset] = keys[row][j].raw & 0xFF;        // low byte
-    }
+//     uint8_t row = data[0];
+//     // can only fit 32 bytes in a packet
+//     // 15 keys per packet
+//     uint8_t offset = 1;
+//     for (int j = 0; j < MATRIX_COLS; j++) {
+//         data[j * 2 + offset]     = (keys[row][j].raw >> 8) & 0xFF; // high byte
+//         data[j * 2 + 1 + offset] = keys[row][j].raw & 0xFF;        // low byte
+//     }
 
-    raw_hid_send(data, length);
-    // do not process anything after this
-    return true;
-}
+//     raw_hid_send(data, length);
+//     // do not process anything after this
+//     return true;
+// }
