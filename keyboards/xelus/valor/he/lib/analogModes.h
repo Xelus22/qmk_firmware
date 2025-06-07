@@ -15,6 +15,6 @@ typedef enum {
 typedef struct {
     bool is_calibrating;
     bool is_calibrated;
-} anlog_config_t;
+} calibration_config_t;
 
 bool process_mode_key(analog_key_mode_t mode, bool bPrevState, uint8_t row, uint8_t col);

@@ -5,16 +5,14 @@
 #include "keymodes/dks.h"
 #include "print.h"
 
-// settings for when to do calibration and what not
-
 // get mode for a key
 uint8_t get_mode(uint8_t row, uint8_t col) {
-    return analog_config[row][col].mode;
+    return get_analog_key_mode(row, col);
 }
 
 // set mode for a key
 void set_mode(uint8_t row, uint8_t col, uint8_t mode) {
-    analog_config[row][col].mode = mode;
+    set_analog_key_mode(row, col, mode);
 }
 
 bool process_static_actuation(bool bPrevState, uint8_t row, uint8_t col) {
@@ -181,7 +179,7 @@ bool process_dks(uint8_t row, uint8_t col) {
     uint16_t botHysteresis = get_bottom_out_calibration_hysteresis(row, col);
 
     dks_region_t currentRegion;
-    dks_region_t prevRegion = dks_keys[analog_config[row][col].dks_num].region;
+    dks_region_t prevRegion = dks_get_key_region(row, col);
 
     if (raw_value < topPress - topHysteresis) {
         // in the unpressed region
@@ -196,7 +194,7 @@ bool process_dks(uint8_t row, uint8_t col) {
         currentRegion = prevRegion;
     }
 
-    return dks_process_key_state(row, col, currentRegion);
+    return dks_process_key_state(row, col, prevRegion, currentRegion);
 }
 
 bool process_mode_key(analog_key_mode_t mode, bool bPrevState, uint8_t row, uint8_t col) {

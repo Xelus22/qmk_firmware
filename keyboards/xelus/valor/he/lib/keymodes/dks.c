@@ -2,7 +2,7 @@
 #include "quantum.h"
 #include "../analogConfig.h"
 
-dks_key_t dks_keys[MAX_DKS_KEYS] = {0};
+dks_key_t *dks_keys = analog_config.dks_keys; // Pointer to the DKS keys array
 
 // need to hook into process_keycode_xxx()
 
@@ -13,13 +13,12 @@ void dks_init(dks_key_t *eeprom_dks_keys, uint8_t size) {
         dks_keys[i].hit    = DKS_HIT_TOP_PRESS;     // initialize state to none
         dks_keys[i].region = DKS_REGION_BEFORE_TOP; // initialize region to before top
         for (uint8_t j = 0; j < NUM_DKS_CONFS_PER_KEY; j++) {
-            dks_keys[i].key_configs[j].dks_keycode             = 0; // initialize keycode to 0
-            dks_keys[i].key_configs[j].dist_config.top_press   = false;
-            dks_keys[i].key_configs[j].dist_config.top_release = false;
-            dks_keys[i].key_configs[j].dist_config.bot_press   = false;
-            dks_keys[i].key_configs[j].dist_config.bot_release = false;
-            dks_keys[i].key_configs[j].dist_config.start_state = DKS_HIT_TOP_PRESS;
-            dks_keys[i].key_configs[j].dist_config.end_state   = DKS_HIT_TOP_PRESS;
+            dks_keys[i].key_configs[j].dks_keycode               = 0; // initialize keycode to 0
+            dks_keys[i].key_configs[j].dist_config.top_press     = false;
+            dks_keys[i].key_configs[j].dist_config.top_release   = false;
+            dks_keys[i].key_configs[j].dist_config.bot_press     = false;
+            dks_keys[i].key_configs[j].dist_config.bot_release   = false;
+            dks_keys[i].key_configs[j].dist_config.active_region = 0;
         }
     }
 }
@@ -46,25 +45,84 @@ void dks_set_key_bot_release(uint8_t idx, uint8_t config_idx, bool botRelease) {
     }
 }
 
-// set regions
-void dks_set_key_start_region(uint8_t idx, uint8_t config_idx, dks_state_t startState) {
+// get the region for the DKS key at index idx and config_idx
+dks_region_t dks_get_key_region(uint8_t idx, uint8_t config_idx) {
     if (idx < MAX_DKS_KEYS && config_idx < NUM_DKS_CONFS_PER_KEY) {
-        dks_keys[idx].key_configs[config_idx].dist_config.start_state = startState;
+        return dks_keys[idx].region;
+    }
+    return 0; // return default region if out of bounds
+}
+
+// set regions
+void dks_set_key_active_region(uint8_t idx, uint8_t config_idx, dks_region_t region) {
+    if (idx < MAX_DKS_KEYS && config_idx < NUM_DKS_CONFS_PER_KEY) {
+        dks_keys[idx].key_configs[config_idx].dist_config.active_region |= (1 << region);
     }
 }
-void dks_set_key_end_region(uint8_t idx, uint8_t config_idx, dks_state_t endState) {
-    if (idx < MAX_DKS_KEYS && config_idx < NUM_DKS_CONFS_PER_KEY) {
-        dks_keys[idx].key_configs[config_idx].dist_config.end_state = endState;
+bool dks_activate_hold_key(dks_region_t regionBitField, dks_state_t state) {
+    // check if the region is valid
+    if (regionBitField == 0) {
+        return false; // no region is active
     }
+
+    switch (state) {
+        case DKS_HIT_TOP_PRESS:
+            if (regionBitField & DKS_REGION_MID_PRESS_MASK) {
+                return true;
+            };
+            break;
+        case DKS_HIT_BOT_PRESS:
+            if (regionBitField & DKS_REGION_AFTER_BOTTOM_MASK) {
+                return true;
+            };
+            break;
+        case DKS_HIT_BOT_RELEASE:
+            if (regionBitField & DKS_REGION_MID_RELEASE_MASK) {
+                return true;
+            };
+            break;
+        case DKS_HIT_TOP_RELEASE:
+            // release will never activate a hold
+            return false;
+    }
+    return false; // no valid state
+}
+
+bool dks_deactivate_hold_key(dks_region_t regionBitField, dks_state_t state) {
+    // check if the region is valid
+    if (regionBitField == 0) {
+        return false; // no region is active
+    }
+
+    switch (state) {
+        case DKS_HIT_TOP_PRESS:
+            // press will never deactivate a hold
+            break;
+        case DKS_HIT_BOT_PRESS:
+            // deactive is the next region does not have the bottom mask
+            if ((regionBitField & DKS_REGION_AFTER_BOTTOM_MASK) != DKS_REGION_AFTER_BOTTOM_MASK) {
+                return true;
+            };
+            break;
+        case DKS_HIT_BOT_RELEASE:
+            if ((regionBitField & DKS_REGION_MID_RELEASE_MASK) != DKS_REGION_MID_RELEASE_MASK) {
+                return true;
+            };
+            break;
+        case DKS_HIT_TOP_RELEASE:
+            if ((regionBitField & DKS_REGION_MID_RELEASE)) {
+                return true;
+            };
+            break;
+    }
+    
+    return false; // no valid state
 }
 
 // for use in process_keycode_xxx()
 void dks_process_key_hit(dks_key_config_t *config, dks_state_t *state) {
     // process the DKS key hit based on the state
     uint16_t keycode = config->dks_keycode; // get the keycode from the config
-
-    dks_state_t startState = config->dist_config.start_state; // get the start region
-    dks_state_t endState   = config->dist_config.end_state;   // get the end region
 
     switch (*state) {
         case DKS_HIT_TOP_PRESS:
@@ -76,6 +134,7 @@ void dks_process_key_hit(dks_key_config_t *config, dks_state_t *state) {
             if (config->dist_config.bot_press) {
                 tap_code16(keycode); // send the keycode for bottom press
             }
+
             break;
         case DKS_HIT_TOP_RELEASE:
             if (config->dist_config.top_release) {
@@ -91,20 +150,26 @@ void dks_process_key_hit(dks_key_config_t *config, dks_state_t *state) {
             break; // no action for none state
     }
 
-    // check the start/end states
-    if (*state == startState) {
+    dks_region_t region = config->dist_config.active_region; // get the active region
+
+    if (dks_activate_hold_key(region, *state)) {
+        // if the hold key is activated, register the keycode
         register_code16(keycode);
     }
 
-    if (*state == endState) {
+    if (dks_deactivate_hold_key(region, *state)) {
+        // if the hold key is deactivated, unregister the keycode
         unregister_code16(keycode);
     }
 }
 
-bool dks_process_key_state(uint8_t row, uint8_t col, dks_region_t currRegion) {
+bool dks_process_key_state(uint8_t row, uint8_t col, dks_region_t prevRegion, dks_region_t currRegion) {
     // process the DKS key state based on the region
-    uint8_t      dks_idx    = analog_config[row][col].dks_num; // get the DKS index for the key
-    dks_region_t prevRegion = dks_keys[dks_idx].region;       // get the previous region
+    if (prevRegion == currRegion) {
+        return false; // no change in region, do nothing
+    }
+
+    uint8_t dks_idx = get_dks_num(row, col); // get the DKS index from the analog config
 
     if (dks_idx >= MAX_DKS_KEYS) {
         return false; // invalid DKS index
@@ -116,42 +181,40 @@ bool dks_process_key_state(uint8_t row, uint8_t col, dks_region_t currRegion) {
     dks_key->region = currRegion;
 
     // check if the region has changed
-    if (prevRegion != currRegion) {
-        // handle region change logic here
-        // e.g. update hit state, etc.
-        switch (prevRegion) {
-            case DKS_REGION_BEFORE_TOP:
-                if (currRegion == DKS_REGION_MID_PRESS) {
-                    // entering top press region
-                    dks_key->hit = DKS_HIT_TOP_PRESS;
-                    return true;
-                }
-                break;
-
-            case DKS_REGION_MID_PRESS:
-                if (currRegion == DKS_REGION_BEFORE_TOP) {
-                    // exiting top press region
-                    dks_key->hit = DKS_HIT_TOP_RELEASE;
-                    return true;
-                } else if (currRegion == DKS_REGION_AFTER_BOTTOM) {
-                    // entering bottom press region
-                    dks_key->hit = DKS_HIT_BOT_PRESS;
-                    return true;
-                }
-                break;
-
-            case DKS_REGION_AFTER_BOTTOM:
-                if (currRegion == DKS_REGION_MID_RELEASE) {
-                    // entering top press region
-                    dks_key->hit = DKS_HIT_BOT_RELEASE;
-                    return true;
-                }
-                break;
-
-            default:
-                break; // no change in region
-        }
+    // handle region change logic here
+    // e.g. update hit state, etc.
+    switch (prevRegion) {
+        case DKS_REGION_BEFORE_TOP:
+            if (currRegion == DKS_REGION_MID_PRESS) {
+                // entering top press region
+                dks_key->hit = DKS_HIT_TOP_PRESS;
+            }
+            break;
+        case DKS_REGION_MID_PRESS:
+            if (currRegion == DKS_REGION_BEFORE_TOP) {
+                // exiting top press region
+                dks_key->hit = DKS_HIT_TOP_RELEASE;
+            } else if (currRegion == DKS_REGION_AFTER_BOTTOM) {
+                // entering bottom press region
+                dks_key->hit = DKS_HIT_BOT_PRESS;
+            }
+            break;
+        case DKS_REGION_AFTER_BOTTOM:
+            if (currRegion == DKS_REGION_MID_RELEASE) {
+                // entering top press region
+                dks_key->hit = DKS_HIT_BOT_RELEASE;
+            }
+            break;
+        case DKS_REGION_MID_RELEASE:
+            if (currRegion == DKS_REGION_AFTER_BOTTOM) {
+                // exiting bottom press region
+                dks_key->hit = DKS_HIT_BOT_PRESS;
+            } else if (currRegion == DKS_REGION_BEFORE_TOP) {
+                // entering top press region
+                dks_key->hit = DKS_HIT_TOP_RELEASE;
+            }
+            break;
     }
 
-    return false;
+    return true;
 }
