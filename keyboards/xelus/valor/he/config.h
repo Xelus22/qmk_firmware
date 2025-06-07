@@ -20,19 +20,19 @@
 #define USB_DRIVER USBD2
 
 // SPI
+#define SPI_DRIVER SPID3
 #define SPI_SCK_PIN C10
 #define SPI_SCK_PAL_MODE 6
 #define SPI_MOSI_PIN C12
 #define SPI_MOSI_PAL_MODE 6
 #define SPI_MISO_PIN C11
 #define SPI_MISO_PAL_MODE 6
-#define SPI_DRIVER SPID3
 
 // SPI FLASH
 #define EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN D2
-#define EXTERNAL_FLASH_SPI_CLOCK_DIVISOR 2  // max supported by W25Q128JV is 133MHz
-#define EXTERNAL_FLASH_SIZE (64 * 1024)  //128Mbit or 16MByte // actually 16MByte but using as 64kB for now
-#define EXTERNAL_FLASH_SPI_TIMEOUT 200000 //datasheet max is 200seconds for flash chip erase
+#define EXTERNAL_FLASH_SPI_CLOCK_DIVISOR 2     // max supported by W25Q128JV is 133MHz
+#define EXTERNAL_FLASH_SIZE (16 * 1024 * 1024) // 16MByte
+#define EXTERNAL_FLASH_SPI_TIMEOUT 200000      // datasheet max is 200 seconds for flash chip erase
 
 // RGB PWM
 #define WS2812_PWM_DRIVER PWMD4
