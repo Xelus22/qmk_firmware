@@ -41,11 +41,11 @@ void reset_analog_config(void) {
 }
 
 void set_analog_config(per_key_analog_config *config, uint8_t row, uint8_t col) {
-    memcpy(&(analog_config.key_config[row][col]), config, sizeof(per_key_analog_config));
+    memcpy(&(analog_config.key_config[row][col]), config, sizeof(per_key_analog_config) * MATRIX_ROWS * MATRIX_COLS);
 }
 
 void get_analog_config(per_key_analog_config *config, uint8_t row, uint8_t col) {
-    memcpy(config, &(analog_config.key_config[row][col]), sizeof(per_key_analog_config));
+    memcpy(config, &(analog_config.key_config[row][col]), sizeof(per_key_analog_config) * MATRIX_ROWS * MATRIX_COLS);
 }
 
 // mode
