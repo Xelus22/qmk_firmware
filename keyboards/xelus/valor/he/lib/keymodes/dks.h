@@ -9,6 +9,10 @@
 #    define NUM_DKS_CONFS_PER_KEY 4 // number of DKS configurations per key
 #endif
 
+#ifndef MAX_DKS_KEYS
+#    define MAX_DKS_KEYS 10 // maximum number of DKS keys, can be changed if needed
+#endif
+
 // this ends up like a reverse state machine
 // where we have the before and after states, but we need to
 // process HOW we got to the state
@@ -57,10 +61,6 @@ typedef struct PACKED {
     dks_key_config_t key_configs[NUM_DKS_CONFS_PER_KEY];
 } dks_key_t; // 14 bytes
 STATIC_ASSERT(sizeof(dks_key_t) == (1 + 1 + 3 * NUM_DKS_CONFS_PER_KEY), "Size mismatch for dks_key_t");
-
-#ifndef MAX_DKS_KEYS
-#    define MAX_DKS_KEYS 10 // maximum number of DKS keys, can be changed if needed
-#endif
 
 void dks_init(dks_key_t *dks_keys, uint8_t size);
 void dks_set_key_top_press(uint8_t idx, uint8_t config_idx, bool topPress);
