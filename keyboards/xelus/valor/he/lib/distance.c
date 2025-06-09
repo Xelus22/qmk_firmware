@@ -1,8 +1,6 @@
 #include "distance.h"
 #pragma once
 
-
-
 // returns a raw value based on the distance and calibration values
 uint16_t distance_to_raw(uint16_t distance, uint16_t top_out_calibration, uint16_t bottom_out_calibration) {
     // Calculate the raw value based on the distance and calibration values

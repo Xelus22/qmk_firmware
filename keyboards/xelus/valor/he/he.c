@@ -31,6 +31,8 @@ void bootmagic_scan(void) {
     uint16_t raw_value = keys[BOOTMAGIC_ROW][BOOTMAGIC_COLUMN].raw;
 
     if (raw_value > threshold) {
+        // reset eeprom
+        eeconfig_disable();
         bootloader_jump();
     }
 }

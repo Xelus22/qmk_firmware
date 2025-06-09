@@ -30,20 +30,20 @@ STATIC_ASSERT(NMUX == NUM_SAMPLES, "NMUX and NUMSAMPLES Size mismatch");
 
 // global variables required for key scanning
 analog_key_t keys[MATRIX_ROWS][MATRIX_COLS] = {0};
-matrix_row_t previous_matrix[MATRIX_ROWS];
+matrix_row_t previous_matrix[MATRIX_ROWS]   = {0};
 
 // process adc reading
 static void process_adc_readings(matrix_row_t *prev_matrix, matrix_row_t *current_matrix, uint8_t ch) {
     uint8_t      row               = ch;
-    uint8_t      current_row_value = 0;
+    matrix_row_t current_row_value = 0;
     matrix_row_t row_shifter       = MATRIX_ROW_SHIFTER;
 
     for (int mux = 0; mux < NMUX; mux++, row_shifter <<= 1) {
         uint8_t col = mux;
         // skip specific rows and columns if they are not used
-        // if ((row == 4 && col == 1) || (row == 7 && (col == 0 || col == 1 || col == 2 || col == 4))) {
-        //     continue;
-        // }
+        if ((row == 4 && col == 1) || (row == 7 && (col == 0 || col == 1 || col == 2 || col == 4))) {
+            continue;
+        }
 
         uint8_t mode         = get_analog_key_mode(row, col);
         bool    bPrevPressed = prev_matrix[row] & row_shifter; // check if the key was pressed before
