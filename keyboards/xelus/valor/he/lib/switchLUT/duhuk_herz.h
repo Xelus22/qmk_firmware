@@ -3,6 +3,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "switchLUT.h"
 #include "progmem.h"
 
 const uint16_t PROGMEM switchLUT_duhuk_herz[1024] = {
