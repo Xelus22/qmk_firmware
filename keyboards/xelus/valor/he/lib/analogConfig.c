@@ -3,7 +3,7 @@
 #include "analogConfig.h"
 #include <string.h>
 
-analog_config_t analog_config;
+analog_config_t analog_config = {0};
 
 void analog_config_init(void) {
     // Initialize the analog configuration structure

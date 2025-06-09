@@ -9,11 +9,11 @@
         "device_version": "0.0.1"
     },
     "build": {
-        "lto": false
+        "lto": true
     },
     "features": {
-        "console": true,
-        "debug": true,
+        "console": false,
+        "debug": false,
         "bootmagic": true,
         "extrakey": true,
         "mousekey": true,
@@ -75,7 +75,7 @@
             "solid_multisplash": true
         },
         "driver": "ws2812",
-        "max_brightness": 80,
+        "max_brightness": 150,
         "sleep": true,
         "layout": [
             {"matrix": [3, 0], "x": 7, "y": 1, "flags": 2}, // macro0
