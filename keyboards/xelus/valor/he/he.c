@@ -20,21 +20,15 @@
 #include "raw_hid.h"
 
 #ifdef BOOTMAGIC_ENABLE
-void bootmagic_scan(void) {
-    wait_us(200); // wait for the sensors to stabilize
-    for (int i = 0; i < 100; i++) {
-        // scan the matrix
-        matrix_scan();
-    }
-
+bool bootmagic_should_reset(void) {
     uint16_t threshold = 3000; // threshold for bootmagic activation
     uint16_t raw_value = keys[BOOTMAGIC_ROW][BOOTMAGIC_COLUMN].raw;
 
     if (raw_value > threshold) {
-        // reset eeprom
-        eeconfig_disable();
-        bootloader_jump();
+        return true;
     }
+    
+    return false;
 }
 #endif
 
