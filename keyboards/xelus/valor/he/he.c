@@ -21,6 +21,10 @@
 
 #ifdef BOOTMAGIC_ENABLE
 bool bootmagic_should_reset(void) {
+    // do it a few more times so that the EMA has time to settle
+    for (int i = 0; i < 100; i++) {
+        matrix_scan();
+    }
     uint16_t threshold = 3000; // threshold for bootmagic activation
     uint16_t raw_value = keys[BOOTMAGIC_ROW][BOOTMAGIC_COLUMN].raw;
 
