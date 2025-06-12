@@ -9,16 +9,16 @@
         "device_version": "0.0.1"
     },
     "build": {
-        "lto": true
+        "lto": false
     },
     "features": {
-        "console": false,
-        "debug": false,
+        "console": true,
+        "debug": true,
         "bootmagic": true,
         "extrakey": true,
         "mousekey": true,
         "nkro": true,
-        "rgb_matrix": true
+        "rgb_matrix": false
     },
     "bootmagic": {
         "enabled": true,
