@@ -42,6 +42,12 @@ void board_init(void) {
     gpio_write_pin_high(A15);
 }
 
+void keyboard_pre_init_kb(void) {
+    wait_ms(2);
+    // Initialize the keyboard user settings
+    keyboard_pre_init_user();
+}
+
 void eeconfig_init_kb(void) {
     // Default values
     reset_analog_config();
