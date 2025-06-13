@@ -25,8 +25,8 @@ void reset_analog_config(void) {
             set_bottom_out_calibration_hysteresis(row, col, DEFAULT_BOTTOM_OUT_CALIBRATION_HYSTERESIS);
 
             // Set static actuation defaults
-            set_static_actuation_point(row, col, DEFAULT_STATIC_ACTUATION_POINT);
-            set_static_actuation_hysteresis(row, col, DEFAULT_STATIC_ACTUATION_HYSTERESIS);
+            set_static_actuation_release_point(row, col, DEFAULT_STATIC_RELEASE_POINT);
+            set_static_actuation_press_point(row, col, DEFAULT_STATIC_PRESS_POINT);
 
             // Set dynamic actuation defaults
             set_dynamic_activate_threshold(row, col, DEFAULT_DYNAMIC_ACTIVATE_THRESHOLD);
@@ -89,17 +89,17 @@ uint16_t get_bottom_out_calibration_hysteresis(uint8_t row, uint8_t col) {
 }
 
 // static actuation
-void set_static_actuation_point(uint8_t row, uint8_t col, uint16_t actuation_point) {
-    analog_config.key_config[row][col].static_actuation_point = actuation_point;
+void set_static_actuation_release_point(uint8_t row, uint8_t col, uint16_t actuation_point) {
+    analog_config.key_config[row][col].static_actuation_release_point = actuation_point;
 }
-uint16_t get_static_actuation_point(uint8_t row, uint8_t col) {
-    return analog_config.key_config[row][col].static_actuation_point;
+uint16_t get_static_actuation_release_point(uint8_t row, uint8_t col) {
+    return analog_config.key_config[row][col].static_actuation_release_point;
 }
-void set_static_actuation_hysteresis(uint8_t row, uint8_t col, uint16_t actuation_hysteresis) {
-    analog_config.key_config[row][col].static_actuation_hysteresis = actuation_hysteresis;
+void set_static_actuation_press_point(uint8_t row, uint8_t col, uint16_t actuation_hysteresis) {
+    analog_config.key_config[row][col].static_actuation_press_point = actuation_hysteresis;
 }
-uint16_t get_static_actuation_hysteresis(uint8_t row, uint8_t col) {
-    return analog_config.key_config[row][col].static_actuation_hysteresis;
+uint16_t get_static_actuation_press_point(uint8_t row, uint8_t col) {
+    return analog_config.key_config[row][col].static_actuation_press_point;
 }
 
 // dynamic actuation

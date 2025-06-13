@@ -3,13 +3,23 @@
 #pragma once
 
 #include <stdint.h>
+#include <math.h>
 #include "switchLUT.h"
 #include "progmem.h"
 
-const uint16_t PROGMEM switchLUT_duhuk_herz[1024] = {
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-    // ... (fill in the rest of the LUT values)
-    // The values should be filled in based on the specific characteristics of the duhuk herz switch
-    // This is just a placeholder for the example
-    // The actual values would depend on the calibration and characteristics of the switch
-};
+#define FUNC(x) (117.39 * log(0.0001215 * x) - 110.43)
+
+// 1 distance unit = 0.0001mm
+// 1000 distance units = 0.1mm
+// 10000 distance units = 1mm
+// 35000 distance units = 3.5mm
+
+// basically non-linear mapping 0 - 1024 -> 0mm - 3.3mm
+
+const uint16_t calculate_duhuk_herz(uint16_t raw_value) {
+    // 0 raw value = 0 distance
+    // 10000 raw value = 1mm distance
+    // Calculate the value based on the raw value using the function
+    // The function is derived from the characteristics of the duhuk herz switch
+    return (uint16_t)(FUNC(raw_value));
+}

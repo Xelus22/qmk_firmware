@@ -28,12 +28,12 @@
 #    define DEFAULT_BOTTOM_OUT_CALIBRATION_HYSTERESIS 50 // Default bottom out calibration hysteresis
 #endif
 
-#ifndef DEFAULT_STATIC_ACTUATION_POINT
-#    define DEFAULT_STATIC_ACTUATION_POINT 2700 // Default static actuation point
+#ifndef DEFAULT_STATIC_RELEASE_POINT
+#    define DEFAULT_STATIC_RELEASE_POINT 2600 // Default static actuation point
 #endif
 
-#ifndef DEFAULT_STATIC_ACTUATION_HYSTERESIS
-#    define DEFAULT_STATIC_ACTUATION_HYSTERESIS 50 // Default static actuation hysteresis
+#ifndef DEFAULT_STATIC_PRESS_POINT
+#    define DEFAULT_STATIC_PRESS_POINT 2700 // Default static actuation point
 #endif
 
 #ifndef DEFAULT_DYNAMIC_ACTIVATE_THRESHOLD
@@ -85,10 +85,10 @@ void     set_bottom_out_calibration_hysteresis(uint8_t row, uint8_t col, uint16_
 uint16_t get_bottom_out_calibration_hysteresis(uint8_t row, uint8_t col);
 
 // static actuation
-void     set_static_actuation_point(uint8_t row, uint8_t col, uint16_t actuation_point);
-uint16_t get_static_actuation_point(uint8_t row, uint8_t col);
-void     set_static_actuation_hysteresis(uint8_t row, uint8_t col, uint16_t actuation_hysteresis);
-uint16_t get_static_actuation_hysteresis(uint8_t row, uint8_t col);
+void     set_static_actuation_release_point(uint8_t row, uint8_t col, uint16_t actuation_point);
+uint16_t get_static_actuation_release_point(uint8_t row, uint8_t col);
+void     set_static_actuation_press_point(uint8_t row, uint8_t col, uint16_t actuation_hysteresis);
+uint16_t get_static_actuation_press_point(uint8_t row, uint8_t col);
 
 // dynamic actuation
 void     set_dynamic_activate_threshold(uint8_t row, uint8_t col, uint16_t activate_threshold);

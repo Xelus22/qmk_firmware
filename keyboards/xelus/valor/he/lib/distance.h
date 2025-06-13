@@ -1,7 +1,11 @@
 #include <stdint.h>
 #include "quantum.h"
 
-// uint16_t distanceToRawMatrix[MATRIX_ROWS][MATRIX_COLS][4096]; // distance in 0.001mm units
+#pragma once
 
+uint16_t raw_to_distance(uint16_t raw, uint16_t top_out_calibration, uint16_t bottom_out_calibration);
 uint16_t distance_to_raw(uint16_t distance, uint16_t top_out_calibration, uint16_t bottom_out_calibration);
-uint16_t distance_to_hysteresis(uint16_t raw, uint16_t top_calib_hysteresis, uint16_t top_out_calibration, uint16_t bottom_out_calibration);
+
+// private but should be used if required
+uint16_t scale_raw_to_distance(uint16_t raw, uint16_t top_out_calibration, uint16_t bottom_out_calibration);
+uint16_t scaled_to_distance(uint16_t scaled);
