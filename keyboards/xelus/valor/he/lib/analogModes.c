@@ -18,17 +18,12 @@ void set_mode(uint8_t row, uint8_t col, uint8_t mode) {
 bool process_static_actuation(bool bPrevState, uint8_t row, uint8_t col) {
     // static actuation logic
     uint16_t raw_value       = keys[row][col].raw;
-    uint16_t actuation_point = get_static_actuation_point(row, col);
-
-    // applies to the negative
-    uint16_t actuation_hysteresis = get_static_actuation_hysteresis(row, col);
-
     if (bPrevState) {
-        if (raw_value < actuation_point - actuation_hysteresis) {
+        if (raw_value < get_static_actuation_release_point(row, col)) {
             return false; // not pressed
         }
     } else {
-        if (raw_value > actuation_point + actuation_hysteresis) {
+        if (raw_value > get_static_actuation_press_point(row, col)) {
             return true; // now pressed
         }
     }
