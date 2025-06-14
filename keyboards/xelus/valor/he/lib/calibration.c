@@ -31,6 +31,55 @@
 #    define BOTTOM_OUT_CALIBRATION_THRESHOLD 2900 // threshold for bottom out calibration, adjust as needed
 #endif
 
+analog_key_mode_t restore_mode[MATRIX_ROWS][MATRIX_COLS] = {0};
+
+void calibration_sequence_top_out(void) {
+    // This function is called to set the top out calibration sequence
+    // It can be used to set the top out calibration value for all keys
+
+    for (int row = 0; row < MATRIX_ROWS; row++) {
+        for (int col = 0; col < MATRIX_COLS; col++) {
+            // save the current mode
+            restore_mode[row][col] = get_analog_key_mode(row, col);
+            set_analog_key_mode(row, col, MODE_CALIBRATION); // set the mode to calibration bottom out
+        }
+    }
+
+    calibrate_top_out();
+
+    // restore the modes
+    for (int row = 0; row < MATRIX_ROWS; row++) {
+        for (int col = 0; col < MATRIX_COLS; col++) {
+            set_analog_key_mode(row, col, restore_mode[row][col]); // restore the mode
+        }
+    }
+}
+
+void calibration_sequence_bottom_out(bool bStart) {
+    // This function is called to set the bottom out calibration sequence
+    // It can be used to set the bottom out calibration value for a specific key
+
+    // save the current mode
+    if (bStart) {
+        for (int row = 0; row < MATRIX_ROWS; row++) {
+            for (int col = 0; col < MATRIX_COLS; col++) {
+                restore_mode[row][col] = get_analog_key_mode(row, col);
+                set_analog_key_mode(row, col, MODE_CALIBRATION); // set the mode to calibration bottom out
+            }
+        }
+    } else {
+        // restores the mode for the specific key
+        for (int row = 0; row < MATRIX_ROWS; row++) {
+            for (int col = 0; col < MATRIX_COLS; col++) {
+                if (get_analog_key_mode(row, col) == MODE_CALIBRATION) {
+                    // if the mode is calibration, restore it
+                    set_analog_key_mode(row, col, restore_mode[row][col]);
+                }
+            }
+        }
+    }
+}
+
 void calibrate_top_out(void) {
     // read matrix a few times and then average the values
 

@@ -53,7 +53,7 @@ void eeconfig_init_kb(void) {
     reset_analog_config();
 
     // Write default value to EEPROM now
-    eeconfig_update_kb_datablock(&analog_config, 0, EECONFIG_KB_DATA_SIZE);
+    save_config_to_eeprom();
 
     eeconfig_init_user();
 }

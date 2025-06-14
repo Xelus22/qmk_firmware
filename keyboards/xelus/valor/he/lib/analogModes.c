@@ -226,7 +226,7 @@ bool process_mode_key(analog_key_mode_t mode, bool bPrevState, uint8_t row, uint
         //     // process analog HID output
         //     // do not ever output a key press
         //     return false;
-        case MODE_CALIBRATION_BOTTOM_OUT:
+        case MODE_CALIBRATION:
             // process calibration
             calibrate_bottom_out(row, col);
             break;

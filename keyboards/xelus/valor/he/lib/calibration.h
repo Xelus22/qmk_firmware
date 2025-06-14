@@ -15,9 +15,12 @@
  */
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #pragma once
 
+void calibration_sequence_top_out(void);
+void calibration_sequence_bottom_out(bool bStart);
 // calibrate top out
 // aka noise floor
 void calibrate_top_out(void);
