@@ -35,9 +35,11 @@ typedef enum {
 #    define DEFAULT_SWITCH_LUT SWITCH_LUT_DUHUK_HERZ // Default switch LUT
 #endif
 
-void     switch_lut_init(void);
-void     set_switch_lut(switch_lut_picker_t lut);
-switch_distance_t get_switch_max_distance(void);
+void                switch_lut_init(void);
+void                set_switch_lut(switch_lut_picker_t lut);
+switch_lut_picker_t get_switch_lut(void);
+const char         *get_switch_lut_name(switch_lut_picker_t lut);
+switch_distance_t   get_switch_max_distance(void);
 
 // get the pointer to the switch LUT
 switch_distance_t get_switch_distance_value(switch_scaled_t scaled_value);

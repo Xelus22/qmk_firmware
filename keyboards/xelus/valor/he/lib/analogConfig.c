@@ -33,37 +33,74 @@ void reset_analog_config(void) {
     // set the selected switch LUT to default
     switch_lut_init();
     dks_init();
-    
+
     // Reset all analog configurations to default values
+    reset_calibration();
+    reset_static_actuation();
+    reset_dynamic_actuation();
+    reset_dks_actuation();
+    reset_analog_key_mode();
+}
+
+void reset_analog_key_mode(void) {
+    // Reset all analog key modes to default
     for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
         for (uint8_t col = 0; col < MATRIX_COLS; col++) {
-            // Set default values using functions
-            set_dks_num(row, col, 255); // No DKS by default
             set_analog_key_mode(row, col, DEFAULT_ANALOG_MODE);
+        }
+    }
+}
 
-            // Set default calibration values
+void reset_calibration(void) {
+    // Reset all calibration values to default
+    for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
+        for (uint8_t col = 0; col < MATRIX_COLS; col++) {
             set_top_out_calibration(row, col, DEFAULT_TOP_OUT_CALIBRATION);
             set_top_out_calibration_hysteresis(row, col, DEFAULT_TOP_OUT_CALIBRATION_HYSTERESIS);
             set_bottom_out_calibration(row, col, DEFAULT_BOTTOM_OUT_CALIBRATION);
             set_bottom_out_calibration_hysteresis(row, col, DEFAULT_BOTTOM_OUT_CALIBRATION_HYSTERESIS);
+        }
+    }
+}
 
-            // Set static actuation defaults
+void reset_static_actuation(void) {
+    // Reset all static actuation values to default
+    for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
+        for (uint8_t col = 0; col < MATRIX_COLS; col++) {
             uint16_t act_press_point   = distance_to_raw(DEFAULT_STATIC_PRESS_POINT_MM, DEFAULT_TOP_OUT_CALIBRATION, DEFAULT_BOTTOM_OUT_CALIBRATION);
             uint16_t act_release_point = distance_to_raw(DEFAULT_STATIC_RELEASE_POINT_MM, DEFAULT_TOP_OUT_CALIBRATION, DEFAULT_BOTTOM_OUT_CALIBRATION);
             set_static_actuation_press_point(row, col, act_press_point);
             set_static_actuation_release_point(row, col, act_release_point);
+        }
+    }
+}
 
-            // Set dynamic actuation defaults
+void reset_dynamic_actuation(void) {
+    // Reset all dynamic actuation values to default
+    for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
+        for (uint8_t col = 0; col < MATRIX_COLS; col++) {
             uint16_t act_threshold = distance_to_raw(DEFAULT_DYNAMIC_ACTIVATE_THRESHOLD_MM, DEFAULT_TOP_OUT_CALIBRATION, DEFAULT_BOTTOM_OUT_CALIBRATION);
             set_dynamic_activate_threshold(row, col, act_threshold);
             set_dynamic_press_hysteresis(row, col, DEFAULT_DYNAMIC_PRESS_HYSTERESIS_MM);
             set_dynamic_release_hysteresis(row, col, DEFAULT_DYNAMIC_RELEASE_HYSTERESIS_MM);
-
-            // Set DKS actuation points
-            set_dks_top_actuation_point(row, col, DEFAULT_DKS_TOP_ACTUATION_POINT);
-            set_dks_bot_actuation_point(row, col, DEFAULT_DKS_TOP_ACTUATION_POINT);
         }
     }
+}
+
+void reset_dks_actuation(void) {
+    // Reset all DKS actuation points to default
+    for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
+        for (uint8_t col = 0; col < MATRIX_COLS; col++) {
+            set_dks_num(row, col, 255); // No DKS by default
+            set_dks_top_actuation_point(row, col, DEFAULT_DKS_TOP_ACTUATION_POINT);
+            set_dks_bot_actuation_point(row, col, DEFAULT_DKS_BOT_ACTUATION_POINT);
+        }
+    }
+}
+
+void save_config_to_eeprom(void) {
+    // Save the analog configuration to EEPROM
+    eeconfig_update_kb_datablock(&analog_config, 0, EECONFIG_KB_DATA_SIZE);
 }
 
 void set_analog_config(per_key_analog_config *config, uint8_t row, uint8_t col) {

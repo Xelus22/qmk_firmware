@@ -31,6 +31,8 @@
 
 // basically non-linear mapping 0 - 1024 -> 0mm - 3.3mm
 
+const char *DUHUK_HERZ_NAME = "Duhuk Herz";
+
 const uint16_t DUHUK_HERZ_MAX_DISTANCE = 33000; // Maximum distance in distance units (0.0001mm increments)
 
 const uint16_t calculate_duhuk_herz(uint16_t raw_value) {

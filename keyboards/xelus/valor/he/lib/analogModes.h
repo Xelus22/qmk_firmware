@@ -24,7 +24,7 @@ typedef enum {
     MODE_CONTINUOUS_DYNAMIC_ACTUATION,
     MODE_DYNAMIC_KEY_STROKE,
     // MODE_ANALOG_HID_OUTPUT,  // not implemented yet
-    MODE_CALIBRATION_BOTTOM_OUT,
+    MODE_CALIBRATION,
 } analog_key_mode_t;
 
 // run time struct for when is what

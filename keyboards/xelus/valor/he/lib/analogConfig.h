@@ -85,6 +85,14 @@ extern analog_config_t analog_config;
 
 void analog_config_init(void);
 void reset_analog_config(void);
+void save_config_to_eeprom(void);
+
+// reset the analog configuration
+void reset_analog_key_mode(void);
+void reset_calibration(void);
+void reset_static_actuation(void);
+void reset_dynamic_actuation(void);
+void reset_dks_actuation(void);
 
 void set_analog_config(per_key_analog_config *config, uint8_t row, uint8_t col);
 void get_analog_config(per_key_analog_config *config, uint8_t row, uint8_t col);

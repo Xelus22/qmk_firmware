@@ -48,6 +48,19 @@ void set_switch_lut(switch_lut_picker_t lut) {
     }
 }
 
+switch_lut_picker_t get_switch_lut(void) {
+    return selectedSwitchLUT; // Return the currently selected switch LUT
+}
+
+const char *get_switch_lut_name(switch_lut_picker_t lut) {
+    switch (lut) {
+        case SWITCH_LUT_DUHUK_HERZ:
+            return DUHUK_HERZ_NAME; // Return the name for duhuk herz switch
+        default:
+            return "Unknown"; // Return a default name for unknown switches
+    }
+}
+
 switch_distance_t get_switch_max_distance(void) {
     switch (selectedSwitchLUT) {
         case SWITCH_LUT_DUHUK_HERZ:
