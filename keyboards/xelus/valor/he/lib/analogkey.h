@@ -32,10 +32,10 @@ typedef struct PACKED {
     uint16_t bottom_out_calibration;
     uint16_t bottom_out_hysteresis;
     // static actuation values
-    uint16_t static_actuation_release_point;      // in raw value
-    uint16_t static_actuation_press_point; // in raw value
+    uint16_t static_actuation_release_point; // in raw value
+    uint16_t static_actuation_press_point;   // in raw value
     // dynamic actuation values
-    uint16_t dynamic_activate_threshold; // in mm
+    uint16_t dynamic_activate_threshold; // in raw value
     uint16_t dynamic_press_hysteresis;   // in mm
     uint16_t dynamic_release_hysteresis; // in mm
     // dks actuation points

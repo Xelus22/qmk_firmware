@@ -20,7 +20,7 @@
 
 #define LUT_SIZE 1024 // Size of the LUT, adjust as necessary
 
-#define DISTANCE_1MM_MULTIPLIER 10000 // 1mm = 10000 distance units
+#define DISTANCE_MM_MULTIPLIER 10000.0 // 1mm = 10000 distance units
 
 typedef enum {
     SWITCH_LUT_DUHUK_HERZ,
