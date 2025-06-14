@@ -58,6 +58,10 @@ void reset_analog_config(void) {
             set_dks_bot_actuation_point(row, col, DEFAULT_DKS_TOP_ACTUATION_POINT);
         }
     }
+
+    // set the selected switch LUT to default
+    analog_config.selectedSwitchLUT = DEFAULT_SWITCH_LUT;
+    analog_config.dks_keys          = {0};
 }
 
 void set_analog_config(per_key_analog_config *config, uint8_t row, uint8_t col) {
