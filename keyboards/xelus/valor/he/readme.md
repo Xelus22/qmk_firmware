@@ -1,4 +1,4 @@
-# Valor Rev 2
+# Valor HE Rev0.1
 
 An Alice replacement keyboard PCB.
 
