@@ -53,3 +53,7 @@ typedef struct PACKED {
     uint16_t lastChangeRaw; // for use in dynamic actuation
 } analog_key_t;
 extern analog_key_t keys[MATRIX_ROWS][MATRIX_COLS];
+
+// make sure the scaled and distance are distinct types
+typedef uint16_t switch_scaled_t; // max is LUT_SIZE
+typedef uint16_t switch_distance_t; // Define the type for switch distance values

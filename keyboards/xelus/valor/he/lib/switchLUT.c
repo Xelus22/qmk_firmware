@@ -37,7 +37,7 @@ void set_switch_lut(switch_lut_picker_t lut) {
 
     selectedSwitchLUT = lut;
 
-    for (uint16_t i = 0; i < LUT_SIZE; i++) {
+    for (switch_scaled_t i = 0; i < LUT_SIZE; i++) {
         switch (lut) {
             case SWITCH_LUT_DUHUK_HERZ:
                 switch_lut[i] = calculate_duhuk_herz(i); // Calculate the value for duhuk herz switch
@@ -48,16 +48,25 @@ void set_switch_lut(switch_lut_picker_t lut) {
     }
 }
 
-uint16_t get_switch_distance_value(uint16_t raw_value) {
-    if (raw_value >= LUT_SIZE) {
-        return 0; // Return 0 or handle out-of-bounds access
+switch_distance_t get_switch_max_distance(void) {
+    switch (selectedSwitchLUT) {
+        case SWITCH_LUT_DUHUK_HERZ:
+            return DUHUK_HERZ_MAX_DISTANCE; // Return the max distance for duhuk herz switch
+        default:
+            return 0; // Return 0 or handle other cases
     }
-    return switch_lut[raw_value]; // Return the value from the LUT based on the raw value
 }
 
-uint16_t get_switch_scaled_value(uint16_t distance) {
+switch_distance_t get_switch_distance_value(switch_scaled_t scaled_value) {
+    if (scaled_value >= LUT_SIZE) {
+        return 0;
+    }
+    return switch_lut[scaled_value]; // Return the value from the LUT based on the raw value
+}
+
+switch_scaled_t get_switch_scaled_value(switch_distance_t distance) {
     // Find the closest value in the LUT to the given distance
-    for (uint16_t i = 0; i < LUT_SIZE; i++) {
+    for (switch_scaled_t i = 0; i < LUT_SIZE; i++) {
         // switch_lut should be strictly increasing
         if (switch_lut[i] >= distance) {
             return i; // Return the index if found

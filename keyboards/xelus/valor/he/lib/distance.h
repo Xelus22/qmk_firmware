@@ -16,12 +16,14 @@
 
 #include <stdint.h>
 #include "quantum.h"
+#include "analogkey.h"
 
 #pragma once
 
-uint16_t raw_to_distance(uint16_t raw, uint16_t top_out_calibration, uint16_t bottom_out_calibration);
-uint16_t distance_to_raw(uint16_t distance, uint16_t top_out_calibration, uint16_t bottom_out_calibration);
+switch_distance_t raw_to_distance(uint16_t raw, uint16_t top_out_calibration, uint16_t bottom_out_calibration);
+uint16_t          distance_to_raw(switch_distance_t distance, uint16_t top_out_calibration, uint16_t bottom_out_calibration);
+switch_distance_t get_max_distance(void);
 
 // private but should be used if required
-uint16_t scale_raw_to_distance(uint16_t raw, uint16_t top_out_calibration, uint16_t bottom_out_calibration);
-uint16_t scaled_to_distance(uint16_t scaled);
+switch_scaled_t   raw_to_scaled(switch_scaled_t raw, uint16_t top_out_calibration, uint16_t bottom_out_calibration);
+switch_distance_t scaled_to_distance(switch_scaled_t scaled);
