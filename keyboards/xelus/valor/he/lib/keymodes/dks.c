@@ -22,10 +22,9 @@ dks_key_t *dks_keys = analog_config.dks_keys; // Pointer to the DKS keys array
 
 // need to hook into process_keycode_xxx()
 
-void dks_init(dks_key_t *eeprom_dks_keys, uint8_t size) {
+void dks_init(void) {
     // initialize the dks keys
-    size = MIN(size, MAX_DKS_KEYS); // ensure we don't exceed the max size
-    for (uint8_t i = 0; i < size; i++) {
+    for (uint8_t i = 0; i < MAX_DKS_KEYS; i++) {
         dks_keys[i].hit    = DKS_HIT_TOP_PRESS;     // initialize state to none
         dks_keys[i].region = DKS_REGION_BEFORE_TOP; // initialize region to before top
         for (uint8_t j = 0; j < NUM_DKS_CONFS_PER_KEY; j++) {

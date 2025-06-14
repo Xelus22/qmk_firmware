@@ -78,7 +78,7 @@ typedef struct PACKED {
 } dks_key_t; // 14 bytes
 STATIC_ASSERT(sizeof(dks_key_t) == (1 + 1 + 3 * NUM_DKS_CONFS_PER_KEY), "Size mismatch for dks_key_t");
 
-void dks_init(dks_key_t *dks_keys, uint8_t size);
+void dks_init(void);
 void dks_set_key_top_press(uint8_t idx, uint8_t config_idx, bool topPress);
 void dks_set_key_top_release(uint8_t idx, uint8_t config_idx, bool topRelease);
 void dks_set_key_bot_press(uint8_t idx, uint8_t config_idx, bool botPress);

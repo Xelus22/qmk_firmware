@@ -25,6 +25,11 @@ uint8_t selectedSwitchLUT = DEFAULT_SWITCH_LUT;
 // output is the distance in 0.0001mm increments
 uint16_t switch_lut[LUT_SIZE] = {0};
 
+void switch_lut_init(void) {
+    // Initialize the switch LUT with the selected LUT
+    set_switch_lut(DEFAULT_SWITCH_LUT);
+}
+
 void set_switch_lut(switch_lut_picker_t lut) {
     if (lut >= SWITCH_LUT_END) {
         lut = DEFAULT_SWITCH_LUT; // Fallback to default if invalid LUT is selected
