@@ -32,6 +32,7 @@ typedef enum {
 #define DEFAULT_SWITCH_LUT SWITCH_LUT_DUHUK_HERZ // Default switch LUT
 #endif
 
+void switch_lut_init(void);
 void set_switch_lut(switch_lut_picker_t lut);
 
 // get the pointer to the switch LUT

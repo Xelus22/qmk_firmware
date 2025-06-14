@@ -17,6 +17,8 @@
 // EEPROM configuration for saving hysteresis values etc
 #include "quantum/eeconfig.h"
 #include "analogConfig.h"
+#include "keymodes/dks.h"
+#include "switchLUT.h"
 #include "distance.h"
 #include <string.h>
 
@@ -60,8 +62,8 @@ void reset_analog_config(void) {
     }
 
     // set the selected switch LUT to default
-    analog_config.selectedSwitchLUT = DEFAULT_SWITCH_LUT;
-    analog_config.dks_keys          = {0};
+    switch_lut_init();
+    dks_init();
 }
 
 void set_analog_config(per_key_analog_config *config, uint8_t row, uint8_t col) {
