@@ -17,6 +17,7 @@
 // EEPROM configuration for saving hysteresis values etc
 #include "quantum/eeconfig.h"
 #include "analogConfig.h"
+#include "distance.h"
 #include <string.h>
 
 analog_config_t analog_config = {0};
@@ -41,13 +42,16 @@ void reset_analog_config(void) {
             set_bottom_out_calibration_hysteresis(row, col, DEFAULT_BOTTOM_OUT_CALIBRATION_HYSTERESIS);
 
             // Set static actuation defaults
-            set_static_actuation_release_point(row, col, DEFAULT_STATIC_RELEASE_POINT);
-            set_static_actuation_press_point(row, col, DEFAULT_STATIC_PRESS_POINT);
+            uint16_t act_press_point   = distance_to_raw(DEFAULT_STATIC_PRESS_POINT_MM, DEFAULT_TOP_OUT_CALIBRATION, DEFAULT_BOTTOM_OUT_CALIBRATION);
+            uint16_t act_release_point = distance_to_raw(DEFAULT_STATIC_RELEASE_POINT_MM, DEFAULT_TOP_OUT_CALIBRATION, DEFAULT_BOTTOM_OUT_CALIBRATION);
+            set_static_actuation_press_point(row, col, act_press_point);
+            set_static_actuation_release_point(row, col, act_release_point);
 
             // Set dynamic actuation defaults
-            set_dynamic_activate_threshold(row, col, DEFAULT_DYNAMIC_ACTIVATE_THRESHOLD);
-            set_dynamic_press_hysteresis(row, col, DEFAULT_DYNAMIC_PRESS_HYSTERESIS);
-            set_dynamic_release_hysteresis(row, col, DEFAULT_DYNAMIC_PRESS_HYSTERESIS);
+            uint16_t act_threshold = distance_to_raw(DEFAULT_DYNAMIC_ACTIVATE_THRESHOLD_MM, DEFAULT_TOP_OUT_CALIBRATION, DEFAULT_BOTTOM_OUT_CALIBRATION);
+            set_dynamic_activate_threshold(row, col, act_threshold);
+            set_dynamic_press_hysteresis(row, col, DEFAULT_DYNAMIC_PRESS_HYSTERESIS_MM);
+            set_dynamic_release_hysteresis(row, col, DEFAULT_DYNAMIC_RELEASE_HYSTERESIS_MM);
 
             // Set DKS actuation points
             set_dks_top_actuation_point(row, col, DEFAULT_DKS_TOP_ACTUATION_POINT);

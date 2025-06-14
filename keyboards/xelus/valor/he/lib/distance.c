@@ -15,7 +15,7 @@
  */
 
 #include "distance.h"
-#include "switchLUT/switchLUT.h"
+#include "switchLUT.h"
 
 // returns a raw value based on the distance and calibration values
 uint16_t scale_raw_to_distance(uint16_t raw, uint16_t top_out_calibration, uint16_t bottom_out_calibration) {

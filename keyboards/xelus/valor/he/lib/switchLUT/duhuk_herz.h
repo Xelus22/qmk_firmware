@@ -20,7 +20,6 @@
 
 #include <stdint.h>
 #include <math.h>
-#include "switchLUT.h"
 #include "progmem.h"
 
 #define FUNC(x) (117.39 * log(0.0001215 * x) - 110.43)

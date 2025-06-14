@@ -16,7 +16,7 @@
 
 #include "switchLUT.h"
 
-#include "duhuk_herz.h" // Include the specific switch LUT header
+#include "switchLUT/duhuk_herz.h" // Include the specific switch LUT header
 
 uint8_t selectedSwitchLUT = DEFAULT_SWITCH_LUT;
 

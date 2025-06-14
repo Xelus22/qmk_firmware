@@ -17,6 +17,7 @@
 #include "analogkey.h"
 #include "analogModes.h"
 #include "keymodes/dks.h"
+#include "switchLUT.h"
 
 #pragma once
 
@@ -44,24 +45,24 @@
 #    define DEFAULT_BOTTOM_OUT_CALIBRATION_HYSTERESIS 50 // Default bottom out calibration hysteresis
 #endif
 
-#ifndef DEFAULT_STATIC_RELEASE_POINT
-#    define DEFAULT_STATIC_RELEASE_POINT 2600 // Default static actuation point
+#ifndef DEFAULT_STATIC_RELEASE_POINT_MM
+#    define DEFAULT_STATIC_RELEASE_POINT_MM (1.5 * DISTANCE_MM_MULTIPLIER)  // Default static actuation point
 #endif
 
-#ifndef DEFAULT_STATIC_PRESS_POINT
-#    define DEFAULT_STATIC_PRESS_POINT 2700 // Default static actuation point
+#ifndef DEFAULT_STATIC_PRESS_POINT_MM
+#    define DEFAULT_STATIC_PRESS_POINT_MM (1.6 * DISTANCE_MM_MULTIPLIER) // Default static actuation point
 #endif
 
-#ifndef DEFAULT_DYNAMIC_ACTIVATE_THRESHOLD
-#    define DEFAULT_DYNAMIC_ACTIVATE_THRESHOLD 2400 // Default dynamic activate threshold
+#ifndef DEFAULT_DYNAMIC_ACTIVATE_THRESHOLD_MM
+#    define DEFAULT_DYNAMIC_ACTIVATE_THRESHOLD_MM (0.5 * DISTANCE_MM_MULTIPLIER) // Default dynamic activate threshold
 #endif
 
-#ifndef DEFAULT_DYNAMIC_PRESS_HYSTERESIS
-#    define DEFAULT_DYNAMIC_PRESS_HYSTERESIS 50 // Default dynamic press hysteresis
+#ifndef DEFAULT_DYNAMIC_PRESS_HYSTERESIS_MM
+#    define DEFAULT_DYNAMIC_PRESS_HYSTERESIS_MM (0.2 * DISTANCE_MM_MULTIPLIER) // Default dynamic press hysteresis
 #endif
 
-#ifndef DEFAULT_DYNAMIC_RELEASE_HYSTERESIS
-#    define DEFAULT_DYNAMIC_RELEASE_HYSTERESIS 50 // Default dynamic release hysteresis
+#ifndef DEFAULT_DYNAMIC_RELEASE_HYSTERESIS_MM
+#    define DEFAULT_DYNAMIC_RELEASE_HYSTERESIS_MM (0.2 * DISTANCE_MM_MULTIPLIER) // Default dynamic release hysteresis
 #endif
 
 #ifndef DEFAULT_DKS_TOP_ACTUATION_POINT
@@ -75,6 +76,7 @@
 typedef struct PACKED {
     per_key_analog_config key_config[MATRIX_ROWS][MATRIX_COLS]; // per key analog configuration
     dks_key_t             dks_keys[MAX_DKS_KEYS];               // DKS key configurations
+    uint8_t               selectedSwitchLUT;                    // selected switch LUT for analog keys
 } analog_config_t;
 
 STATIC_ASSERT(sizeof(analog_config_t) == EECONFIG_KB_DATA_SIZE, "Size mismatch for analog_config_t");
