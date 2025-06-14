@@ -17,10 +17,13 @@
 #pragma once
 
 #include <stdint.h>
+#include "analogkey.h"
 
 #define LUT_SIZE 1024 // Size of the LUT, adjust as necessary
 
 #define DISTANCE_MM_MULTIPLIER 10000.0 // 1mm = 10000 distance units
+
+#define DEFAULT_MAX_DISTANCE (4.0 * DISTANCE_MM_MULTIPLIER) // Default maximum distance in distance units (0.0001mm increments)
 
 typedef enum {
     SWITCH_LUT_DUHUK_HERZ,
@@ -29,13 +32,14 @@ typedef enum {
 } switch_lut_picker_t;
 
 #ifndef DEFAULT_SWITCH_LUT
-#define DEFAULT_SWITCH_LUT SWITCH_LUT_DUHUK_HERZ // Default switch LUT
+#    define DEFAULT_SWITCH_LUT SWITCH_LUT_DUHUK_HERZ // Default switch LUT
 #endif
 
-void switch_lut_init(void);
-void set_switch_lut(switch_lut_picker_t lut);
+void     switch_lut_init(void);
+void     set_switch_lut(switch_lut_picker_t lut);
+switch_distance_t get_switch_max_distance(void);
 
 // get the pointer to the switch LUT
-uint16_t get_switch_distance_value(uint16_t raw_value);
+switch_distance_t get_switch_distance_value(switch_scaled_t scaled_value);
 
-uint16_t get_switch_scaled_value(uint16_t distance);
+switch_scaled_t get_switch_scaled_value(switch_distance_t distance);
