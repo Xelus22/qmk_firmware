@@ -30,6 +30,10 @@ void analog_config_init(void) {
 }
 
 void reset_analog_config(void) {
+    // set the selected switch LUT to default
+    switch_lut_init();
+    dks_init();
+    
     // Reset all analog configurations to default values
     for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
         for (uint8_t col = 0; col < MATRIX_COLS; col++) {
@@ -60,10 +64,6 @@ void reset_analog_config(void) {
             set_dks_bot_actuation_point(row, col, DEFAULT_DKS_TOP_ACTUATION_POINT);
         }
     }
-
-    // set the selected switch LUT to default
-    switch_lut_init();
-    dks_init();
 }
 
 void set_analog_config(per_key_analog_config *config, uint8_t row, uint8_t col) {
