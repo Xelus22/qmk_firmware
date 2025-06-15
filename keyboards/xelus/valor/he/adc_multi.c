@@ -44,18 +44,26 @@ void adc_multi_lld_start(void) {
     /* If in stopped state then enables the ADC and DMA clocks.*/
     if (adcp->state == ADC_STOP) {
 #if STM32_ADC_USE_ADC1
-        adcp->dmastp = dmaStreamAllocI(STM32_ADC_ADC1_DMA_STREAM, STM32_ADC_ADC1_DMA_IRQ_PRIORITY, (stm32_dmaisr_t)adc_lld_serve_rx_interrupt, (void *)adcp);
-        osalDbgAssert(adcp->dmastp != NULL, "unable to allocate stream");
-        dmaStreamSetPeripheral(adcp->dmastp, &ADC->CDR);
-        rccEnableADC1(FALSE);
+    if (&ADCD1 == adcp) {
+      adcp->dmastp = dmaStreamAllocI(STM32_ADC_ADC1_DMA_STREAM,
+                                     STM32_ADC_ADC1_DMA_IRQ_PRIORITY,
+                                     (stm32_dmaisr_t)adc_lld_serve_rx_interrupt,
+                                     (void *)adcp);
+      osalDbgAssert(adcp->dmastp != NULL, "unable to allocate stream");
+      dmaStreamSetPeripheral(adcp->dmastp, &ADC->CDR);
+#if defined(rccResetADC1)
+      rccResetADC1();
+#endif
+      rccEnableADC1(false);
+    }
 #endif /* STM32_ADC_USE_ADC1 */
 
 #if STM32_ADC_USE_ADC2
-        rccEnableADC2(FALSE);
+        rccEnableADC2(false);
 #endif /* STM32_ADC_USE_ADC2 */
 
 #if STM32_ADC_USE_ADC3
-        rccEnableADC3(FALSE);
+        rccEnableADC3(false);
 #endif /* STM32_ADC_USE_ADC3 */
 
         /* This is a common register but apparently it requires that at least one
