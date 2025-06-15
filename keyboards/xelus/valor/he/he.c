@@ -31,7 +31,7 @@ bool bootmagic_should_reset(void) {
     if (raw_value > threshold) {
         return true;
     }
-    
+
     return false;
 }
 #endif
@@ -61,8 +61,8 @@ void eeconfig_init_kb(void) {
 void keyboard_post_init_kb(void) {
     debug_enable = true;
     debug_matrix = true;
-    
-    analog_config_init();
+
+    reset_analog_config();
     eeconfig_read_kb_datablock(&analog_config, 0, EECONFIG_KB_DATA_SIZE);
 
     keyboard_post_init_user();
