@@ -19,14 +19,15 @@
 #include "../analogConfig.h"
 
 dks_key_t *dks_keys = analog_config.dks_keys; // Pointer to the DKS keys array
+dks_register_t dks_register[MAX_DKS_KEYS] = {0}; // Array to hold DKS key configurations
 
 // need to hook into process_keycode_xxx()
 
 void dks_init(void) {
     // initialize the dks keys
     for (uint8_t i = 0; i < MAX_DKS_KEYS; i++) {
-        dks_keys[i].hit    = DKS_HIT_TOP_PRESS;     // initialize state to none
-        dks_keys[i].region = DKS_REGION_BEFORE_TOP; // initialize region to before top
+        dks_register[i].hit    = DKS_HIT_TOP_PRESS;     // initialize state to none
+        dks_register[i].region = DKS_REGION_BEFORE_TOP; // initialize region to before top
         for (uint8_t j = 0; j < NUM_DKS_CONFS_PER_KEY; j++) {
             dks_keys[i].key_configs[j].dks_keycode               = 0; // initialize keycode to 0
             dks_keys[i].key_configs[j].dist_config.top_press     = false;
@@ -63,7 +64,7 @@ void dks_set_key_bot_release(uint8_t idx, uint8_t config_idx, bool botRelease) {
 // get the region for the DKS key at index idx and config_idx
 dks_region_t dks_get_key_region(uint8_t idx, uint8_t config_idx) {
     if (idx < MAX_DKS_KEYS && config_idx < NUM_DKS_CONFS_PER_KEY) {
-        return dks_keys[idx].region;
+        return dks_register[idx].region;
     }
     return 0; // return default region if out of bounds
 }
@@ -190,10 +191,8 @@ bool dks_process_key_state(uint8_t row, uint8_t col, dks_region_t prevRegion, dk
         return false; // invalid DKS index
     }
 
-    dks_key_t *dks_key = &dks_keys[dks_idx];
-
     // update the region
-    dks_key->region = currRegion;
+    dks_register[dks_idx].region = currRegion;
 
     // check if the region has changed
     // handle region change logic here
@@ -202,31 +201,31 @@ bool dks_process_key_state(uint8_t row, uint8_t col, dks_region_t prevRegion, dk
         case DKS_REGION_BEFORE_TOP:
             if (currRegion == DKS_REGION_MID_PRESS) {
                 // entering top press region
-                dks_key->hit = DKS_HIT_TOP_PRESS;
+                dks_register[dks_idx].hit = DKS_HIT_TOP_PRESS;
             }
             break;
         case DKS_REGION_MID_PRESS:
             if (currRegion == DKS_REGION_BEFORE_TOP) {
                 // exiting top press region
-                dks_key->hit = DKS_HIT_TOP_RELEASE;
+                dks_register[dks_idx].hit = DKS_HIT_TOP_RELEASE;
             } else if (currRegion == DKS_REGION_AFTER_BOTTOM) {
                 // entering bottom press region
-                dks_key->hit = DKS_HIT_BOT_PRESS;
+                dks_register[dks_idx].hit = DKS_HIT_BOT_PRESS;
             }
             break;
         case DKS_REGION_AFTER_BOTTOM:
             if (currRegion == DKS_REGION_MID_RELEASE) {
                 // entering top press region
-                dks_key->hit = DKS_HIT_BOT_RELEASE;
+                dks_register[dks_idx].hit = DKS_HIT_BOT_RELEASE;
             }
             break;
         case DKS_REGION_MID_RELEASE:
             if (currRegion == DKS_REGION_AFTER_BOTTOM) {
                 // exiting bottom press region
-                dks_key->hit = DKS_HIT_BOT_PRESS;
+                dks_register[dks_idx].hit = DKS_HIT_BOT_PRESS;
             } else if (currRegion == DKS_REGION_BEFORE_TOP) {
                 // entering top press region
-                dks_key->hit = DKS_HIT_TOP_RELEASE;
+                dks_register[dks_idx].hit = DKS_HIT_TOP_RELEASE;
             }
             break;
     }

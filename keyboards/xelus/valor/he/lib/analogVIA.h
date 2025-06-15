@@ -38,7 +38,7 @@ enum via_enums {
     id_bottom_out_calibration,
     id_reset_calibration,
     id_get_calibration_data,
-    // modes - TBD
+    // modes
     id_actuation_mode,
     id_reset_mode,
     id_static_actuation_press_point,
@@ -48,6 +48,7 @@ enum via_enums {
     id_dynamic_press_hysteresis,
     id_dynamic_release_hysteresis,
     id_reset_dynamic_actuation,
+    id_reset_dks_actuation,
     // dks
     id_dks_num,
     id_dks_top_actuation_point,

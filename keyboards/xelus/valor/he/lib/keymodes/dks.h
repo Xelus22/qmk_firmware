@@ -33,6 +33,12 @@
 // where we have the before and after states, but we need to
 // process HOW we got to the state
 
+// active region mask
+#define DKS_REGION_BEFORE_TOP_MASK 0x01   // mask for before top region
+#define DKS_REGION_MID_PRESS_MASK 0x02    // mask for mid press region
+#define DKS_REGION_AFTER_BOTTOM_MASK 0x04 // mask for after bottom region
+#define DKS_REGION_MID_RELEASE_MASK 0x08  // mask for mid release region
+
 typedef enum {
     DKS_HIT_TOP_PRESS = 0, // top press state
     DKS_HIT_BOT_PRESS,     // bottom press state
@@ -48,12 +54,6 @@ typedef enum {
     DKS_REGION_MID_RELEASE,    // release press middle region
 } dks_region_t;                // 1 byte
 STATIC_ASSERT(sizeof(dks_region_t) == 1, "Size mismatch for dks_region_t");
-
-// active region mask
-#define DKS_REGION_BEFORE_TOP_MASK 0x01   // mask for before top region
-#define DKS_REGION_MID_PRESS_MASK 0x02    // mask for mid press region
-#define DKS_REGION_AFTER_BOTTOM_MASK 0x04 // mask for after bottom region
-#define DKS_REGION_MID_RELEASE_MASK 0x08  // mask for mid release region
 
 typedef struct PACKED {
     bool           top_press : 1;     // true if the top press is active
@@ -72,17 +72,26 @@ typedef struct PACKED {
 STATIC_ASSERT(sizeof(dks_key_config_t) == 3, "Size mismatch for dks_key_t");
 
 typedef struct PACKED {
-    dks_activate_t   hit;    // current DKS state - internal state machine use
-    dks_region_t     region; // DKS region - set by the matrix scan
     dks_key_config_t key_configs[NUM_DKS_CONFS_PER_KEY];
-} dks_key_t; // 14 bytes
-STATIC_ASSERT(sizeof(dks_key_t) == (1 + 1 + 3 * NUM_DKS_CONFS_PER_KEY), "Size mismatch for dks_key_t");
+} dks_key_t; // 12 bytes
+STATIC_ASSERT(sizeof(dks_key_t) == (3 * NUM_DKS_CONFS_PER_KEY), "Size mismatch for dks_key_t");
+
+typedef struct {
+    dks_activate_t hit;
+    dks_region_t   region;
+} dks_register_t; // 2 bytes, used for register state
+STATIC_ASSERT(sizeof(dks_register_t) == 2, "Size mismatch for dks_register_t");
+
 
 void dks_init(void);
 void dks_set_key_top_press(uint8_t idx, uint8_t config_idx, bool topPress);
+bool dks_get_key_top_press(uint8_t idx, uint8_t config_idx);
 void dks_set_key_top_release(uint8_t idx, uint8_t config_idx, bool topRelease);
+bool dks_get_key_top_release(uint8_t idx, uint8_t config_idx);
 void dks_set_key_bot_press(uint8_t idx, uint8_t config_idx, bool botPress);
+bool dks_get_key_bot_press(uint8_t idx, uint8_t config_idx);
 void dks_set_key_bot_release(uint8_t idx, uint8_t config_idx, bool botRelease);
+bool dks_get_key_bot_release(uint8_t idx, uint8_t config_idx);
 
 dks_region_t dks_get_key_region(uint8_t idx, uint8_t config_idx);
 
