@@ -75,7 +75,7 @@ __attribute__((used)) void adcCompleteCallback(ADCDriver *adcp) {
         // store the raw ADC sample
         keys[row][col].raw += (adcSamples[col] - keys[row][col].raw) >> ALPHA_SHIFT; // exponential moving average
     }
-    row = (row + 1) % NUM_ROWS;
+    row = (row + 1) % MATRIX_ROWS;
     matrix_mux_change(row);
     osalSysUnlockFromISR();
 }
