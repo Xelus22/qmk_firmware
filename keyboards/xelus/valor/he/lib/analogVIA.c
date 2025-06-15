@@ -63,6 +63,98 @@ void via_config_set_value(uint8_t *data) {
             }
             break;
         }
+        case id_actuation_mode: {
+            // Handle setting actuation mode
+            uint8_t row  = value_data[0]; // byte 3
+            uint8_t col  = value_data[1]; // byte 4
+            uint8_t mode = value_data[2]; // byte 5
+            set_analog_key_mode(row, col, mode);
+            break;
+        }
+        case id_reset_mode: {
+            // Handle resetting actuation mode
+            reset_analog_key_mode();
+            break;
+        }
+        case id_static_actuation_press_point: {
+            // Handle setting static actuation press point
+            uint8_t  row             = value_data[0];                        // byte 3
+            uint8_t  col             = value_data[1];                        // byte 4
+            uint16_t actuation_point = (value_data[2] << 8) | value_data[3]; // bytes 5 and 6
+            set_static_actuation_press_point(row, col, actuation_point);
+            break;
+        }
+        case id_static_actuation_release_point: {
+            // Handle setting static actuation release point
+            uint8_t  row             = value_data[0];                        // byte 3
+            uint8_t  col             = value_data[1];                        // byte 4
+            uint16_t actuation_point = (value_data[2] << 8) | value_data[3]; // bytes 5 and 6
+            set_static_actuation_release_point(row, col, actuation_point);
+            break;
+        }
+        case id_reset_static_actuation: {
+            // Handle resetting static actuation
+            reset_static_actuation();
+            break;
+        }
+        case id_dynamic_activate_threshold: {
+            // Handle setting dynamic activate threshold
+            uint8_t  row           = value_data[0];                        // byte 3
+            uint8_t  col           = value_data[1];                        // byte 4
+            uint16_t act_threshold = (value_data[2] << 8) | value_data[3]; // bytes 5 and 6
+            set_dynamic_activate_threshold(row, col, act_threshold);
+            break;
+        }
+        case id_dynamic_press_hysteresis: {
+            // Handle setting dynamic press hysteresis
+            uint8_t  row              = value_data[0];                        // byte 3
+            uint8_t  col              = value_data[1];                        // byte 4
+            uint16_t press_hysteresis = (value_data[2] << 8) | value_data[3]; // bytes 5 and 6
+            set_dynamic_press_hysteresis(row, col, press_hysteresis);
+            break;
+        }
+        case id_dynamic_release_hysteresis: {
+            // Handle setting dynamic release hysteresis
+            uint8_t  row                = value_data[0];                        // byte 3
+            uint8_t  col                = value_data[1];                        // byte 4
+            uint16_t release_hysteresis = (value_data[2] << 8) | value_data[3]; // bytes 5 and 6
+            set_dynamic_release_hysteresis(row, col, release_hysteresis);
+            break;
+        }
+        case id_reset_dynamic_actuation: {
+            // Handle resetting dynamic actuation
+            reset_dynamic_actuation();
+            break;
+        }
+        case id_reset_dks_actuation: {
+            // Handle resetting DKS actuation
+            reset_dks_actuation();
+            break;
+        }
+        case id_dks_num: {
+            // Handle setting DKS number
+            uint8_t row     = value_data[0]; // byte 3
+            uint8_t col     = value_data[1]; // byte 4
+            uint8_t dks_num = value_data[2]; // byte 5
+            set_dks_num(row, col, dks_num);
+            break;
+        }
+        case id_dks_top_actuation_point: {
+            // Handle setting DKS top actuation point
+            uint8_t  row             = value_data[0];                        // byte 3
+            uint8_t  col             = value_data[1];                        // byte 4
+            uint16_t actuation_point = (value_data[2] << 8) | value_data[3]; // bytes 5 and 6
+            set_dks_top_actuation_point(row, col, actuation_point);
+            break;
+        }
+        case id_dks_bottom_actuation_point: {
+            // Handle setting DKS bottom actuation point
+            uint8_t  row             = value_data[0];                        // byte 3
+            uint8_t  col             = value_data[1];                        // byte 4
+            uint16_t actuation_point = (value_data[2] << 8) | value_data[3]; // bytes 5 and 6
+            set_dks_bot_actuation_point(row, col, actuation_point);
+            break;
+        }
         default: {
             // Unhandled message.
             *value_id = id_unhandled;
@@ -173,6 +265,92 @@ void via_config_get_value(uint8_t *data) {
             value_data[9]                   = bottom_out_hysteresis & 0xFF;         // Low byte
             break;
         }
+        case id_actuation_mode: {
+            // Handle getting actuation mode
+            uint8_t row   = value_data[0];                 // byte 3
+            uint8_t col   = value_data[1];                 // byte 4
+            value_data[2] = get_analog_key_mode(row, col); // Store the mode in byte 5
+            break;
+        }
+        case id_static_actuation_press_point: {
+            // Handle getting static actuation press point
+            uint8_t  row             = value_data[0]; // byte 3
+            uint8_t  col             = value_data[1]; // byte 4
+            uint16_t actuation_point = get_static_actuation_press_point(row, col);
+            value_data[2]            = (actuation_point >> 8) & 0xFF; // High byte
+            value_data[3]            = actuation_point & 0xFF;        // Low byte
+            break;
+        }
+        case id_static_actuation_release_point: {
+            // Handle getting static actuation release point
+            uint8_t  row             = value_data[0]; // byte 3
+            uint8_t  col             = value_data[1]; // byte 4
+            uint16_t actuation_point = get_static_actuation_release_point(row, col);
+            value_data[2]            = (actuation_point >> 8) & 0xFF; // High byte
+            value_data[3]            = actuation_point & 0xFF;        // Low byte
+            break;
+        }
+        case id_dynamic_activate_threshold: {
+            // Handle getting dynamic activate threshold
+            uint8_t  row           = value_data[0]; // byte 3
+            uint8_t  col           = value_data[1]; // byte 4
+            uint16_t act_threshold = get_dynamic_activate_threshold(row, col);
+            value_data[2]          = (act_threshold >> 8) & 0xFF; // High byte
+            value_data[3]          = act_threshold & 0xFF;        // Low byte
+            break;
+        }
+        case id_dynamic_press_hysteresis: {
+            // Handle getting dynamic press hysteresis
+            uint8_t  row              = value_data[0]; // byte 3
+            uint8_t  col              = value_data[1]; // byte 4
+            uint16_t press_hysteresis = get_dynamic_press_hysteresis(row, col);
+            value_data[2]             = (press_hysteresis >> 8) & 0xFF; // High byte
+            value_data[3]             = press_hysteresis & 0xFF;        // Low byte
+            break;
+        }
+        case id_dynamic_release_hysteresis: {
+            // Handle getting dynamic release hysteresis
+            uint8_t  row                = value_data[0]; // byte 3
+            uint8_t  col                = value_data[1]; // byte 4
+            uint16_t release_hysteresis = get_dynamic_release_hysteresis(row, col);
+            value_data[2]               = (release_hysteresis >> 8) & 0xFF; // High byte
+            value_data[3]               = release_hysteresis & 0xFF;        // Low byte
+            break;
+        }
+        case id_dks_num: {
+            // Handle getting DKS number
+            uint8_t row   = value_data[0];         // byte 3
+            uint8_t col   = value_data[1];         // byte 4
+            value_data[2] = get_dks_num(row, col); // Store the DKS number in byte 5
+            break;
+        }
+        case id_dks_top_actuation_point: {
+            // Handle getting DKS top actuation point
+            uint8_t  row             = value_data[0]; // byte 3
+            uint8_t  col             = value_data[1]; // byte 4
+            uint16_t actuation_point = get_dks_top_actuation_point(row, col);
+            value_data[2]            = (actuation_point >> 8) & 0xFF; // High byte
+            value_data[3]            = actuation_point & 0xFF;        // Low byte
+            break;
+        }
+        case id_dks_bottom_actuation_point: {
+            // Handle getting DKS bottom actuation point
+            uint8_t  row             = value_data[0]; // byte 3
+            uint8_t  col             = value_data[1]; // byte 4
+            uint16_t actuation_point = get_dks_bot_actuation_point(row, col);
+            value_data[2]            = (actuation_point >> 8) & 0xFF; // High byte
+            value_data[3]            = actuation_point & 0xFF;        // Low byte
+            break;
+        }
+        // case id_dks_config: {
+        //     // Handle getting DKS configuration
+        //     uint8_t   row        = value_data[0]; // byte 3
+        //     uint8_t   col        = value_data[1]; // byte 4
+        //     uint8_t   nDksKey    = value_data[2]; // byte 5
+        //     uint8_t   nKeyConfig = value_data[3]; // byte 6
+        //     dks_key_t dks_key    = get_dks_key(row, col);
+        //     break;
+        // }
     }
 }
 

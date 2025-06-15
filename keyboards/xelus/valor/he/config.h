@@ -51,4 +51,4 @@
 
 #define BOOTMAGIC_DEBOUNCE 0
 
-#define EECONFIG_KB_DATA_SIZE ((24 * 8 * 9) + 14 * 10 + 1) // 24 bytes per key, 8 rows, 9 cols + 10 dks keys
+#define EECONFIG_KB_DATA_SIZE ((24 * 8 * 9) + 12 * 10 + 1) // 24 bytes per key, 8 rows, 9 cols + 10 dks keys + switchLUT
