@@ -46,7 +46,7 @@ void reset_analog_key_mode(void) {
     // Reset all analog key modes to default
     for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
         for (uint8_t col = 0; col < MATRIX_COLS; col++) {
-            set_analog_key_mode(row, col, DEFAULT_ANALOG_MODE);
+            set_analog_key_mode(row, col, MODE_CALIBRATION);
         }
     }
 }
@@ -67,8 +67,8 @@ void reset_static_actuation(void) {
     // Reset all static actuation values to default
     for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
         for (uint8_t col = 0; col < MATRIX_COLS; col++) {
-            uint16_t act_press_point   = distance_to_raw(DEFAULT_STATIC_PRESS_POINT_MM, DEFAULT_TOP_OUT_CALIBRATION, DEFAULT_BOTTOM_OUT_CALIBRATION);
-            uint16_t act_release_point = distance_to_raw(DEFAULT_STATIC_RELEASE_POINT_MM, DEFAULT_TOP_OUT_CALIBRATION, DEFAULT_BOTTOM_OUT_CALIBRATION);
+            uint16_t act_press_point   = 2700;
+            uint16_t act_release_point = 2600;
             set_static_actuation_press_point(row, col, act_press_point);
             set_static_actuation_release_point(row, col, act_release_point);
         }

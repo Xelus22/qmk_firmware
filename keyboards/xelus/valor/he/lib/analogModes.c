@@ -228,7 +228,8 @@ bool process_mode_key(analog_key_mode_t mode, bool bPrevState, uint8_t row, uint
         //     return false;
         case MODE_CALIBRATION:
             // process calibration
-            calibrate_bottom_out(row, col);
+            // calibrate_bottom_out(row, col);
+            return false;
             break;
         default:
             break;

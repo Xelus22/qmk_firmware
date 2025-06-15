@@ -17,26 +17,67 @@
 #include "adc.h"
 #include "print.h"
 #include "stm32f405xx.h"
+#include "adc_multi.h"
+#include "quantum.h"
 
-semaphore_t       sem                     = {0};
-adcsample_t       adcSamples[NUM_SAMPLES] = {0}; // Buffer for ADC samples
+#ifndef ALPHA_SHIFT
+#    define ALPHA_SHIFT 4 // exponential moving average shift value
+#endif
+
+analog_key_t keys[MATRIX_ROWS][MATRIX_COLS] = {0};
+adcsample_t  adcSamples[NUM_SAMPLES]        = {0}; // Buffer for ADC samples
+uint8_t      row                            = 0;   // Current row being processed
+
+void matrix_mux_change(uint8_t iteration) {
+    // set mux
+    switch (iteration) {
+        default:
+        case 0:
+            // 000
+            gpio_write_pin_low(B6);
+            break;
+        case 1:
+            // 001
+            gpio_write_pin_high(B8);
+            break;
+        case 2:
+            // 011
+            gpio_write_pin_high(B7);
+            break;
+        case 3:
+            // 010
+            gpio_write_pin_low(B8);
+            break;
+        case 4:
+            // 110
+            gpio_write_pin_high(B6);
+            break;
+        case 5:
+            // 111
+            gpio_write_pin_high(B8);
+            break;
+        case 6:
+            // 101
+            gpio_write_pin_low(B7);
+            break;
+        case 7:
+            // 100
+            gpio_write_pin_low(B8);
+            break;
+    }
+}
 
 __attribute__((used)) void adcCompleteCallback(ADCDriver *adcp) {
-    (void)adcp;
+    (void)adcp; // Unused parameter
+    // Copy the samples to the global buffer
     osalSysLockFromISR();
-    chSemSignalI(&sem);
+    for (uint8_t col = 0; col < NUM_SAMPLES; col++) {
+        // store the raw ADC sample
+        keys[row][col].raw += (adcSamples[col] - keys[row][col].raw) >> ALPHA_SHIFT; // exponential moving average
+    }
+    row = (row + 1) % NUM_ROWS;
+    matrix_mux_change(row);
     osalSysUnlockFromISR();
-}
-
-bool waitForAdcConversion(void) {
-    // uprintf("Waiting for ADC conversion to complete...\n");
-    chSemWait(&sem); // Wait for the semaphore to be signalled
-    return true;
-}
-
-adcsample_t *adc_get_samples(void) {
-    // Return the pointer to the ADC samples buffer
-    return adcSamples;
 }
 
 __attribute__((used)) void adcErrorCallback(ADCDriver *adcp, adcerror_t err) {
@@ -61,49 +102,87 @@ __attribute__((used)) void adcErrorCallback(ADCDriver *adcp, adcerror_t err) {
 
 // turn off clang-format
 // clang-format off
+// static const ADCConversionGroup adc1Config = {
+//     .circular     = false,
+//     .num_channels = ADC_NUM_CHANNELS,
+//     .end_cb       = adcCompleteCallback,
+//     .error_cb     = adcErrorCallback,
+//     .cr1 = ADC_CR1_SCAN,
+//     .cr2 = ADC_CR2_SWSTART | ADC_CR2_DMA | ADC_CR2_DDS | ADC_CR2_ADON | ADC_CR2_CONT,
+//     .smpr1 = ADC_SMPR1_SMP_AN11(ADC_SAMPLE_3) |
+//              ADC_SMPR1_SMP_AN14(ADC_SAMPLE_3) |
+//              ADC_SMPR1_SMP_AN15(ADC_SAMPLE_3),
+//     .smpr2 = ADC_SMPR2_SMP_AN4(ADC_SAMPLE_3) |
+//              ADC_SMPR2_SMP_AN6(ADC_SAMPLE_3) |
+//              ADC_SMPR2_SMP_AN7(ADC_SAMPLE_3) |
+//              ADC_SMPR2_SMP_AN0(ADC_SAMPLE_3) |
+//              ADC_SMPR2_SMP_AN1(ADC_SAMPLE_3) |
+//              ADC_SMPR2_SMP_AN2(ADC_SAMPLE_3),
+//     .sqr1 = 0U,
+//     .sqr2 = ADC_SQR2_SQ7_N(ADC_CHANNEL_IN0) |
+//             ADC_SQR2_SQ8_N(ADC_CHANNEL_IN1) |
+//             ADC_SQR2_SQ9_N(ADC_CHANNEL_IN2),
+//     .sqr3 = ADC_SQR3_SQ1_N(ADC_CHANNEL_IN4) |
+//             ADC_SQR3_SQ2_N(ADC_CHANNEL_IN6) |
+//             ADC_SQR3_SQ3_N(ADC_CHANNEL_IN7) |
+//             ADC_SQR3_SQ4_N(ADC_CHANNEL_IN11) |
+//             ADC_SQR3_SQ5_N(ADC_CHANNEL_IN14) |
+//             ADC_SQR3_SQ6_N(ADC_CHANNEL_IN15),
+// };
+
 static const ADCConversionGroup adc1Config = {
-    .circular     = false,
+    .circular     = true,
     .num_channels = ADC_NUM_CHANNELS,
     .end_cb       = adcCompleteCallback,
     .error_cb     = adcErrorCallback,
-    .cr1 = ADC_CR1_SCAN,
-    .cr2 = ADC_CR2_SWSTART | ADC_CR2_DMA | ADC_CR2_DDS | ADC_CR2_ADON | ADC_CR2_CONT,
+    .cr1 = 0U,
+    .cr2 = ADC_CR2_SWSTART,
+    .smpr1 = 0U,
+    .smpr2 = ADC_SMPR2_SMP_AN4(ADC_SAMPLE_3) |
+             ADC_SMPR2_SMP_AN6(ADC_SAMPLE_3) |
+             ADC_SMPR2_SMP_AN7(ADC_SAMPLE_3),
+    .sqr1 = ADC_SQR1_NUM_CH(ADC_NUM_CHANNELS),
+    .sqr2 = 0U,
+    .sqr3 = ADC_SQR3_SQ1_N(ADC_CHANNEL_IN4) |
+            ADC_SQR3_SQ2_N(ADC_CHANNEL_IN6) |
+            ADC_SQR3_SQ3_N(ADC_CHANNEL_IN7)
+};
+
+static const ADCConversionGroup adc2Config = {
+    .circular     = true,
+    .num_channels = 0U,
+    .end_cb       = NULL,
+    .error_cb     = NULL,
+    .cr1 = 0,
+    .cr2 = 0,
     .smpr1 = ADC_SMPR1_SMP_AN11(ADC_SAMPLE_3) |
              ADC_SMPR1_SMP_AN14(ADC_SAMPLE_3) |
              ADC_SMPR1_SMP_AN15(ADC_SAMPLE_3),
-    .smpr2 = ADC_SMPR2_SMP_AN4(ADC_SAMPLE_3) |
-             ADC_SMPR2_SMP_AN6(ADC_SAMPLE_3) |
-             ADC_SMPR2_SMP_AN7(ADC_SAMPLE_3) |
-             ADC_SMPR2_SMP_AN0(ADC_SAMPLE_3) |
-             ADC_SMPR2_SMP_AN1(ADC_SAMPLE_3) |
-             ADC_SMPR2_SMP_AN2(ADC_SAMPLE_3),
-    .sqr1 = 0U,
-    .sqr2 = ADC_SQR2_SQ7_N(ADC_CHANNEL_IN0) |
-            ADC_SQR2_SQ8_N(ADC_CHANNEL_IN1) |
-            ADC_SQR2_SQ9_N(ADC_CHANNEL_IN2),
-    .sqr3 = ADC_SQR3_SQ1_N(ADC_CHANNEL_IN4) |
-            ADC_SQR3_SQ2_N(ADC_CHANNEL_IN6) |
-            ADC_SQR3_SQ3_N(ADC_CHANNEL_IN7) |
-            ADC_SQR3_SQ4_N(ADC_CHANNEL_IN11) |
-            ADC_SQR3_SQ5_N(ADC_CHANNEL_IN14) |
-            ADC_SQR3_SQ6_N(ADC_CHANNEL_IN15),
+    .smpr2 = 0U,
+    .sqr1 = ADC_SQR1_NUM_CH(ADC_NUM_CHANNELS),
+    .sqr2 = 0U,
+    .sqr3 = ADC_SQR3_SQ1_N(ADC_CHANNEL_IN11) |
+            ADC_SQR3_SQ2_N(ADC_CHANNEL_IN14) |
+            ADC_SQR3_SQ3_N(ADC_CHANNEL_IN15)
 };
 
-void setup_adc_registers(ADCDriver *adcp, const ADCConversionGroup *grpp, adcsample_t *samples) {
-    adcp->samples = samples;
-    adcp->depth   = 1;
-    adcp->grpp    = grpp;
-
-    adcp->adc->SMPR1 = grpp->smpr1;
-    adcp->adc->SMPR2 = grpp->smpr2;
-    adcp->adc->HTR   = grpp->htr;
-    adcp->adc->LTR   = grpp->ltr;
-    adcp->adc->SQR1  = grpp->sqr1 | ADC_SQR1_NUM_CH(grpp->num_channels);
-    adcp->adc->SQR2  = grpp->sqr2;
-    adcp->adc->SQR3  = grpp->sqr3;
-    adcp->adc->CR1   = 0;
-    adcp->adc->CR2   = 0;
-}
+static const ADCConversionGroup adc3Config = {
+    .circular     = true,
+    .num_channels = 0,
+    .end_cb       = NULL,
+    .error_cb     = NULL,
+    .cr1 = 0,
+    .cr2 = 0,
+    .smpr1 = 0U,
+    .smpr2 = ADC_SMPR2_SMP_AN0(ADC_SAMPLE_3) |
+             ADC_SMPR2_SMP_AN1(ADC_SAMPLE_3) |
+             ADC_SMPR2_SMP_AN2(ADC_SAMPLE_3),
+    .sqr1 = ADC_SQR1_NUM_CH(ADC_NUM_CHANNELS),
+    .sqr2 = 0U,
+    .sqr3 = ADC_SQR3_SQ1_N(ADC_CHANNEL_IN0) |
+            ADC_SQR3_SQ2_N(ADC_CHANNEL_IN1) |
+            ADC_SQR3_SQ3_N(ADC_CHANNEL_IN2)
+};
 
 void adc_init(void) {
     uprintf("ADC Init\n");
@@ -119,32 +198,8 @@ void adc_init(void) {
     palSetPadMode(GPIOA, 1, PAL_MODE_INPUT_ANALOG); // 1 - 6 - 7
     palSetPadMode(GPIOA, 2, PAL_MODE_INPUT_ANALOG); // 2 - 5 - 8
 
-    adcStart(&ADCD1, NULL); // Start ADC1
-
-    chSemObjectInit(&sem, 0);
-    uprintf("Complete semaphore\n");
-
     // Initialize the ADC conversion groups
-    chSysLock();
-    setup_adc_registers(&ADCD1, &adc1Config, adcSamples);
-    chSysUnlock();
+    adcMultiStart();
+    adcMultiStartConversion(&adc1Config, &adc2Config, &adc3Config, adcSamples, 1);
 }
 
-void adc_start(void) {
-    chSysLock();
-    // ADC1
-    uint32_t cr2 = adc1Config.cr2;
-    dmaStreamSetMemory0(ADCD1.dmastp, adcSamples);
-    dmaStreamSetTransactionSize(ADCD1.dmastp, (uint32_t)ADC_NUM_CHANNELS);
-    dmaStreamSetMode(ADCD1.dmastp, ADCD1.dmamode);
-    dmaStreamEnable(ADCD1.dmastp);
-    ADCD1.state     = ADC_ACTIVE; // Set the state to active
-    ADCD1.grpp      = &adc1Config;
-    ADCD1.adc->SR   = 0;
-    ADCD1.adc->SQR2 = adc1Config.sqr2;
-    ADCD1.adc->SQR3 = adc1Config.sqr3;
-    ADCD1.adc->CR1  = adc1Config.cr1;
-    ADCD1.adc->CR2  = (cr2) & ~ADC_CR2_SWSTART;
-    ADCD1.adc->CR2  = (cr2);
-    chSysUnlock();
-}

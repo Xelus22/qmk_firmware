@@ -50,37 +50,38 @@ void keyboard_pre_init_kb(void) {
 
 void eeconfig_init_kb(void) {
     // Default values
-    reset_analog_config();
-
+    // reset_analog_config();
+    
     // Write default value to EEPROM now
-    save_config_to_eeprom();
-
+    // save_config_to_eeprom();
+    
     eeconfig_init_user();
 }
 
 void keyboard_post_init_kb(void) {
     debug_enable = true;
     debug_matrix = true;
-
+    
+    // analog_config_init();
+    // eeconfig_read_kb_datablock(&analog_config, 0, EECONFIG_KB_DATA_SIZE);
     reset_analog_config();
-    eeconfig_read_kb_datablock(&analog_config, 0, EECONFIG_KB_DATA_SIZE);
 
     keyboard_post_init_user();
 }
 
-// bool via_command_kb(uint8_t *data, uint8_t length) {
-//     // send the matrix key numbers
+bool via_command_kb(uint8_t *data, uint8_t length) {
+    // send the matrix key numbers
 
-//     uint8_t row = data[0];
-//     // can only fit 32 bytes in a packet
-//     // 15 keys per packet
-//     uint8_t offset = 1;
-//     for (int j = 0; j < MATRIX_COLS; j++) {
-//         data[j * 2 + offset]     = (keys[row][j].raw >> 8) & 0xFF; // high byte
-//         data[j * 2 + 1 + offset] = keys[row][j].raw & 0xFF;        // low byte
-//     }
+    uint8_t row = data[0];
+    // can only fit 32 bytes in a packet
+    // 15 keys per packet
+    uint8_t offset = 1;
+    for (int j = 0; j < MATRIX_COLS; j++) {
+        data[j * 2 + offset]     = (keys[row][j].raw >> 8) & 0xFF; // high byte
+        data[j * 2 + 1 + offset] = keys[row][j].raw & 0xFF;        // low byte
+    }
 
-//     raw_hid_send(data, length);
-//     // do not process anything after this
-//     return true;
-// }
+    raw_hid_send(data, length);
+    // do not process anything after this
+    return true;
+}
