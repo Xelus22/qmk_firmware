@@ -18,8 +18,8 @@
 #include "print.h"
 #include "stm32f405xx.h"
 
-semaphore_t       sem                     = {0};
-adcsample_t       adcSamples[NUM_SAMPLES] = {0}; // Buffer for ADC samples
+semaphore_t sem                     = {0};
+adcsample_t adcSamples[NUM_SAMPLES] = {0}; // Buffer for ADC samples
 
 __attribute__((used)) void adcCompleteCallback(ADCDriver *adcp) {
     (void)adcp;
@@ -59,15 +59,36 @@ __attribute__((used)) void adcErrorCallback(ADCDriver *adcp, adcerror_t err) {
     osalSysUnlockFromISR();
 }
 
+static const GPTConfig gpt3cfg = {
+    .frequency = 1000000, // 1 MHz timer clock (adjust as needed)
+    .callback  = NULL,    // No callback needed for TRGO use
+    .cr2       = 0,       // We'll override this manually below
+    .dier      = 0        // No interrupts
+};
+
+void init_tim3_trgo(void) {
+    gptStart(&GPTD3, &gpt3cfg); // Init GPT driver (TIM3)
+    gptStopTimer(&GPTD3);       // Make sure it's not counting
+
+    // Setup TIM3->CR2 MMS to generate TRGO on update event
+    TIM3->CR2 = (TIM3->CR2 & ~TIM_CR2_MMS) | TIM_CR2_MMS_1;
+
+    // Optionally enable auto-reload preload
+    TIM3->CR1 |= TIM_CR1_ARPE;
+
+    // Enable update events
+    TIM3->EGR |= TIM_EGR_UG;
+}
+
 // turn off clang-format
 // clang-format off
 static const ADCConversionGroup adc1Config = {
-    .circular     = false,
+    .circular     = true,
     .num_channels = ADC_NUM_CHANNELS,
     .end_cb       = adcCompleteCallback,
     .error_cb     = adcErrorCallback,
     .cr1 = ADC_CR1_SCAN,
-    .cr2 = ADC_CR2_SWSTART | ADC_CR2_DMA | ADC_CR2_DDS | ADC_CR2_ADON | ADC_CR2_CONT,
+    .cr2 = ADC_CR2_DMA | ADC_CR2_DDS | ADC_CR2_EXTEN_0  | ADC_CR2_EXTSEL_3,
     .smpr1 = ADC_SMPR1_SMP_AN11(ADC_SAMPLE_3) |
              ADC_SMPR1_SMP_AN14(ADC_SAMPLE_3) |
              ADC_SMPR1_SMP_AN15(ADC_SAMPLE_3),
@@ -89,24 +110,7 @@ static const ADCConversionGroup adc1Config = {
             ADC_SQR3_SQ6_N(ADC_CHANNEL_IN15),
 };
 
-void setup_adc_registers(ADCDriver *adcp, const ADCConversionGroup *grpp, adcsample_t *samples) {
-    adcp->samples = samples;
-    adcp->depth   = 1;
-    adcp->grpp    = grpp;
-
-    adcp->adc->SMPR1 = grpp->smpr1;
-    adcp->adc->SMPR2 = grpp->smpr2;
-    adcp->adc->HTR   = grpp->htr;
-    adcp->adc->LTR   = grpp->ltr;
-    adcp->adc->SQR1  = grpp->sqr1 | ADC_SQR1_NUM_CH(grpp->num_channels);
-    adcp->adc->SQR2  = grpp->sqr2;
-    adcp->adc->SQR3  = grpp->sqr3;
-    adcp->adc->CR1   = 0;
-    adcp->adc->CR2   = 0;
-}
-
 void adc_init(void) {
-    uprintf("ADC Init\n");
     // setup the ADC pins
     // ADC input channel - MUX NUMBER
     palSetPadMode(GPIOA, 4, PAL_MODE_INPUT_ANALOG); // 4 - 4 - 0
@@ -119,32 +123,14 @@ void adc_init(void) {
     palSetPadMode(GPIOA, 1, PAL_MODE_INPUT_ANALOG); // 1 - 6 - 7
     palSetPadMode(GPIOA, 2, PAL_MODE_INPUT_ANALOG); // 2 - 5 - 8
 
-    adcStart(&ADCD1, NULL); // Start ADC1
-
     chSemObjectInit(&sem, 0);
-    uprintf("Complete semaphore\n");
-
-    // Initialize the ADC conversion groups
-    chSysLock();
-    setup_adc_registers(&ADCD1, &adc1Config, adcSamples);
-    chSysUnlock();
+    init_tim3_trgo();
+    
+    adcStart(&ADCD1, NULL); // Start ADC1
+    adcStartConversionI(&ADCD1, &adc1Config, adcSamples, 1);
 }
 
 void adc_start(void) {
-    chSysLock();
-    // ADC1
-    uint32_t cr2 = adc1Config.cr2;
-    dmaStreamSetMemory0(ADCD1.dmastp, adcSamples);
-    dmaStreamSetTransactionSize(ADCD1.dmastp, (uint32_t)ADC_NUM_CHANNELS);
-    dmaStreamSetMode(ADCD1.dmastp, ADCD1.dmamode);
-    dmaStreamEnable(ADCD1.dmastp);
-    ADCD1.state     = ADC_ACTIVE; // Set the state to active
-    ADCD1.grpp      = &adc1Config;
-    ADCD1.adc->SR   = 0;
-    ADCD1.adc->SQR2 = adc1Config.sqr2;
-    ADCD1.adc->SQR3 = adc1Config.sqr3;
-    ADCD1.adc->CR1  = adc1Config.cr1;
-    ADCD1.adc->CR2  = (cr2) & ~ADC_CR2_SWSTART;
-    ADCD1.adc->CR2  = (cr2);
-    chSysUnlock();
+    // place the trigger timer code here 
+    TIM3->EGR |= TIM_EGR_UG; // Software trigger (TRGO fires immediately)
 }
