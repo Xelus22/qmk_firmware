@@ -30,6 +30,7 @@ enum via_enums {
     id_get_raw_value_multi,
     // switch LUT
     id_switch_lut,
+    id_switch_lut_table,
     id_get_switch_lut_options,
     id_get_switch_lut_name,
     id_get_switch_max_distance,

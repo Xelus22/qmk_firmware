@@ -46,6 +46,20 @@ STATIC_ASSERT(NMUX == NUM_SAMPLES, "NMUX and NUMSAMPLES Size mismatch");
 analog_key_t keys[MATRIX_ROWS][MATRIX_COLS] = {0};
 matrix_row_t previous_matrix[MATRIX_ROWS]   = {0};
 
+const uint32_t MUX_OUTPUTS[MATRIX_ROWS] = {
+    // clang-format off
+                                            // B8 | B7 | B6
+    [0] = 0,                                // 0  | 0  | 0
+    [1] = (1 << 8),                         // 1  | 0  | 0
+    [2] = (1 << 8) | (1 << 7),              // 1  | 1  | 0
+    [3] = (1 << 7),                         // 0  | 1  | 0
+    [4] = (1 << 7) | (1 << 6),              // 0  | 1  | 1
+    [5] = (1 << 8) | (1 << 7) | (1 << 6),   // 1  | 1  | 1
+    [6] = (1 << 8) | (1 << 6),              // 1  | 0  | 1
+    [7] = (1 << 6)                          // 0  | 0  | 1
+    // clang-format on
+};
+
 // process adc reading
 static void process_adc_readings(matrix_row_t *prev_matrix, matrix_row_t *current_matrix, uint8_t ch) {
     uint8_t      row               = ch;
@@ -66,47 +80,6 @@ static void process_adc_readings(matrix_row_t *prev_matrix, matrix_row_t *curren
     }
 
     current_matrix[row] = current_row_value; // update the current matrix row
-}
-
-void matrix_mux_change(uint8_t iteration) {
-    // set mux
-    switch (iteration) {
-        default:
-        case 0:
-            // 000
-            gpio_write_pin_low(B6);
-            // gpio_write_pin_low(B7);
-            // gpio_write_pin_low(B8);
-            break;
-        case 1:
-            // 001
-            gpio_write_pin_high(B8);
-            break;
-        case 2:
-            // 011
-            gpio_write_pin_high(B7);
-            break;
-        case 3:
-            // 010
-            gpio_write_pin_low(B8);
-            break;
-        case 4:
-            // 110
-            gpio_write_pin_high(B6);
-            break;
-        case 5:
-            // 111
-            gpio_write_pin_high(B8);
-            break;
-        case 6:
-            // 101
-            gpio_write_pin_low(B7);
-            break;
-        case 7:
-            // 100
-            gpio_write_pin_low(B8);
-            break;
-    }
 }
 
 void matrix_init_custom(void) {
@@ -138,13 +111,13 @@ bool matrix_scan_custom(matrix_row_t current_matrix[]) {
 
     // start ADC Conversion so that we can do processing during reads
     // only the first one we cant process
-    matrix_mux_change(0);
+    palWriteGroup(GPIOB, 0xFFFF, 0, MUX_OUTPUTS[0]); // set all mux outputs to low
     adc_start();            // start ADC conversion
     waitForAdcConversion(); // wait for ADC conversion to complete
     copy_adc_samples_to_matrix(adc_get_samples(), 0);
-
+    
     for (uint8_t ch = 1; ch < MUX_CHANNELS; ch++) {
-        matrix_mux_change(ch);
+        palWriteGroup(GPIOB, 0xFFFF, 0, MUX_OUTPUTS[ch]); // set all mux outputs to low
         adc_start(); // start ADC conversion
 
         process_adc_readings(previous_matrix, current_matrix, ch - 1);

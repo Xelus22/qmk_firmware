@@ -67,8 +67,8 @@ void reset_static_actuation(void) {
     // Reset all static actuation values to default
     for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
         for (uint8_t col = 0; col < MATRIX_COLS; col++) {
-            uint16_t act_press_point   = distance_to_raw(DEFAULT_STATIC_PRESS_POINT_MM, DEFAULT_TOP_OUT_CALIBRATION, DEFAULT_BOTTOM_OUT_CALIBRATION);
-            uint16_t act_release_point = distance_to_raw(DEFAULT_STATIC_RELEASE_POINT_MM, DEFAULT_TOP_OUT_CALIBRATION, DEFAULT_BOTTOM_OUT_CALIBRATION);
+            uint16_t act_release_point = 2500;
+            uint16_t act_press_point   = 2600;
             set_static_actuation_press_point(row, col, act_press_point);
             set_static_actuation_release_point(row, col, act_release_point);
         }
@@ -152,14 +152,14 @@ uint16_t get_bottom_out_calibration_hysteresis(uint8_t row, uint8_t col) {
 }
 
 // static actuation
-void set_static_actuation_release_point(uint8_t row, uint8_t col, uint16_t actuation_point) {
-    analog_config.key_config[row][col].static_actuation_release_point = actuation_point;
+void set_static_actuation_release_point(uint8_t row, uint8_t col, uint16_t release_point) {
+    analog_config.key_config[row][col].static_actuation_release_point = release_point;
 }
 uint16_t get_static_actuation_release_point(uint8_t row, uint8_t col) {
     return analog_config.key_config[row][col].static_actuation_release_point;
 }
-void set_static_actuation_press_point(uint8_t row, uint8_t col, uint16_t actuation_hysteresis) {
-    analog_config.key_config[row][col].static_actuation_press_point = actuation_hysteresis;
+void set_static_actuation_press_point(uint8_t row, uint8_t col, uint16_t actuation_point) {
+    analog_config.key_config[row][col].static_actuation_press_point = actuation_point;
 }
 uint16_t get_static_actuation_press_point(uint8_t row, uint8_t col) {
     return analog_config.key_config[row][col].static_actuation_press_point;

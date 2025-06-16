@@ -184,9 +184,9 @@ void via_config_get_value(uint8_t *data) {
             // can only fit 28 bytes in a packet after all the request bytes
             // 14 keys per packet
             uint8_t row    = value_data[0]; // byte 3
-            uint8_t offset = 4;             // Start from byte 4 for row
+            uint8_t offset = 1;             // Start from byte 4 for row
             for (int j = 0; j < MATRIX_COLS; j++) {
-                uint8_t raw                    = keys[row][j].raw;
+                uint16_t raw                   = keys[row][j].raw;
                 value_data[offset + j * 2]     = (raw >> 8) & 0xFF; // high byte
                 value_data[offset + j * 2 + 1] = raw & 0xFF;        // low byte
             }
@@ -197,6 +197,18 @@ void via_config_get_value(uint8_t *data) {
             // Handle getting switch LUT
             switch_lut_picker_t lut = get_switch_lut();
             value_data[0]           = lut; // Store the LUT index in the first byte
+            break;
+        }
+        case id_switch_lut_table: {
+            // Handle getting switch LUT
+            uint16_t idx_high = value_data[0]; // High byte of LUT index
+            uint16_t idx_low  = value_data[1]; // Low byte of LUT index
+            uint16_t idx      = (idx_high << 8) | idx_low; // Combine high and low bytes
+            switch_distance_t lut_value = get_switch_distance_value(idx); // Get the distance value and store it in value_data starting from byte 3
+            uint8_t  lut_val_high = (lut_value >> 8) & 0xFF; // High byte of LUT value
+            uint8_t  lut_val_low  = lut_value & 0xFF;        // Low byte of LUT value
+            value_data[2] = lut_val_high; // Store high byte in byte 3
+            value_data[3] = lut_val_low;  // Store low byte in byte 4
             break;
         }
         case id_get_switch_lut_options: {
@@ -342,15 +354,15 @@ void via_config_get_value(uint8_t *data) {
             value_data[3]            = actuation_point & 0xFF;        // Low byte
             break;
         }
-        // case id_dks_config: {
-        //     // Handle getting DKS configuration
-        //     uint8_t   row        = value_data[0]; // byte 3
-        //     uint8_t   col        = value_data[1]; // byte 4
-        //     uint8_t   nDksKey    = value_data[2]; // byte 5
-        //     uint8_t   nKeyConfig = value_data[3]; // byte 6
-        //     dks_key_t dks_key    = get_dks_key(row, col);
-        //     break;
-        // }
+            // case id_dks_config: {
+            //     // Handle getting DKS configuration
+            //     uint8_t   row        = value_data[0]; // byte 3
+            //     uint8_t   col        = value_data[1]; // byte 4
+            //     uint8_t   nDksKey    = value_data[2]; // byte 5
+            //     uint8_t   nKeyConfig = value_data[3]; // byte 6
+            //     dks_key_t dks_key    = get_dks_key(row, col);
+            //     break;
+            // }
     }
 }
 
