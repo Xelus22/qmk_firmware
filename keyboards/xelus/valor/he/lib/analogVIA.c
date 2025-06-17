@@ -22,6 +22,7 @@
 #include "calibration.h"
 #include "analogConfig.h"
 #include "distance.h"
+#include "quantum.h"
 
 #define MAX_VIA_DATA_SIZE (32 - 4) // max amount of data that can be sent in a VIA packet
 
@@ -169,6 +170,17 @@ void via_config_get_value(uint8_t *data) {
     uint8_t *value_data = &(data[1]);
 
     switch (*value_id) {
+#ifdef DEBUG_MATRIX_SCAN_RATE
+        case id_get_matrix_scan_rate: {
+            // Handle getting matrix scan rate
+            uint32_t scan_rate = get_matrix_scan_rate();
+            value_data[0]      = (scan_rate >> 24) & 0xFF; // High byte
+            value_data[1]      = (scan_rate >> 16) & 0xFF; // Second byte
+            value_data[2]      = (scan_rate >> 8) & 0xFF;  // Third byte
+            value_data[3]      = scan_rate & 0xFF;         // Low byte
+            break;
+        }
+#endif
         case id_get_raw_value: {
             // Handle getting raw value
             uint8_t  row       = value_data[0];
@@ -201,14 +213,14 @@ void via_config_get_value(uint8_t *data) {
         }
         case id_switch_lut_table: {
             // Handle getting switch LUT
-            uint16_t idx_high = value_data[0]; // High byte of LUT index
-            uint16_t idx_low  = value_data[1]; // Low byte of LUT index
-            uint16_t idx      = (idx_high << 8) | idx_low; // Combine high and low bytes
-            switch_distance_t lut_value = get_switch_distance_value(idx); // Get the distance value and store it in value_data starting from byte 3
-            uint8_t  lut_val_high = (lut_value >> 8) & 0xFF; // High byte of LUT value
-            uint8_t  lut_val_low  = lut_value & 0xFF;        // Low byte of LUT value
-            value_data[2] = lut_val_high; // Store high byte in byte 3
-            value_data[3] = lut_val_low;  // Store low byte in byte 4
+            uint16_t          idx_high     = value_data[0];                  // High byte of LUT index
+            uint16_t          idx_low      = value_data[1];                  // Low byte of LUT index
+            uint16_t          idx          = (idx_high << 8) | idx_low;      // Combine high and low bytes
+            switch_distance_t lut_value    = get_switch_distance_value(idx); // Get the distance value and store it in value_data starting from byte 3
+            uint8_t           lut_val_high = (lut_value >> 8) & 0xFF;        // High byte of LUT value
+            uint8_t           lut_val_low  = lut_value & 0xFF;               // Low byte of LUT value
+            value_data[2]                  = lut_val_high;                   // Store high byte in byte 3
+            value_data[3]                  = lut_val_low;                    // Store low byte in byte 4
             break;
         }
         case id_get_switch_lut_options: {

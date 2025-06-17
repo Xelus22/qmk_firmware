@@ -20,13 +20,18 @@
 // if you need to move the custom options further,
 // you can change the VIA_CUSTOM_OPTION_START here
 #ifndef VIA_CUSTOM_OPTION_START
-#define VIA_CUSTOM_OPTION_START (1)
+#    define VIA_CUSTOM_OPTION_START (1)
 #endif
 
 enum via_enums {
-    // clang-format off
+// clang-format off
     // diagnostic
+#ifdef DEBUG_MATRIX_SCAN_RATE
+    id_get_matrix_scan_rate = VIA_CUSTOM_OPTION_START,
+    id_get_raw_value,
+#else 
     id_get_raw_value = VIA_CUSTOM_OPTION_START,
+#endif
     id_get_raw_value_multi,
     // switch LUT
     id_switch_lut,

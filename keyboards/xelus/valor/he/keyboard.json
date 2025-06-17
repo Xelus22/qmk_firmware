@@ -9,11 +9,11 @@
         "device_version": "0.0.1"
     },
     "build": {
-        "lto": false
+        "lto": true
     },
     "features": {
-        "console": true,
-        "debug": true,
+        "console": false,
+        "debug": false,
         "bootmagic": true,
         "extrakey": true,
         "mousekey": true,
