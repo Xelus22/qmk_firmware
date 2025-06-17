@@ -98,7 +98,8 @@ void matrix_init_custom(void) {
 }
 
 // helper function to copy the current samples to the correct row and col
-void copy_adc_samples_to_matrix(adcsample_t *samples, uint8_t row) {
+void copy_adc_samples_to_matrix(uint8_t row) {
+    uint16_t *samples = adc_get_samples();
     for (uint8_t col = 0; col < NUM_SAMPLES; col++) {
         // store the raw ADC sample
         keys[row][col].raw += (samples[col] - keys[row][col].raw) >> ALPHA_SHIFT; // exponential moving average
@@ -112,18 +113,18 @@ bool matrix_scan_custom(matrix_row_t current_matrix[]) {
     // start ADC Conversion so that we can do processing during reads
     // only the first one we cant process
     palWriteGroup(GPIOB, 0xFFFF, 0, MUX_OUTPUTS[0]); // set all mux outputs to low
-    adc_start();            // start ADC conversion
-    waitForAdcConversion(); // wait for ADC conversion to complete
-    copy_adc_samples_to_matrix(adc_get_samples(), 0);
-    
+    adc_start();                                     // start ADC conversion
+    waitForAdcConversion();                          // wait for ADC conversion to complete
+    copy_adc_samples_to_matrix(0);
+
     for (uint8_t ch = 1; ch < MUX_CHANNELS; ch++) {
         palWriteGroup(GPIOB, 0xFFFF, 0, MUX_OUTPUTS[ch]); // set all mux outputs to low
-        adc_start(); // start ADC conversion
+        adc_start();                                      // start ADC conversion
 
         process_adc_readings(previous_matrix, current_matrix, ch - 1);
 
         waitForAdcConversion(); // wait for ADC conversion to complete
-        copy_adc_samples_to_matrix(adc_get_samples(), ch);
+        copy_adc_samples_to_matrix(ch);
     }
     process_adc_readings(previous_matrix, current_matrix, MUX_CHANNELS - 1);
 

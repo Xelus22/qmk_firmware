@@ -29,7 +29,6 @@ __attribute__((used)) void adcCompleteCallback(ADCDriver *adcp) {
 }
 
 void waitForAdcConversion(void) {
-    // uprintf("Waiting for ADC conversion to complete...\n");
     chSemWait(&sem); // Wait for the semaphore to be signalled
 }
 
