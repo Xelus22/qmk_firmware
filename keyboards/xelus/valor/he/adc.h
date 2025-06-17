@@ -28,5 +28,5 @@
 adcsample_t *adc_get_samples(void);
 void adc_init(void);
 void adc_start(void);
-bool waitForAdcConversion(void);
+void waitForAdcConversion(void);
 extern uint32_t mux_output;

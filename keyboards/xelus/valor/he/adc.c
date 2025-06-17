@@ -28,10 +28,9 @@ __attribute__((used)) void adcCompleteCallback(ADCDriver *adcp) {
     osalSysUnlockFromISR();
 }
 
-bool waitForAdcConversion(void) {
+void waitForAdcConversion(void) {
     // uprintf("Waiting for ADC conversion to complete...\n");
     chSemWait(&sem); // Wait for the semaphore to be signalled
-    return true;
 }
 
 adcsample_t *adc_get_samples(void) {
