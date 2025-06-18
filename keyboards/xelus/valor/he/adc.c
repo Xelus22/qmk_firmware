@@ -18,6 +18,8 @@
 #include "print.h"
 #include "stm32f405xx.h"
 
+#define TIM8_TRGO_EVT (ADC_CR2_EXTSEL_3 | ADC_CR2_EXTSEL_2 | ADC_CR2_EXTSEL_1) // TIM8 TRGO event
+
 semaphore_t sem                     = {0};
 adcsample_t adcSamples[NUM_SAMPLES] = {0}; // Buffer for ADC samples
 
@@ -57,64 +59,35 @@ __attribute__((used)) void adcErrorCallback(ADCDriver *adcp, adcerror_t err) {
     osalSysUnlockFromISR();
 }
 
-static const GPTConfig gpt3cfg = {
+static const GPTConfig gpt8cfg = {
     .frequency = 1000000, // 1 MHz timer clock (adjust as needed)
     .callback  = NULL,    // No callback needed for TRGO use
     .cr2       = 0,       // We'll override this manually below
     .dier      = 0        // No interrupts
 };
 
-void init_tim3_trgo(void) {
-    gptStart(&GPTD3, &gpt3cfg); // Init GPT driver (TIM3)
-    gptStopTimer(&GPTD3);       // Make sure it's not counting
+void init_tim8_trgo(void) {
+    gptStart(&GPTD8, &gpt8cfg); // Init GPT driver (TIM8)
+    gptStopTimer(&GPTD8);       // Make sure it's not counting
 
-    // Setup TIM3->CR2 MMS to generate TRGO on update event
-    TIM3->CR2 = (TIM3->CR2 & ~TIM_CR2_MMS) | TIM_CR2_MMS_1;
+    // Setup TIM8->CR2 MMS to generate TRGO on update event
+    TIM8->CR2 = (TIM8->CR2 & ~TIM_CR2_MMS) | TIM_CR2_MMS_1;
 
     // Optionally enable auto-reload preload
-    TIM3->CR1 |= TIM_CR1_ARPE;
+    TIM8->CR1 |= TIM_CR1_ARPE;
 
     // Enable update events
-    TIM3->EGR |= TIM_EGR_UG;
+    TIM8->EGR |= TIM_EGR_UG;
 }
 
-// turn off clang-format
 // clang-format off
-// static const ADCConversionGroup adc1Config = {
-//     .circular     = true,
-//     .num_channels = ADC_NUM_CHANNELS,
-//     .end_cb       = adcCompleteCallback,
-//     .error_cb     = adcErrorCallback,
-//     .cr1 = ADC_CR1_SCAN,
-//     .cr2 = ADC_CR2_DMA | ADC_CR2_DDS | ADC_CR2_EXTEN_0  | ADC_CR2_EXTSEL_3,
-//     .smpr1 = ADC_SMPR1_SMP_AN11(ADC_SAMPLE_3) |
-//              ADC_SMPR1_SMP_AN14(ADC_SAMPLE_3) |
-//              ADC_SMPR1_SMP_AN15(ADC_SAMPLE_3),
-//     .smpr2 = ADC_SMPR2_SMP_AN4(ADC_SAMPLE_3) |
-//              ADC_SMPR2_SMP_AN6(ADC_SAMPLE_3) |
-//              ADC_SMPR2_SMP_AN7(ADC_SAMPLE_3) |
-//              ADC_SMPR2_SMP_AN0(ADC_SAMPLE_3) |
-//              ADC_SMPR2_SMP_AN1(ADC_SAMPLE_3) |
-//              ADC_SMPR2_SMP_AN2(ADC_SAMPLE_3),
-//     .sqr1 = 0U,
-//     .sqr2 = ADC_SQR2_SQ7_N(ADC_CHANNEL_IN0) |
-//             ADC_SQR2_SQ8_N(ADC_CHANNEL_IN1) |
-//             ADC_SQR2_SQ9_N(ADC_CHANNEL_IN2),
-//     .sqr3 = ADC_SQR3_SQ1_N(ADC_CHANNEL_IN4) |
-//             ADC_SQR3_SQ2_N(ADC_CHANNEL_IN6) |
-//             ADC_SQR3_SQ3_N(ADC_CHANNEL_IN7) |
-//             ADC_SQR3_SQ4_N(ADC_CHANNEL_IN11) |
-//             ADC_SQR3_SQ5_N(ADC_CHANNEL_IN14) |
-//             ADC_SQR3_SQ6_N(ADC_CHANNEL_IN15),
-// };
-
 static const ADCConversionGroup adc1Config = {
     .circular     = true,
     .num_channels = ADC_NUM_CHANNELS,
     .end_cb       = adcCompleteCallback,
     .error_cb     = adcErrorCallback,
     .cr1 = ADC_CR1_SCAN,
-    .cr2 = ADC_CR2_DMA | ADC_CR2_DDS | ADC_CR2_EXTEN_0  | ADC_CR2_EXTSEL_3,
+    .cr2 = ADC_CR2_DMA | ADC_CR2_DDS | ADC_CR2_EXTEN_0 | TIM8_TRGO_EVT,
     .smpr1 = 0U,
     .smpr2 = ADC_SMPR2_SMP_AN4(ADC_SAMPLE_3) |
              ADC_SMPR2_SMP_AN6(ADC_SAMPLE_3) |
@@ -132,7 +105,7 @@ static const ADCConversionGroup adc2Config = {
     .end_cb       = NULL,
     .error_cb     = NULL,
     .cr1 = ADC_CR1_SCAN,
-    .cr2 = ADC_CR2_DMA | ADC_CR2_DDS | ADC_CR2_EXTEN_0  | ADC_CR2_EXTSEL_3,
+    .cr2 = ADC_CR2_DMA | ADC_CR2_DDS | ADC_CR2_EXTEN_0 | TIM8_TRGO_EVT,
     .smpr1 = ADC_SMPR1_SMP_AN11(ADC_SAMPLE_3) |
              ADC_SMPR1_SMP_AN14(ADC_SAMPLE_3) |
              ADC_SMPR1_SMP_AN15(ADC_SAMPLE_3),
@@ -150,7 +123,7 @@ static const ADCConversionGroup adc3Config = {
     .end_cb       = NULL,
     .error_cb     = NULL,
     .cr1 = ADC_CR1_SCAN,
-    .cr2 =  ADC_CR2_DMA | ADC_CR2_DDS | ADC_CR2_EXTEN_0  | ADC_CR2_EXTSEL_3,
+    .cr2 =  ADC_CR2_DMA | ADC_CR2_DDS | ADC_CR2_EXTEN_0 | TIM8_TRGO_EVT,
     .smpr1 = 0U,
     .smpr2 = ADC_SMPR2_SMP_AN0(ADC_SAMPLE_3) |
              ADC_SMPR2_SMP_AN1(ADC_SAMPLE_3) |
@@ -161,6 +134,7 @@ static const ADCConversionGroup adc3Config = {
             ADC_SQR3_SQ2_N(ADC_CHANNEL_IN1) |
             ADC_SQR3_SQ3_N(ADC_CHANNEL_IN2)
 };
+//clang-format on
 
 void adc_init(void) {
     // setup the ADC pins
@@ -176,7 +150,7 @@ void adc_init(void) {
     palSetPadMode(GPIOA, 2, PAL_MODE_INPUT_ANALOG); // 2 - 5 - 8
 
     chSemObjectInit(&sem, 0);
-    init_tim3_trgo();
+    init_tim8_trgo();
     
     adcStart(&ADCD1, NULL); // Start ADC1
     adcStart(&ADCD2, NULL); // Start ADC1
@@ -188,5 +162,5 @@ void adc_init(void) {
 
 void adc_start(void) {
     // place the trigger timer code here 
-    TIM3->EGR |= TIM_EGR_UG; // Software trigger (TRGO fires immediately)
+    TIM8->EGR |= TIM_EGR_UG; // Software trigger (TRGO fires immediately)
 }
