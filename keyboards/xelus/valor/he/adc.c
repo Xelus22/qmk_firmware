@@ -80,6 +80,34 @@ void init_tim3_trgo(void) {
 
 // turn off clang-format
 // clang-format off
+// static const ADCConversionGroup adc1Config = {
+//     .circular     = true,
+//     .num_channels = ADC_NUM_CHANNELS,
+//     .end_cb       = adcCompleteCallback,
+//     .error_cb     = adcErrorCallback,
+//     .cr1 = ADC_CR1_SCAN,
+//     .cr2 = ADC_CR2_DMA | ADC_CR2_DDS | ADC_CR2_EXTEN_0  | ADC_CR2_EXTSEL_3,
+//     .smpr1 = ADC_SMPR1_SMP_AN11(ADC_SAMPLE_3) |
+//              ADC_SMPR1_SMP_AN14(ADC_SAMPLE_3) |
+//              ADC_SMPR1_SMP_AN15(ADC_SAMPLE_3),
+//     .smpr2 = ADC_SMPR2_SMP_AN4(ADC_SAMPLE_3) |
+//              ADC_SMPR2_SMP_AN6(ADC_SAMPLE_3) |
+//              ADC_SMPR2_SMP_AN7(ADC_SAMPLE_3) |
+//              ADC_SMPR2_SMP_AN0(ADC_SAMPLE_3) |
+//              ADC_SMPR2_SMP_AN1(ADC_SAMPLE_3) |
+//              ADC_SMPR2_SMP_AN2(ADC_SAMPLE_3),
+//     .sqr1 = 0U,
+//     .sqr2 = ADC_SQR2_SQ7_N(ADC_CHANNEL_IN0) |
+//             ADC_SQR2_SQ8_N(ADC_CHANNEL_IN1) |
+//             ADC_SQR2_SQ9_N(ADC_CHANNEL_IN2),
+//     .sqr3 = ADC_SQR3_SQ1_N(ADC_CHANNEL_IN4) |
+//             ADC_SQR3_SQ2_N(ADC_CHANNEL_IN6) |
+//             ADC_SQR3_SQ3_N(ADC_CHANNEL_IN7) |
+//             ADC_SQR3_SQ4_N(ADC_CHANNEL_IN11) |
+//             ADC_SQR3_SQ5_N(ADC_CHANNEL_IN14) |
+//             ADC_SQR3_SQ6_N(ADC_CHANNEL_IN15),
+// };
+
 static const ADCConversionGroup adc1Config = {
     .circular     = true,
     .num_channels = ADC_NUM_CHANNELS,
@@ -87,25 +115,51 @@ static const ADCConversionGroup adc1Config = {
     .error_cb     = adcErrorCallback,
     .cr1 = ADC_CR1_SCAN,
     .cr2 = ADC_CR2_DMA | ADC_CR2_DDS | ADC_CR2_EXTEN_0  | ADC_CR2_EXTSEL_3,
+    .smpr1 = 0U,
+    .smpr2 = ADC_SMPR2_SMP_AN4(ADC_SAMPLE_3) |
+             ADC_SMPR2_SMP_AN6(ADC_SAMPLE_3) |
+             ADC_SMPR2_SMP_AN7(ADC_SAMPLE_3),
+    .sqr1 = 0U,
+    .sqr2 = 0U,
+    .sqr3 = ADC_SQR3_SQ1_N(ADC_CHANNEL_IN4) |
+            ADC_SQR3_SQ2_N(ADC_CHANNEL_IN6) |
+            ADC_SQR3_SQ3_N(ADC_CHANNEL_IN7)
+};
+
+static const ADCConversionGroup adc2Config = {
+    .circular     = true,
+    .num_channels = ADC_NUM_CHANNELS,
+    .end_cb       = NULL,
+    .error_cb     = NULL,
+    .cr1 = ADC_CR1_SCAN,
+    .cr2 = ADC_CR2_DMA | ADC_CR2_DDS | ADC_CR2_EXTEN_0  | ADC_CR2_EXTSEL_3,
     .smpr1 = ADC_SMPR1_SMP_AN11(ADC_SAMPLE_3) |
              ADC_SMPR1_SMP_AN14(ADC_SAMPLE_3) |
              ADC_SMPR1_SMP_AN15(ADC_SAMPLE_3),
-    .smpr2 = ADC_SMPR2_SMP_AN4(ADC_SAMPLE_3) |
-             ADC_SMPR2_SMP_AN6(ADC_SAMPLE_3) |
-             ADC_SMPR2_SMP_AN7(ADC_SAMPLE_3) |
-             ADC_SMPR2_SMP_AN0(ADC_SAMPLE_3) |
+    .smpr2 = 0U,
+    .sqr1 = 0U,
+    .sqr2 = 0U,
+    .sqr3 = ADC_SQR3_SQ1_N(ADC_CHANNEL_IN11) |
+            ADC_SQR3_SQ2_N(ADC_CHANNEL_IN14) |
+            ADC_SQR3_SQ3_N(ADC_CHANNEL_IN15)
+};
+
+static const ADCConversionGroup adc3Config = {
+    .circular     = true,
+    .num_channels = ADC_NUM_CHANNELS,
+    .end_cb       = NULL,
+    .error_cb     = NULL,
+    .cr1 = ADC_CR1_SCAN,
+    .cr2 =  ADC_CR2_DMA | ADC_CR2_DDS | ADC_CR2_EXTEN_0  | ADC_CR2_EXTSEL_3,
+    .smpr1 = 0U,
+    .smpr2 = ADC_SMPR2_SMP_AN0(ADC_SAMPLE_3) |
              ADC_SMPR2_SMP_AN1(ADC_SAMPLE_3) |
              ADC_SMPR2_SMP_AN2(ADC_SAMPLE_3),
     .sqr1 = 0U,
-    .sqr2 = ADC_SQR2_SQ7_N(ADC_CHANNEL_IN0) |
-            ADC_SQR2_SQ8_N(ADC_CHANNEL_IN1) |
-            ADC_SQR2_SQ9_N(ADC_CHANNEL_IN2),
-    .sqr3 = ADC_SQR3_SQ1_N(ADC_CHANNEL_IN4) |
-            ADC_SQR3_SQ2_N(ADC_CHANNEL_IN6) |
-            ADC_SQR3_SQ3_N(ADC_CHANNEL_IN7) |
-            ADC_SQR3_SQ4_N(ADC_CHANNEL_IN11) |
-            ADC_SQR3_SQ5_N(ADC_CHANNEL_IN14) |
-            ADC_SQR3_SQ6_N(ADC_CHANNEL_IN15),
+    .sqr2 = 0U,
+    .sqr3 = ADC_SQR3_SQ1_N(ADC_CHANNEL_IN0) |
+            ADC_SQR3_SQ2_N(ADC_CHANNEL_IN1) |
+            ADC_SQR3_SQ3_N(ADC_CHANNEL_IN2)
 };
 
 void adc_init(void) {
@@ -125,7 +179,11 @@ void adc_init(void) {
     init_tim3_trgo();
     
     adcStart(&ADCD1, NULL); // Start ADC1
+    adcStart(&ADCD2, NULL); // Start ADC1
+    adcStart(&ADCD3, NULL); // Start ADC1
     adcStartConversionI(&ADCD1, &adc1Config, adcSamples, 1);
+    adcStartConversionI(&ADCD2, &adc2Config, &adcSamples[3], 1);
+    adcStartConversionI(&ADCD3, &adc3Config, &adcSamples[6], 1);
 }
 
 void adc_start(void) {

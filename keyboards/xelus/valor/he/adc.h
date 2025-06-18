@@ -19,9 +19,9 @@
 
 #pragma once
 
-#define ADC_GROUPS 1
+#define ADC_GROUPS 3
 
-#define ADC_NUM_CHANNELS 9 // Number of ADC channels
+#define ADC_NUM_CHANNELS 3 // Number of ADC channels
 
 #define NUM_SAMPLES (ADC_GROUPS * ADC_NUM_CHANNELS)
 
