@@ -25,9 +25,7 @@ adcsample_t adcSamples[NUM_SAMPLES] = {0}; // Buffer for ADC samples
 
 __attribute__((used)) void adcCompleteCallback(ADCDriver *adcp) {
     (void)adcp;
-    osalSysLockFromISR();
     chSemSignalI(&sem);
-    osalSysUnlockFromISR();
 }
 
 void waitForAdcConversion(void) {
