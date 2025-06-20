@@ -50,14 +50,15 @@ bool process_dynamic_actuation(bool bPrevState, uint8_t row, uint8_t col) {
 
     // get the thresholds
     uint16_t activate_threshold = get_dynamic_activate_threshold(row, col);
+
+    // make sure that we are below the activate threshold
+    if (raw_value < activate_threshold) {
+        return false;
+    }
+
     uint16_t press_hysteresis   = get_dynamic_press_hysteresis(row, col);
     uint16_t release_hysteresis = get_dynamic_release_hysteresis(row, col);
     uint16_t top_out_hysteresis = get_top_out_calibration_hysteresis(row, col);
-
-    // make sure that we are below the activate threshold
-    if (!bPrevState && raw_value < activate_threshold) {
-        return false;
-    }
 
     if (bPrevState) {
         // pressed state
@@ -108,9 +109,6 @@ bool process_continuous_dynamic_actuation(bool bPrevState, uint8_t row, uint8_t 
 
     // get the thresholds
     uint16_t activate_threshold = get_dynamic_activate_threshold(row, col);
-    uint16_t press_hysteresis   = get_dynamic_press_hysteresis(row, col);
-    uint16_t release_hysteresis = get_dynamic_release_hysteresis(row, col);
-    uint16_t top_out_hysteresis = get_top_out_calibration_hysteresis(row, col);
 
     bool bBelowActivateThreshold = (raw_value < activate_threshold);
 
@@ -120,6 +118,11 @@ bool process_continuous_dynamic_actuation(bool bPrevState, uint8_t row, uint8_t 
         lastChangeRaw[row][col] = raw_value;
         return false;
     }
+    
+    uint16_t press_hysteresis   = get_dynamic_press_hysteresis(row, col);
+    uint16_t release_hysteresis = get_dynamic_release_hysteresis(row, col);
+    uint16_t top_out_hysteresis = get_top_out_calibration_hysteresis(row, col);
+
 
     if (bPrevState) {
         // pressed state
