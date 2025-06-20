@@ -34,14 +34,11 @@ void set_mode(uint8_t row, uint8_t col, uint8_t mode) {
 bool process_static_actuation(bool bPrevState, uint8_t row, uint8_t col) {
     // static actuation logic
     uint16_t raw_value = keysRaw[row][col];
-    if (bPrevState) {
-        if (raw_value < get_static_actuation_release_point(row, col)) {
-            return false; // not pressed
-        }
-    } else {
-        if (raw_value > get_static_actuation_press_point(row, col)) {
-            return true; // now pressed
-        }
+    if (raw_value < get_static_actuation_release_point(row, col)) {
+        return false; // not pressed
+    }
+    if (raw_value > get_static_actuation_press_point(row, col)) {
+        return true; // now pressed
     }
 
     return bPrevState; // no mans land keep prev state
