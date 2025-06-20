@@ -43,7 +43,7 @@ STATIC_ASSERT(MATRIX_COLS == 9, "MATRIX_COLS must be 8");
 STATIC_ASSERT(NMUX == NUM_SAMPLES, "NMUX and NUMSAMPLES Size mismatch");
 
 // global variables required for key scanning
-uint16_t     keysRaw[MATRIX_ROWS][MATRIX_COLS]      = {0};
+uint16_t     keysRaw[MATRIX_ROWS][MATRIX_COLS]       = {0};
 uint16_t     lastChangeRaw[MATRIX_ROWS][MATRIX_COLS] = {0};
 matrix_row_t previous_matrix[MATRIX_ROWS]            = {0};
 
