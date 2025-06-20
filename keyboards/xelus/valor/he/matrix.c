@@ -30,7 +30,7 @@
 
 // can be changed to 2 maybe if required for speed
 #ifndef ALPHA_SHIFT
-#    define ALPHA_SHIFT 4 // exponential moving average shift value
+#    define ALPHA_SHIFT 3 // exponential moving average shift value
 #endif
 
 #define MUX_CHANNELS MATRIX_ROWS
