@@ -46,14 +46,14 @@ typedef struct PACKED {
 _Static_assert(sizeof(per_key_analog_config) == 24, "Size mismatch");
 
 // for use in RAM
-typedef struct PACKED {
-    /* For individual analog key data */
-    uint16_t raw;
-    uint16_t prev;
-    uint16_t lastChangeRaw; // for use in dynamic actuation
-} analog_key_t;
-extern analog_key_t keys[MATRIX_ROWS][MATRIX_COLS];
+// typedef struct {
+//     /* For individual analog key data */
+//     uint16_t raw;
+//     uint16_t lastChangeRaw; // for use in dynamic actuation
+// } analog_key_t;
+extern uint16_t keysRaw[MATRIX_ROWS][MATRIX_COLS];
+extern uint16_t lastChangeRaw[MATRIX_ROWS][MATRIX_COLS];
 
 // make sure the scaled and distance are distinct types
-typedef uint16_t switch_scaled_t; // max is LUT_SIZE
+typedef uint16_t switch_scaled_t;   // max is LUT_SIZE
 typedef uint16_t switch_distance_t; // Define the type for switch distance values

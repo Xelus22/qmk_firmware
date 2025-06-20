@@ -33,7 +33,7 @@ void set_mode(uint8_t row, uint8_t col, uint8_t mode) {
 
 bool process_static_actuation(bool bPrevState, uint8_t row, uint8_t col) {
     // static actuation logic
-    uint16_t raw_value       = keys[row][col].raw;
+    uint16_t raw_value = keysRaw[row][col];
     if (bPrevState) {
         if (raw_value < get_static_actuation_release_point(row, col)) {
             return false; // not pressed
@@ -49,13 +49,13 @@ bool process_static_actuation(bool bPrevState, uint8_t row, uint8_t col) {
 
 bool process_dynamic_actuation(bool bPrevState, uint8_t row, uint8_t col) {
     // dynamic actuation logic
-    uint16_t raw_value = keys[row][col].raw;
+    uint16_t raw_value = keysRaw[row][col];
 
     // get the thresholds
     uint16_t activate_threshold = get_dynamic_activate_threshold(row, col);
     uint16_t press_hysteresis   = get_dynamic_press_hysteresis(row, col);
     uint16_t release_hysteresis = get_dynamic_release_hysteresis(row, col);
-    uint16_t top_out_hysteresis   = get_top_out_calibration_hysteresis(row, col);
+    uint16_t top_out_hysteresis = get_top_out_calibration_hysteresis(row, col);
 
     // make sure that we are below the activate threshold
     if (!bPrevState && raw_value < activate_threshold) {
@@ -66,33 +66,33 @@ bool process_dynamic_actuation(bool bPrevState, uint8_t row, uint8_t col) {
         // pressed state
 
         // check lastChangeRaw currently is the lowest press point
-        if (raw_value < keys[row][col].lastChangeRaw - release_hysteresis) {
+        if (raw_value < lastChangeRaw[row][col] - release_hysteresis) {
             if (row == 5 && col == 3) {
                 // uprintf("release\n");
             }
             // key release
-            keys[row][col].lastChangeRaw = raw_value; // update last change raw
-            return false;                             // not pressed
+            lastChangeRaw[row][col] = raw_value; // update last change raw
+            return false;                        // not pressed
         }
 
         // update the last change raw if the current raw value is higher
-        if (raw_value > keys[row][col].lastChangeRaw + top_out_hysteresis) {
-            keys[row][col].lastChangeRaw = raw_value; // update last change raw
+        if (raw_value > lastChangeRaw[row][col] + top_out_hysteresis) {
+            lastChangeRaw[row][col] = raw_value; // update last change raw
         }
     } else {
         // released state
-        if (raw_value > keys[row][col].lastChangeRaw + press_hysteresis) {
+        if (raw_value > lastChangeRaw[row][col] + press_hysteresis) {
             // key press
             if (row == 5 && col == 3) {
                 // uprintf("press\n");
             }
-            keys[row][col].lastChangeRaw = raw_value; // update last change raw
-            return true;                              // now pressed
+            lastChangeRaw[row][col] = raw_value; // update last change raw
+            return true;                         // now pressed
         }
 
         // update the last change raw if the current raw value is lower
-        if (raw_value < keys[row][col].lastChangeRaw - top_out_hysteresis) {
-            keys[row][col].lastChangeRaw = raw_value; // update last change raw
+        if (raw_value < lastChangeRaw[row][col] - top_out_hysteresis) {
+            lastChangeRaw[row][col] = raw_value; // update last change raw
         }
     }
 
@@ -101,26 +101,26 @@ bool process_dynamic_actuation(bool bPrevState, uint8_t row, uint8_t col) {
 
 bool process_continuous_dynamic_actuation(bool bPrevState, uint8_t row, uint8_t col) {
     // dynamic actuation logic
-    uint16_t raw_value = keys[row][col].raw;
+    uint16_t raw_value = keysRaw[row][col];
     // resuse the lastChangeRaw for dynamic actuation
     // use to check if it is in the top-out region
 
     // top bit is used to check the state
-    bool     bState        = keys[row][col].lastChangeRaw & 0x8000; // get the state from the lastChangeRaw
-    uint16_t lastChangeRaw = keys[row][col].lastChangeRaw & 0x7FFF;
+    bool     bState      = lastChangeRaw[row][col] & 0x8000; // get the state from the lastChangeRaw
+    uint16_t extremumRaw = lastChangeRaw[row][col] & 0x7FFF;
 
     // get the thresholds
     uint16_t activate_threshold = get_dynamic_activate_threshold(row, col);
     uint16_t press_hysteresis   = get_dynamic_press_hysteresis(row, col);
     uint16_t release_hysteresis = get_dynamic_release_hysteresis(row, col);
-    uint16_t top_out_hysteresis   = get_top_out_calibration_hysteresis(row, col);
+    uint16_t top_out_hysteresis = get_top_out_calibration_hysteresis(row, col);
 
     bool bBelowActivateThreshold = (raw_value < activate_threshold);
 
     if (!bState && bBelowActivateThreshold) {
         // automatically resets the bState to 0 here
         // because we are stealing the top bit of the lastChangeRaw
-        keys[row][col].lastChangeRaw = raw_value;
+        lastChangeRaw[row][col] = raw_value;
         return false;
     }
 
@@ -128,7 +128,7 @@ bool process_continuous_dynamic_actuation(bool bPrevState, uint8_t row, uint8_t 
         // pressed state
 
         // check lastChangeRaw currently is the lowest press point
-        if (raw_value < lastChangeRaw - release_hysteresis) {
+        if (raw_value < extremumRaw - release_hysteresis) {
             if (row == 5 && col == 3) {
                 // uprintf("release\n");
             }
@@ -136,20 +136,20 @@ bool process_continuous_dynamic_actuation(bool bPrevState, uint8_t row, uint8_t 
             if (bState) {
                 raw_value |= 0x8000;
             }
-            keys[row][col].lastChangeRaw = raw_value; // update last change raw
-            return false;                             // not pressed
+            lastChangeRaw[row][col] = raw_value; // update last change raw
+            return false;                        // not pressed
         }
 
         // update the last change raw if the current raw value is higher
-        if (raw_value > keys[row][col].lastChangeRaw + top_out_hysteresis) {
+        if (raw_value > extremumRaw + top_out_hysteresis) {
             if (bState) {
                 raw_value |= 0x8000;
             }
-            keys[row][col].lastChangeRaw = raw_value; // update last change raw
+            lastChangeRaw[row][col] = raw_value; // update last change raw
         }
     } else {
         // released state
-        if (raw_value > keys[row][col].lastChangeRaw + press_hysteresis) {
+        if (raw_value > extremumRaw + press_hysteresis) {
             // key press
             if (row == 5 && col == 3) {
                 // uprintf("press\n");
@@ -162,17 +162,17 @@ bool process_continuous_dynamic_actuation(bool bPrevState, uint8_t row, uint8_t 
             if (bState) {
                 raw_value |= 0x8000;
             }
-            keys[row][col].lastChangeRaw = raw_value; // update last change raw
+            lastChangeRaw[row][col] = raw_value; // update last change raw
 
             return true; // now pressed
         }
 
         // update the last change raw if the current raw value is lower
-        if (raw_value < keys[row][col].lastChangeRaw - top_out_hysteresis) {
+        if (raw_value < extremumRaw - top_out_hysteresis) {
             if (bState) {
                 raw_value |= 0x8000;
             }
-            keys[row][col].lastChangeRaw = raw_value; // update last change raw
+            lastChangeRaw[row][col] = raw_value; // update last change raw
         }
     }
 
@@ -181,11 +181,11 @@ bool process_continuous_dynamic_actuation(bool bPrevState, uint8_t row, uint8_t 
 
 bool process_dks(uint8_t row, uint8_t col) {
     // process DKS logic
-    uint16_t raw_value = keys[row][col].raw;
+    uint16_t raw_value = keysRaw[row][col];
 
     // check which region the key is in
-    uint16_t topPress   = get_dks_top_actuation_point(row, col);
-    uint16_t botPress   = get_dks_bot_actuation_point(row, col);
+    uint16_t topPress      = get_dks_top_actuation_point(row, col);
+    uint16_t botPress      = get_dks_bot_actuation_point(row, col);
     uint16_t topHysteresis = get_top_out_calibration_hysteresis(row, col);
     uint16_t botHysteresis = get_bottom_out_calibration_hysteresis(row, col);
 
@@ -198,7 +198,7 @@ bool process_dks(uint8_t row, uint8_t col) {
     } else if (raw_value > botPress + botHysteresis) {
         // in the bottom pressed region
         currentRegion = DKS_REGION_AFTER_BOTTOM;
-    } else if ( topPress + topHysteresis <= raw_value && raw_value <= botPress - botHysteresis) {
+    } else if (topPress + topHysteresis <= raw_value && raw_value <= botPress - botHysteresis) {
         // in the middle pressed region
         currentRegion = DKS_REGION_MID_PRESS;
     } else {

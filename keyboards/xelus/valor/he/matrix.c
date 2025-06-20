@@ -43,8 +43,9 @@ STATIC_ASSERT(MATRIX_COLS == 9, "MATRIX_COLS must be 8");
 STATIC_ASSERT(NMUX == NUM_SAMPLES, "NMUX and NUMSAMPLES Size mismatch");
 
 // global variables required for key scanning
-analog_key_t keys[MATRIX_ROWS][MATRIX_COLS] = {0};
-matrix_row_t previous_matrix[MATRIX_ROWS]   = {0};
+uint16_t     keysRaw[MATRIX_ROWS][MATRIX_COLS]      = {0};
+uint16_t     lastChangeRaw[MATRIX_ROWS][MATRIX_COLS] = {0};
+matrix_row_t previous_matrix[MATRIX_ROWS]            = {0};
 
 const uint32_t MUX_OUTPUTS[MATRIX_ROWS] = {
     // clang-format off
@@ -102,7 +103,7 @@ void copy_adc_samples_to_matrix(uint8_t row) {
     uint16_t *samples = adc_get_samples();
     for (uint8_t col = 0; col < NUM_SAMPLES; col++) {
         // store the raw ADC sample
-        keys[row][col].raw += (samples[col] - keys[row][col].raw) >> ALPHA_SHIFT; // exponential moving average
+        keysRaw[row][col] += (samples[col] - keysRaw[row][col]) >> ALPHA_SHIFT; // exponential moving average
     }
 }
 

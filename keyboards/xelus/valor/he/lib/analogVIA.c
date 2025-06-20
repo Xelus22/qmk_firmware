@@ -185,7 +185,7 @@ void via_config_get_value(uint8_t *data) {
             // Handle getting raw value
             uint8_t  row       = value_data[0];
             uint8_t  col       = value_data[1];
-            uint16_t raw_value = keys[row][col].raw;
+            uint16_t raw_value = keysRaw[row][col];
             value_data[2]      = (raw_value >> 8) & 0xFF; // High byte
             value_data[3]      = raw_value & 0xFF;        // Low byte
             break;
@@ -198,7 +198,7 @@ void via_config_get_value(uint8_t *data) {
             uint8_t row    = value_data[0]; // byte 3
             uint8_t offset = 1;             // Start from byte 4 for row
             for (int j = 0; j < MATRIX_COLS; j++) {
-                uint16_t raw                   = keys[row][j].raw;
+                uint16_t raw                   = keysRaw[row][j];
                 value_data[offset + j * 2]     = (raw >> 8) & 0xFF; // high byte
                 value_data[offset + j * 2 + 1] = raw & 0xFF;        // low byte
             }

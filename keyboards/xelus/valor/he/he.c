@@ -26,7 +26,7 @@ bool bootmagic_should_reset(void) {
         matrix_scan();
     }
     uint16_t threshold = 3000; // threshold for bootmagic activation
-    uint16_t raw_value = keys[BOOTMAGIC_ROW][BOOTMAGIC_COLUMN].raw;
+    uint16_t raw_value = keysRaw[BOOTMAGIC_ROW][BOOTMAGIC_COLUMN];
 
     if (raw_value > threshold) {
         return true;

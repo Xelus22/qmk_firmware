@@ -96,10 +96,10 @@ void calibrate_top_out(void) {
             uint16_t max = 0;          // maximum value for the key, used to check if the key is pressed
             for (int i = 0; i < NUM_CALIBRATION_SAMPLES; i++) {
                 matrix_scan();
-                sum += keys[row][col].raw;
+                sum += keysRaw[row][col];
 
-                min = MIN(min, keys[row][col].raw);
-                max = MAX(max, keys[row][col].raw);
+                min = MIN(min, keysRaw[row][col]);
+                max = MAX(max, keysRaw[row][col]);
             }
             // calculate the average
             uint16_t average = sum / NUM_CALIBRATION_SAMPLES;
@@ -121,7 +121,7 @@ void calibrate_bottom_out(uint8_t row, uint8_t col) {
     // check if it is the maximum number found
     // assumes that further pressed (magnet closer to sensor), mean larger raw value
     // must be larger than the threshold to be considered a valid bottom out calibration
-    uint32_t calibration_value = MAX(keys[row][col].raw, BOTTOM_OUT_CALIBRATION_THRESHOLD);
+    uint32_t calibration_value = MAX(keysRaw[row][col], BOTTOM_OUT_CALIBRATION_THRESHOLD);
 
     // since we're always getting the max we want to get the "average" rather than the abs max
     set_bottom_out_calibration(row, col, calibration_value - (get_bottom_out_calibration_hysteresis(row, col) + 1) / 2);
