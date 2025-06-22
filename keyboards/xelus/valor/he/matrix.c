@@ -30,7 +30,7 @@
 
 // can be changed to 2 maybe if required for speed
 #ifndef ALPHA_SHIFT
-#    define ALPHA_SHIFT 3 // exponential moving average shift value
+#    define ALPHA_SHIFT 2 // exponential moving average shift value
 #endif
 
 #define MUX_CHANNELS MATRIX_ROWS
@@ -49,15 +49,15 @@ matrix_row_t previous_matrix[MATRIX_ROWS]            = {0};
 
 const uint32_t MUX_OUTPUTS[MATRIX_ROWS] = {
     // clang-format off
-                                            // B8 | B7 | B6
-    [0] = 0,                                // 0  | 0  | 0
-    [1] = (1 << 8),                         // 1  | 0  | 0
-    [2] = (1 << 8) | (1 << 7),              // 1  | 1  | 0
-    [3] = (1 << 7),                         // 0  | 1  | 0
-    [4] = (1 << 7) | (1 << 6),              // 0  | 1  | 1
-    [5] = (1 << 8) | (1 << 7) | (1 << 6),   // 1  | 1  | 1
-    [6] = (1 << 8) | (1 << 6),              // 1  | 0  | 1
-    [7] = (1 << 6)                          // 0  | 0  | 1
+    // B8 | B7 | B6
+    [7] = 0,                              // 0  | 0  | 0
+    [0] = (1 << 8),                       // 1  | 0  | 0
+    [1] = (1 << 8) | (1 << 7),            // 1  | 1  | 0
+    [2] = (1 << 7),                       // 0  | 1  | 0
+    [3] = (1 << 7) | (1 << 6),            // 0  | 1  | 1
+    [4] = (1 << 8) | (1 << 7) | (1 << 6), // 1  | 1  | 1
+    [5] = (1 << 8) | (1 << 6),            // 1  | 0  | 1
+    [6] = (1 << 6)                        // 0  | 0  | 1
     // clang-format on
 };
 
@@ -113,18 +113,16 @@ bool matrix_scan_custom(matrix_row_t current_matrix[]) {
 
     // start ADC Conversion so that we can do processing during reads
     // only the first one we cant process
-    palWriteGroup(GPIOB, 0xFFFF, 0, MUX_OUTPUTS[0]); // set all mux outputs to low
     adc_start();                                     // start ADC conversion
     waitForAdcConversion();                          // wait for ADC conversion to complete
+    palWriteGroup(GPIOB, 0xFFFF, 0, MUX_OUTPUTS[0]); // set all mux outputs to low
     copy_adc_samples_to_matrix(0);
 
     for (uint8_t ch = 1; ch < MUX_CHANNELS; ch++) {
-        palWriteGroup(GPIOB, 0xFFFF, 0, MUX_OUTPUTS[ch]); // set all mux outputs to low
-        adc_start();                                      // start ADC conversion
-
+        adc_start(); // start ADC conversion
         process_adc_readings(previous_matrix, current_matrix, ch - 1);
-
-        waitForAdcConversion(); // wait for ADC conversion to complete
+        waitForAdcConversion();                           // wait for ADC conversion to complete
+        palWriteGroup(GPIOB, 0xFFFF, 0, MUX_OUTPUTS[ch]); // set all mux outputs to low
         copy_adc_samples_to_matrix(ch);
     }
     process_adc_readings(previous_matrix, current_matrix, MUX_CHANNELS - 1);
