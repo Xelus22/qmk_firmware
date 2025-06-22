@@ -29,7 +29,9 @@ __attribute__((used)) void adcCompleteCallback(ADCDriver *adcp) {
 }
 
 void waitForAdcConversion(void) {
+    osalSysLockFromISR();
     chSemWait(&sem); // Wait for the semaphore to be signalled
+    osalSysUnlockFromISR();
 }
 
 adcsample_t *adc_get_samples(void) {
